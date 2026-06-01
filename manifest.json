@@ -1,0 +1,26 @@
+{
+    "id": "elkrose_vt",
+    "name": "VT",
+    "short_description": "Adds a pregnancy, cycles, new dialogs.",
+    "description": "Main VT Mod has all the core for the pregnancy, however the pregnancy fullbodies will need to be downloaded seperately for girls that need them. \r\n\r\n Use the girl addons with PREG Fullbodies in the description, or VT at the end of their names, to include their pregnancy fullbodies.",
+    "changelog": "Version 1.0: First version uploaded to mod manager",
+    "modder": "elkrose",
+    "type": "content",
+    "girl_id": "",
+    "required_mod_ids": [],
+    "tags": [],
+    "version": "1.0",
+    "game_version": 0.6,
+    "content_breakdown": {},
+    "download_data": {
+        "mod_link": "https://corrupted-mods.academy/elkrose/vt/mod.zip",
+        "mod_size": 3.55,
+        "icon_link": "https://corrupted-mods.academy/elkrose/vt/icon.png"
+    },
+    "created_at": "2025-12-08 06:55",
+    "updated_at": "2025-12-28 08:36",
+    "warning_level": 0,
+    "warning_message": "",
+    "hidden": false,
+    "install_path": null
+}

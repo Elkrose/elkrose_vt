@@ -1,0 +1,81 @@
+Fullbody Images required:
+
+Pregnant Fullbody is pretty straight forward, the following tags are the only ones it will grab, if more tags are required, please let me know:
+Example: preg_3rd_shower.webp
+
+NOTE: It will still grab a sluttier/whore version as per usual:  preg_3rd_work_slut.webp, preg_3rd_work_slut1.webp, preg_3rd_work_whore.webp, preg_3rd_work_ultimate_whore.webp
+
+Remember: That it should be in order, and you can have many versions for variety.
+Example: preg_2nd_work.webp, preg_2nd_work1.webp, preg_2nd_work2.webp
+
+# --- Third Trimester (Most Specific) ---
+"preg_3rd_shower"
+"preg_3rd_bare"
+"preg_3rd_swimsuit"
+"preg_3rd_bikini"
+"preg_3rd_underwear"
+"preg_3rd_bottomless"
+"preg_3rd_topless"
+"preg_3rd_maid"
+"preg_3rd_nurse"
+"preg_3rd_secretary"
+"preg_3rd_teacher"
+"preg_3rd_teaching_assistant"
+"preg_3rd_uniform"
+"preg_3rd_athletic"
+"preg_3rd_work"
+"preg_3rd_clothed"
+
+# --- Second Trimester ---
+"preg_2nd_shower"
+"preg_2nd_bare"
+"preg_2nd_swimsuit"
+"preg_2nd_bikini"
+"preg_2nd_underwear"
+"preg_2nd_bottomless"
+"preg_2nd_topless"
+"preg_2nd_maid"
+"preg_2nd_nurse"
+"preg_2nd_secretary"
+"preg_2nd_teacher"
+"preg_2nd_teaching_assistant"
+"preg_2nd_uniform"
+"preg_2nd_athletic"
+"preg_2nd_work"
+"preg_2nd_clothed"
+
+# --- First Trimester ---
+"preg_1st_shower"
+"preg_1st_bare"
+"preg_1st_swimsuit"
+"preg_1st_bikini"
+"preg_1st_underwear"
+"preg_1st_bottomless"
+"preg_1st_topless"
+"preg_1st_maid"
+"preg_1st_nurse"
+"preg_1st_secretary"
+"preg_1st_teacher"
+"preg_1st_teaching_assistant"
+"preg_1st_uniform"
+"preg_1st_athletic"
+"preg_1st_work"
+"preg_1st_clothed"
+
+# --- General Pregnancy (Fallback for any visible pregnancy, so if you don't want to do all 3 stages, this is pretty much the flat to full preg belly image) ---
+"preg_shower"
+"preg_bare"
+"preg_swimsuit"
+"preg_bikini"
+"preg_underwear"
+"preg_bottomless"
+"preg_topless"
+"preg_maid"
+"preg_nurse"
+"preg_secretary"
+"preg_teacher"
+"preg_teaching_assistant"
+"preg_uniform"
+"preg_athletic"
+"preg_work"
+"preg_clothed"

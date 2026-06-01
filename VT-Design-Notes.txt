@@ -1,0 +1,58 @@
+
+The following CA Game Files are replaced at the moment to duplicate the game in order to inject cherry codes:
+
+
+
+vt_girl_hud.rpy
+
+	screen girl_hud => screen_girl_hud.rpy
+		if girl is None error fix <-- it is a rando bug that happens on creation or sudden refresh or rapid clicking, this fixes it.
+
+	screen girl_quick_overview => screen_girl_hud.rpy
+		$ girl = girl, error fix, making sure the girl is passed through
+		cherry_window - line 101
+		
+
+
+vt_screen_sex_exam_actions_menu.rpy
+	
+	screen exam_actions_menu => screen_exam_actions_menu.rpy
+		condom_cherry - line 44
+		cherry_window - line 1230
+
+
+vt_screen_exam_menu.rpy
+	screen exam_menu => screen_exam_menu.rpy
+		condom_cherry line 44
+	
+	screen exam_outro_screen => label_conclude_exam.rpy *note I actually fixed Exam Conclusion header, contained in its own hbox*
+		condom_cherry, and python clean up for condoms - line 1008-1018
+		cherry_window line 1244
+
+
+vt_girl_review_hud.rpy
+
+	screen girl_review_menu => screen_girl_review_menu.rpy
+		cherry_minimum_window - line 1006
+
+
+vt_screen_sex_interaction_menu.rpy
+	screen sex_interaction_menu => screen_sex_interaction_menu.rpy 
+		condom_cherry - line 32
+		cherry_window - line 903
+
+	screen sex_outro_screen => screen_sex_interaction_menu.rpy
+		condom_cherry - line 945
+		cherry_window - line 1077
+
+vt_player_hud.rpy
+	screen player_hud => screen_player_hud.rpy
+		hud_condom_cherry - line 81 (condom access and Viagra active)
+
+vt_tooltip_overlay.rpy
+	screen screen_tooltip_overlay.rpy
+		
+
+
+
+Cherry injections are in the vt_huds folder, and yes, called cherry_windows.rpy for easy finding.

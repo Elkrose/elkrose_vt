@@ -1,0 +1,46 @@
+Virginal Tracker Mod 1.0.2
+
+1.0.2
+- fixed the night class Mother bug
+
+1.0.1
+- did a bunch of bug fixes, forgot to write them down, but any that was in the discord, was fixed :P
+- had to rename the content branch to elkrose_vt, so that in the future if it gets added to the Mod Manager, it will update as usual
+- the elkrose_vt change for Mod Manager (still not on Mod Manager yet)
+- Hex and I still looking for a better way to add the Cherry Windows to the UI without me having to overwrite screens.
+
+Don't be fooled by the name, it contains way more than just 'virgins'.
+
+The Following are included:
+- Virgins (oral, body, anal, vaginal) yes, it counts for fetish purposes
+- Full Pregnancy System
+
+UI - Cherries! At the top is your condom indicator! Equip or go bare!
+
+
+Items to Gift:
+Prenatal Vitamins - gift to girl (cheat vitamins to reduce pregnancy time)
+Fertility Pills - gift to girl (cheat pills to increase Fertility percentile)
+2 kinds of plan B Pills - gift to girl (basically a pregnant block)
+
+Items in Misc:
+Condoms!
+Basic - chance to break 
+Premium - near impossible to break, unless you really really really try >.>'
+
+FETISHES:
+oral, anal, vaginal, thighs, ass, boobs, pussy fetishes! 
+
+NEW DIALOGS:
+- Pregnancy
+- Condoms
+- Birth Control
+- ENHANCED: Corruption, Fear, and Naturism Small Talk
+
+
+SMALL TALK:
+Basically its pretty straight forward, and you can unlock whatever method you want.
+
+Talk about birth control, you can get them off or on them... not much of a stat check, more for your style of game you want.
+Talk about Condoms, what parts you want raw or not.
+Gift: you can gift them Fertile pills to increase your chances, or pregnancy pills if they are pregnant to speed up the pregnancy.

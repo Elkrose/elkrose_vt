@@ -1,0 +1,8 @@
+This mod does NOT overwrite any base game screens. 
+Instead, it creates standalone overlay screens that work alongside 
+the original player_hud and girl_hud screens:
+
+- cherry_hud_overlay: Independent overlay for the condom/cherry HUD
+- girl_cherry_overlay: Independent overlay for girl quick overview
+- No screen definitions are modified or overwritten
+- All content uses "use" statements for self-contained screens
