@@ -1,4 +1,4 @@
-screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2):
+screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, icon_size=50):
     $ girl = girl or persistent.selected_girl
     #$ girl = girl
 
@@ -32,6 +32,8 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
         $ yanchor_val = 1.0
         $ yoffset = -10
     
+    $ _frame_w = 6 * icon_size + 29 + border_size * 2
+
     #Single frame with proper sizing and border
     frame:
         xalign xalign_val
@@ -40,24 +42,20 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
         yanchor yanchor_val
         xoffset xoffset
         yoffset yoffset
-        xsize 360
+        xsize _frame_w
         #ysize 50
         padding (0, 0, 0, 0)
         
         # Border frame
         frame:
-            xsize 360
+            xsize _frame_w
             #ysize 50
-            background Frame(
-                "#00000000",  # Transparent base
-                xborder=border_size,
-                yborder=border_size,
-                border=border_color
-            )
+            background border_color
+            padding (0, border_size, 0, border_size)
             
             # Content frame - contains background and UI
             frame:
-                xsize (360 - (border_size * 2))
+                xsize (_frame_w - border_size * 2)
                 xalign 0.5
                 yalign 0.0
                 xanchor 0.5
@@ -67,7 +65,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                 #background Frame("_mods/content/vtmod/extra_images/Cherry_Background.png", xzoom=0.2, yzoom=0.2)
                 
                 vbox:
-                    xsize (360 - (border_size * 2) - 4)
+                    xsize (_frame_w - border_size * 2 - 4)
                     spacing 5
                     xalign 0.0  # Left-align content
                     yalign 0.0  # Top-align content
@@ -75,13 +73,14 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                         #First Row
                     hbox:
                         spacing 5
-                        ysize 50
+                        ysize icon_size
 
                         # Cherry Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                                 hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
                                 action Show("vtmod_virgin_preg_ui", girl=girl)
@@ -89,7 +88,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                         
                         # Birth control status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_token.png"
                             $ vt_tt_bc = "Unprotected"
@@ -120,6 +119,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     $ vt_tt_bc = "No idea if she is on birth control."
                             
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle vt_img_bc
                                 action NullAction()
                                 tooltip vt_tt_bc
@@ -128,7 +128,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
 
                          # Sex/Arousal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             $ ss_tt_vag = f"{{color={menu_text_color_valid}}}Fresh and untouched, ready for action!{{/color}}"
@@ -146,6 +146,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
 
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle ss_img_vag
                                 action NullAction()
                                 tooltip ss_tt_vag
@@ -154,10 +155,10 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                     # Item Status
                     hbox:
                         spacing 5
-                        ysize 50
+                        ysize icon_size
                         #Oral Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
@@ -179,6 +180,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ oraltt = "No idea if she wants condom for Oral."
                                 $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle oralimg
@@ -187,7 +189,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                        
                         #Body Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
@@ -210,6 +212,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ bodytt = "No idea if she wants condom for Body."
                                 $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle bodyimg
@@ -218,7 +221,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                        
                         #Anal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
@@ -240,6 +243,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ analtt = "No idea if she wants condom for Anal."
                                 $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle analimg
@@ -248,7 +252,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                         
                         #Vaginal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
@@ -270,6 +274,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                                 $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle vaginalimg
@@ -277,13 +282,14 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 tooltip vaginaltt
                         
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             
                             # FertiBOOST
                             if girl.fertility_boost >= 1:
                                 $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
                                 imagebutton:
+                                    at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
@@ -291,11 +297,12 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     tooltip f"{{color={menu_text_color_valid}}}FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}!{{/color}}"
 
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             # PregnaVITA
                             if girl.prenatal_boost >= 1:
                                 imagebutton:
+                                    at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
