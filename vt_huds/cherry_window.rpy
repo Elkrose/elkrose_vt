@@ -16,7 +16,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
     elif position == "right":
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
-        $ xoffset = -10
+        $ xoffset = -55
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
@@ -940,7 +940,18 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
-        $ yoffset = 10
+        $ yoffset = 20
+        $ xoffset = -275
+    elif position == "top_left":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 20
+        $ xoffset = -275
+    elif position == "top_right":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 20
+        $ xoffset = 360
     elif position == "bottom":
         $ yalign_val = 1.0
         $ yanchor_val = 1.0
