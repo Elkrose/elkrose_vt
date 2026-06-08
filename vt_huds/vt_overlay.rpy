@@ -39,11 +39,6 @@ screen vt_cherry_overlay():
             use condom_cherry(position="top") id "vt_ea_condom"
             use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
 
-    elif renpy.get_screen("exam_outro_screen", layer="master"):
-        if _vt_girl:
-            use condom_cherry(position="top") id "vt_eo_condom"
-            use cherry_window(girl=_vt_girl, position="top", border_color="#FF0000", border_size=2) id "vt_eo_cherry"
-
     elif renpy.get_screen("sex_interaction_menu", layer="master"):
         if _vt_girl:
             use condom_cherry(position="top_right") id "vt_si_condom"
@@ -60,6 +55,10 @@ screen vt_cherry_overlay():
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
+
+    # Player HUD condom cherry - right side, below the 3 HUD buttons
+    if renpy.get_screen("player_hud"):
+        use hud_condom_cherry(position="top_right", icon_size=32) id "vt_ph_condom"
 
     # Tooltip cherry info - mirrors base game Girl tooltip x-clamping (screen_tooltip_overlay.rpy)
     if isinstance(_vt_tooltip, Girl):

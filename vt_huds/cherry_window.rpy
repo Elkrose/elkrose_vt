@@ -1069,7 +1069,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
                         action NullAction()
                         tooltip f"{{color={menu_text_color_valid}}} Viagra Active!{{/color}}"
 
-screen hud_condom_cherry(position="center", xoffset=0, yoffset=0):
+screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
     # Determine positioning values directly
     $ xalign_val = 0.5
     $ yalign_val = 0.5
@@ -1086,9 +1086,12 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0):
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
         $ xoffset = -10
-    elif position == "top":
+    elif position == "top_right":
+        $ xalign_val = 1.0
+        $ xanchor_val = 1.0
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
+        $ xoffset = -10
         $ yoffset = 10
     elif position == "bottom":
         $ yalign_val = 1.0
@@ -1103,19 +1106,18 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0):
         yanchor yanchor_val
         xoffset xoffset
         yoffset yoffset
-        xsize 50
+        xsize icon_size
         #ysize 50
         padding (0, 0, 0, 0)
         background None
-        
+
         #First Row
         vbox:
             spacing 5
-            ysize 100
 
             # Cherry Condom Status - SINGLE IMAGEBUTTON IMPLEMENTATION
             hbox:
-                xsize 50
+                xsize icon_size
                 xalign 0.0
                 
                 # DETERMINE CURRENT STATE AND SET VARIABLES
@@ -1186,6 +1188,7 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0):
 
                 # FINAL IMAGEBUTTON - SINGLE DEFINITION
                 imagebutton:
+                    at Transform(zoom=(icon_size / 50.0))
                     yalign 0.5
                     idle condom_idle_img
                     hover condom_hover_img
@@ -1194,11 +1197,12 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0):
 
             #Viagra Effects
             hbox:
-                xsize 50
+                xsize icon_size
                 xalign 0.0
-                
+
                 if "Viagra" in player.temporary_stat_changes:
                     imagebutton:
+                        at Transform(zoom=(icon_size / 50.0))
                         yalign 0.5
                         idle "_mods/content/elkrose_vt/extra_images/viagra.webp"
                         action NullAction()
