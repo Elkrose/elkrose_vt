@@ -5,13 +5,13 @@ init 1:
         tag vtmod_ui  # CRITICAL FOR MANAGEMENT
         zorder 99
         modal False
-        sensitive True 
+        sensitive True
         add "black" alpha 0.001 xalign 0.0 yalign 0.0 xsize 1.0 ysize 1.0
-        
+
         if girl is not None and hasattr(girl, "birth_control"):
             frame:
-                background Frame("/_mods/content/elkrose_vt/extra_images/Cherry_Background.png", 
-                                left_size=10, right_size=10, 
+                background Frame("/_mods/content/elkrose_vt/extra_images/Cherry_Background.png",
+                                left_size=10, right_size=10,
                                 top_size=10, bottom_size=10)
                 xsize 400
                 #ysize 400  # Set explicit height for proper scaling
@@ -21,7 +21,7 @@ init 1:
                 ypadding 10
                 #xfill True
                 #yfill True
-            
+
                 vbox:
                     #xsize 380
                     #xalign 0.0
@@ -68,7 +68,7 @@ init 1:
                                     elif girl.pregnancy_phase == 3 and girl.preg_progress_days > 10:
                                         $ vt_img_pp = "_mods/content/elkrose_vt/extra_images/third_trimester.webp"
                                         $ vt_text_pp = "Third Trimester: It is a baby, right?"
-                                    
+
                                     xalign 0.5
                                     imagebutton:
                                         idle vt_img_pp
@@ -76,7 +76,7 @@ init 1:
                                         #tooltip vt_tt_ps
                                 #vbox:
                             text vt_text_pp size 20
-                                
+
                             # ADD: Pregnancy Progression Section
                             null height 10
                             text "Pregnancy Progression:" size 20
@@ -94,8 +94,7 @@ init 1:
                                 # at Transform(anchor=(0.0, 0.0), pos=(0, 0))
                                 # at truecenter  # This centers it over the background
                             text f"Day [girl.preg_progress_days] of 260" size 14 xalign 0.5
-                                
-                                
+
                         else:
                             text "Ovulation Info:" size 20
                             # The bar will now sit neatly under this header
@@ -104,8 +103,7 @@ init 1:
                                 use pmsCycleBar(char=girl)
 
                         # --- ONLY SHOW after hymen breaks ---
-                        
-                        
+
                         #if not girl.hymen and not girl.player_knows_pregnant:
                         if not girl.player_knows_pregnant:
                             null height 10 # Spacer
@@ -227,14 +225,14 @@ init 1:
                                     tooltip f"{{color={menu_text_color_valid}}} PregnaVITA Active! {{/color}}"
                             if not thereareitems:
                                 text "nothing" size 20
-                        
+
         else:
             # Instead of recursive call, just hide the screen
             $ renpy.hide_screen("vtmod_virgin_preg_ui")
             $ persistent.vt_virgin_preg_ui_visible = False
 
 init 1 python:
-    
+
     # def toggle_virgin_preg_ui(girl = None):
         # # CORRECT: get_screen() doesn't take _layer parameter
         # if renpy.get_screen("vtmod_virgin_preg_ui"):
@@ -243,7 +241,7 @@ init 1 python:
             # renpy.show_screen("vtmod_virgin_preg_ui",girl=girl, _layer="master")
 
     persistent.vt_virgin_preg_ui_visible = False
-    
+
     def toggle_virgin_preg_ui(girl=None):
         """Safely toggle the virgin/pregnancy UI screen for Ren'Py 8.3.x"""
         # Safety check - don't proceed if girl is invalid
@@ -254,11 +252,11 @@ init 1 python:
                 girl = selected_girl
             else:
                 return
-        
+
         try:
             # Check actual screen state with layer specification
             screen_visible = renpy.get_screen("vtmod_virgin_preg_ui") is not None
-            
+
             # Always hide first to ensure clean state
             if screen_visible:
                 renpy.hide_screen("vtmod_virgin_preg_ui", layer="master")
@@ -266,12 +264,12 @@ init 1 python:
             else:
                 # In Ren'Py 8.3.x, to replace a screen we must hide it first
                 # then show with the same tag
-                renpy.show_screen("vtmod_virgin_preg_ui", 
-                                 girl=girl, 
-                                 layer="master", 
-                                 tag="vtmod_virgin_preg_ui")
+                renpy.show_screen("vtmod_virgin_preg_ui",
+                    girl=girl,
+                    layer="master",
+                    tag="vtmod_virgin_preg_ui")
                 persistent.vt_virgin_preg_ui_visible = True
-                
+
         except Exception as e:
             renpy.log(f"VT MOD ERROR in toggle_virgin_preg_ui: {str(e)}")
             # Reset state on error
