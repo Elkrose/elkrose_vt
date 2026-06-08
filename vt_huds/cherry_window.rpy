@@ -1,14 +1,14 @@
-screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2):
+screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, icon_size=50):
     $ girl = girl or persistent.selected_girl
     #$ girl = girl
 
-    
+
     # Determine positioning values directly
     $ xalign_val = 0.5
     $ yalign_val = 0.5
     $ xanchor_val = 0.5
     $ yanchor_val = 0.5
-    
+
     if position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
@@ -16,7 +16,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
     elif position == "right":
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
-        $ xoffset = -10
+        $ xoffset = -55
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
@@ -31,7 +31,9 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
         $ yalign_val = 1.0
         $ yanchor_val = 1.0
         $ yoffset = -10
-    
+
+    $ _frame_w = 6 * icon_size + 29 + border_size * 2
+
     #Single frame with proper sizing and border
     frame:
         xalign xalign_val
@@ -40,24 +42,20 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
         yanchor yanchor_val
         xoffset xoffset
         yoffset yoffset
-        xsize 360
+        xsize _frame_w
         #ysize 50
         padding (0, 0, 0, 0)
-        
+
         # Border frame
         frame:
-            xsize 360
+            xsize _frame_w
             #ysize 50
-            background Frame(
-                "#00000000",  # Transparent base
-                xborder=border_size,
-                yborder=border_size,
-                border=border_color
-            )
-            
+            background border_color
+            padding (0, border_size, 0, border_size)
+
             # Content frame - contains background and UI
             frame:
-                xsize (360 - (border_size * 2))
+                xsize (_frame_w - border_size * 2)
                 xalign 0.5
                 yalign 0.0
                 xanchor 0.5
@@ -65,35 +63,36 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                 padding (5, 5, 5, 5)
                 background Frame("_mods/content/elkrose_vt/extra_images/Cherry_Background.png", xborder=1, yborder=1, xzoom=0.199, yzoom=0.201)
                 #background Frame("_mods/content/vtmod/extra_images/Cherry_Background.png", xzoom=0.2, yzoom=0.2)
-                
+
                 vbox:
-                    xsize (360 - (border_size * 2) - 4)
+                    xsize (_frame_w - border_size * 2 - 4)
                     spacing 5
                     xalign 0.0  # Left-align content
                     yalign 0.0  # Top-align content
-                    
+
                         #First Row
                     hbox:
                         spacing 5
-                        ysize 50
+                        ysize icon_size
 
                         # Cherry Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                                 hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
                                 action Show("vtmod_virgin_preg_ui", girl=girl)
                                 tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
-                        
+
                         # Birth control status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_token.png"
                             $ vt_tt_bc = "Unprotected"
-                            
+
                             if girl.pregnant and girl.player_knows_pregnant:
                                 $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/feeding_bottle.png"
                                 $ vt_tt_bc = f"{{color={menu_text_color_valid}}}Pregnant!{{/color}}"
@@ -118,22 +117,23 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 else:
                                     $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bcknown.png"
                                     $ vt_tt_bc = "No idea if she is on birth control."
-                            
+
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle vt_img_bc
                                 action NullAction()
                                 tooltip vt_tt_bc
                                 xalign 0.0
                                 yalign 0.0
 
-                         # Sex/Arousal Status
+                        # Sex/Arousal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             $ ss_tt_vag = f"{{color={menu_text_color_valid}}}Fresh and untouched, ready for action!{{/color}}"
                             $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
-                            
+
                             if girl.hymen:
                                 $ ss_tt_vag = f"{{color={menu_text_color_valid}}}A pristine canvas, untouched and pure!{{/color}}"
                                 $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/virginsymbol.png"
@@ -146,20 +146,21 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
 
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 idle ss_img_vag
                                 action NullAction()
                                 tooltip ss_tt_vag
 
-                        
+
                     # Item Status
                     hbox:
                         spacing 5
-                        ysize 50
+                        ysize icon_size
                         #Oral Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             $ oraltt = "No idea if she uses condoms for oral sex."
                             if girl.player_knows_oral_condom:
@@ -179,17 +180,18 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ oraltt = "No idea if she wants condom for Oral."
                                 $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle oralimg
                                 action NullAction()
                                 tooltip oraltt
-                       
+
                         #Body Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             $ bodytt = "No idea if she uses condoms for body play."
                             if girl.player_knows_body_condom:
@@ -210,17 +212,18 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ bodytt = "No idea if she wants condom for Body."
                                 $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle bodyimg
                                 action NullAction()
                                 tooltip bodytt
-                       
+
                         #Anal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             $ analtt = "No idea if she uses condoms for anal sex."
                             if girl.player_knows_anal_condom:
@@ -240,17 +243,18 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ analtt = "No idea if she wants condom for Anal."
                                 $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle analimg
                                 action NullAction()
                                 tooltip analtt
-                        
+
                         #Vaginal Status
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                             if girl.player_knows_vaginal_condom:
@@ -270,20 +274,22 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                                 $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
                                 idle vaginalimg
                                 action NullAction()
                                 tooltip vaginaltt
-                        
+
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
-                            
+
                             # FertiBOOST
                             if girl.fertility_boost >= 1:
                                 $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
                                 imagebutton:
+                                    at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
@@ -291,11 +297,12 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     tooltip f"{{color={menu_text_color_valid}}}FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}!{{/color}}"
 
                         vbox:
-                            xsize 50
+                            xsize icon_size
                             xalign 0.0
                             # PregnaVITA
                             if girl.prenatal_boost >= 1:
                                 imagebutton:
+                                    at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
@@ -424,7 +431,7 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                                 xalign 0.0
                                 yalign 0.0
 
-                         # Sex/Arousal Status
+                        # Sex/Arousal Status
                         vbox:
                             xsize 50
                             xalign 0.0
@@ -600,6 +607,319 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                                     action NullAction()
                                     tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
 
+screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, current_day=None, icon_size=50):
+    $ girl = girl
+
+    # Determine positioning values directly
+    $ xalign_val = 0.5
+    $ yalign_val = 0.5
+    $ xanchor_val = 0.5
+    $ yanchor_val = 0.5
+
+    if position == "left":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ xoffset = 10
+    elif position == "right":
+        $ xalign_val = 1.0
+        $ xanchor_val = 1.0
+        $ xoffset = -10
+    elif position == "top":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 9
+        $ xoffset = 620
+    elif position == "top_left":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 9
+        $ xoffset = -490
+    elif position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "tooltip":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+    elif position == "girl_review":
+        $ xalign_val = 0.5
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.5
+        $ yanchor_val = 0.0
+        $ xoffset = -120
+        $ yoffset = -50
+    elif position == "sex_outro":
+        $ xalign_val = 0.5
+        $ xanchor_val = 0.5
+        $ yalign_val = 0.5
+        $ yanchor_val = 0.5
+
+    $ _frame_w = 9 * icon_size + 44 + border_size * 2
+
+    #Single frame with proper sizing and border
+    frame:
+        xalign xalign_val
+        yalign yalign_val
+        xanchor xanchor_val
+        yanchor yanchor_val
+        xoffset xoffset
+        yoffset yoffset
+        xsize _frame_w
+        padding (0, 0, 0, 0)
+
+        # Border frame
+        frame:
+            xsize _frame_w
+            background border_color
+            padding (0, border_size, 0, border_size)
+
+            # Content frame - contains background and UI
+            frame:
+                xsize (_frame_w - border_size * 2)
+                xalign 0.5
+                yalign 0.0
+                xanchor 0.5
+                yanchor 0.0
+                padding (5, 5, 5, 5)
+                background Frame("_mods/content/elkrose_vt/extra_images/Cherry_Background.png", xborder=1, yborder=1, xzoom=0.199, yzoom=0.201)
+
+                hbox:
+                    xsize (_frame_w - border_size * 2 - 4)
+                    spacing 5
+                    ysize icon_size
+                    xalign 0.0
+                    yalign 0.0
+
+                    # Cherry Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
+                            hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
+                            action Show("vtmod_virgin_preg_ui", girl=girl)
+                            tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
+
+                    # Birth control status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+                        $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_token.png"
+                        $ vt_tt_bc = "Unprotected"
+
+                        if girl.pregnant and girl.player_knows_pregnant:
+                            $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/feeding_bottle.png"
+                            $ vt_tt_bc = f"{{color={menu_text_color_valid}}}Pregnant!{{/color}}"
+                        else:
+                            if girl.bc_status_known:
+                                $ vt_tt_bc += f"\nFertility: [girl.effective_fertility():.1f]%\n{girl.get_fertility_day_status()}"
+                                if girl.birth_control:
+                                    $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bc_token.png"
+                                    $ vt_tt_bc = f"{{color={menu_text_color_valid}}}Birth Control Active{{/color}}"
+                                    if girl.vaginal_cum >= 1:
+                                        $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bc_cum.png"
+                                        $ vt_tt_bc += f"{{color=#ff5555}} Cum inside: {girl.vaginal_cum}{{/color}}"
+                                else:
+                                    $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_token.png"
+                                    $ vt_tt_bc = "Unprotected"
+                                    if girl.vaginal_cum >= 1:
+                                        $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_cum.png"
+                                        $ vt_tt_bc += f"{{color=#ff5555}} Cum inside: {girl.vaginal_cum}{{/color}}"
+                                    if girl.is_highly_fertile() :
+                                        $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/nobc_fertile_cum.png"
+                                        $ vt_tt_bc += f"\n{{color=#ff0000}}She is ovulating and has a higher chance of getting pregnant.{{/color}}"
+                            else:
+                                $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bcknown.png"
+                                $ vt_tt_bc = "No idea if she is on birth control."
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            idle vt_img_bc
+                            action NullAction()
+                            tooltip vt_tt_bc
+                            xalign 0.0
+                            yalign 0.0
+
+                    # Sex/Arousal Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        $ ss_tt_vag = f"{{color={menu_text_color_valid}}}Fresh and untouched, ready for action!{{/color}}"
+                        $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
+
+                        if girl.hymen:
+                            $ ss_tt_vag = f"{{color={menu_text_color_valid}}}A pristine canvas, untouched and pure!{{/color}}"
+                            $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/virginsymbol.png"
+                        else:
+                            if girl.had_sex_today:
+                                $ ss_tt_vag = f"{{color={menu_text_color_valid}}}Had sex today!{{/color}}"
+                                $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/hadsextoday.png"
+                            else:
+                                $ ss_tt_vag += f"\nNo sex today, yet."
+                                $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
+
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            idle ss_img_vag
+                            action NullAction()
+                            tooltip ss_tt_vag
+
+                    #Oral Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        $ oraltt = "No idea if she uses condoms for oral sex."
+                        if girl.player_knows_oral_condom:
+                            if girl.wants_oral_condom:
+                                $ oralimg = "_mods/content/elkrose_vt/extra_images/condom_premium50.png"
+                                $ oraltt =  f"{{color=#ff0000}}Wants Condom for Oral!{{/color}}"
+                            else:
+                                $ oralimg = "_mods/content/elkrose_vt/extra_images/cherries_idle.png"
+                                $ oraltt =  f"{{color={menu_text_color_valid}}}Likes the risk during Oral!{{/color}}"
+                                if girl.oral_cum > 0:
+                                    $ cumtextfix = "unit"
+                                    if girl.oral_cum>1:
+                                        $ cumtextfix = "units"
+                                    $ oralimg = "_mods/content/elkrose_vt/extra_images/cumcherries_idle.png"
+                                    $ oraltt =  f"{{color={menu_text_color_valid}}} Has {girl.oral_cum} {cumtextfix} of cum in her belly!{{/color}}"
+                        else:
+                            $ oraltt = "No idea if she wants condom for Oral."
+                            $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            xalign 0.5
+                            yalign 0.5
+                            idle oralimg
+                            action NullAction()
+                            tooltip oraltt
+
+                    #Body Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        $ bodytt = "No idea if she uses condoms for body play."
+                        if girl.player_knows_body_condom:
+                            if girl.wants_body_condom:
+                                $ bodyimg = "_mods/content/elkrose_vt/extra_images/condom_premium50.png"
+                                $ bodytt =  f"{{color=#ff0000}}Wants Condom for Body!{{/color}}"
+                            else:
+                                $ bodyimg = "_mods/content/elkrose_vt/extra_images/cherries_idle.png"
+                                $ bodytt =  f"{{color={menu_text_color_valid}}}Likes the risk during Body!{{/color}}"
+                                #will need to figure out the body cum mechanic
+                                # if girl.oral_cum > 0:
+                                    # $ cumtextfix = "unit"
+                                    # if girl.oral_cum>1:
+                                        # $ cumtextfix = "units"
+                                    # $ bodyimg = "_mods/content/elkrose_vt/extra_images/cumcherries_idle.png"
+                                    # $ bodytt =  f"{{color={menu_text_color_valid}}} Has {girl.oral_cum} of cum on her body!{{/color}}"
+                        else:
+                            $ bodytt = "No idea if she wants condom for Body."
+                            $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            xalign 0.5
+                            yalign 0.5
+                            idle bodyimg
+                            action NullAction()
+                            tooltip bodytt
+
+                    #Anal Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        $ analtt = "No idea if she uses condoms for anal sex."
+                        if girl.player_knows_anal_condom:
+                            if girl.wants_anal_condom:
+                                $ analimg = "_mods/content/elkrose_vt/extra_images/condom_premium50.png"
+                                $ analtt =  f"{{color=#ff0000}}Wants Condom for Anal!{{/color}}"
+                            else:
+                                $ analimg = "_mods/content/elkrose_vt/extra_images/cherries_idle.png"
+                                $ analtt =  f"{{color={menu_text_color_valid}}}Likes the risk during Anal!{{/color}}"
+                                if girl.anal_cum > 0:
+                                    $ acumtextfix = "unit"
+                                    if girl.anal_cum>1:
+                                        $ acumtextfix = "units"
+                                    $ analimg = "_mods/content/elkrose_vt/extra_images/cumcherries_idle.png"
+                                    $ analtt =  f"{{color={menu_text_color_valid}}} Has {girl.anal_cum} {acumtextfix} of cum in her ass!{{/color}}"
+                        else:
+                            $ analtt = "No idea if she wants condom for Anal."
+                            $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            xalign 0.5
+                            yalign 0.5
+                            idle analimg
+                            action NullAction()
+                            tooltip analtt
+
+                    #Vaginal Status
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        $ vaginaltt = "No idea if she uses condoms for vaginal sex."
+                        if girl.player_knows_vaginal_condom:
+                            if girl.wants_vaginal_condom:
+                                $ vaginalimg = "_mods/content/elkrose_vt/extra_images/condom_premium50.png"
+                                $ vaginaltt =  f"{{color=#ff0000}}Wants Condom for Vaginal!{{/color}}"
+                            else:
+                                $ vaginalimg = "_mods/content/elkrose_vt/extra_images/cherries_idle.png"
+                                $ vaginaltt =  f"{{color={menu_text_color_valid}}}Likes the risk during Vaginal!{{/color}}"
+                                if girl.vaginal_cum > 0:
+                                    $ vcumtextfix = "unit"
+                                    if girl.vaginal_cum>1:
+                                        $ vcumtextfix = "units"
+                                    $ vaginalimg = "_mods/content/elkrose_vt/extra_images/cumcherries_idle.png"
+                                    $ vaginaltt =  f"{{color={menu_text_color_valid}}} Has {girl.vaginal_cum} {vcumtextfix} of cum in her womb!{{/color}}"
+                        else:
+                            $ vaginaltt = "No idea if she uses condoms for vaginal sex."
+                            $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
+                        imagebutton:
+                            at Transform(zoom=(icon_size / 50.0))
+                            xalign 0.5
+                            yalign 0.5
+                            idle vaginalimg
+                            action NullAction()
+                            tooltip vaginaltt
+
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+
+                        # FertiBOOST
+                        if girl.fertility_boost >= 1:
+                            $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
+                            imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
+                                xalign 0.5
+                                yalign 0.5
+                                idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
+                                action NullAction()
+                                tooltip f"{{color={menu_text_color_valid}}}FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}!{{/color}}"
+
+                    vbox:
+                        xsize icon_size
+                        xalign 0.0
+                        # PregnaVITA
+                        if girl.prenatal_boost >= 1:
+                            imagebutton:
+                                at Transform(zoom=(icon_size / 50.0))
+                                xalign 0.5
+                                yalign 0.5
+                                idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
+                                action NullAction()
+                                tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
+
 screen condom_cherry(position="center", xoffset=0, yoffset=0):
     # Determine positioning values directly
     $ xalign_val = 0.5
@@ -620,7 +940,18 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
-        $ yoffset = 10
+        $ yoffset = 20
+        $ xoffset = -275
+    elif position == "top_left":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 20
+        $ xoffset = -275
+    elif position == "top_right":
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+        $ yoffset = 20
+        $ xoffset = 360
     elif position == "bottom":
         $ yalign_val = 1.0
         $ yanchor_val = 1.0
@@ -1024,10 +1355,3 @@ init 10:
                     xalign 0.5
                 
                 null height 2
-
-
-
-
-
-
-#end of file
