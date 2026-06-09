@@ -39,13 +39,18 @@ screen vt_cherry_overlay():
             use condom_cherry(position="top") id "vt_ea_condom"
             use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
 
+    elif renpy.get_screen("exam_outro_screen", layer="master"):
+        $ _vt_eo_girls = exam_manager.girls_in_exam.get("player", []) + exam_manager.girls_who_left_early
+        for _vt_eo_i, _vt_eo_girl in enumerate(_vt_eo_girls):
+            use cherry_window_column(girl=_vt_eo_girl, position="exam_outro", xoffset=76+_vt_eo_i*625, yoffset=135, border_color="#FF0000", border_size=2, icon_size=24) id "vt_eo_cherry_{}".format(_vt_eo_i)
+
     elif renpy.get_screen("sex_interaction_menu", layer="master"):
         if _vt_girl:
             use condom_cherry(position="top_right") id "vt_si_condom"
             use cherry_window_row(girl=_vt_girl, position="top_left", border_color="#FF0000", border_size=2, icon_size=36) id "vt_si_cherry"
 
     elif renpy.get_screen("sex_outro_screen", layer="master"):
-        $ _vt_so_girls = getattr(store, "se_female_participants", []) or ([_vt_part] if _vt_part else [])
+        $ _vt_so_girls = [p for p in getattr(store, "se_participants", []) if isinstance(p, Girl)]
         if _vt_so_girls:
             $ _vt_so_n = len(_vt_so_girls)
             use condom_cherry(position="top") id "vt_so_condom"
@@ -55,6 +60,10 @@ screen vt_cherry_overlay():
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
+
+    # VTMod pregnancy check pane - overlaid over bottom two-thirds of middle panel in girl ratings detail
+    if renpy.get_screen("single_girl_rating_menu", layer="master"):
+        use vtmod_preg_check_pane() id "vt_preg_pane"
 
     # Player HUD condom cherry - right side, below the 3 HUD buttons
     if renpy.get_screen("player_hud"):
