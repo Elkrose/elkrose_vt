@@ -50,7 +50,7 @@ screen vt_cherry_overlay():
             use cherry_window_row(girl=_vt_girl, position="top_left", border_color="#FF0000", border_size=2, icon_size=36) id "vt_si_cherry"
 
     elif renpy.get_screen("sex_outro_screen", layer="master"):
-        $ _vt_so_girls = getattr(store, "se_female_participants", []) or ([_vt_part] if _vt_part else [])
+        $ _vt_so_girls = [p for p in getattr(store, "se_participants", []) if isinstance(p, Girl)]
         if _vt_so_girls:
             $ _vt_so_n = len(_vt_so_girls)
             use condom_cherry(position="top") id "vt_so_condom"
