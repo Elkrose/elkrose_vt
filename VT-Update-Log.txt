@@ -1,4 +1,12 @@
-Virginal Tracker Mod 1.0.2
+Virginal Tracker Mod 1.0.4
+
+1.0.4
+- Reworked screens so that they don't replicate base game screen code. Everything draws on top of base screens.
+- Reworked some of the cherry_window screens to be a single row or column to fit in the existing screens.
+- Reworked the VT mod content checks on the girl_rating screen so that it draws a scrollable pane in the center pane.
+
+1.0.3
+- ...
 
 1.0.2
 - fixed the night class Mother bug
