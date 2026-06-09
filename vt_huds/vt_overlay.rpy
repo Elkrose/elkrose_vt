@@ -39,6 +39,11 @@ screen vt_cherry_overlay():
             use condom_cherry(position="top") id "vt_ea_condom"
             use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
 
+    elif renpy.get_screen("exam_outro_screen", layer="master"):
+        $ _vt_eo_girls = exam_manager.girls_in_exam.get("player", []) + exam_manager.girls_who_left_early
+        for _vt_eo_i, _vt_eo_girl in enumerate(_vt_eo_girls):
+            use cherry_window_column(girl=_vt_eo_girl, position="exam_outro", xoffset=76+_vt_eo_i*625, yoffset=135, border_color="#FF0000", border_size=2, icon_size=24) id "vt_eo_cherry_{}".format(_vt_eo_i)
+
     elif renpy.get_screen("sex_interaction_menu", layer="master"):
         if _vt_girl:
             use condom_cherry(position="top_right") id "vt_si_condom"
