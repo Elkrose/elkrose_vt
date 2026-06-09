@@ -56,6 +56,10 @@ screen vt_cherry_overlay():
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
 
+    # VTMod pregnancy check pane - overlaid over bottom two-thirds of middle panel in girl ratings detail
+    if renpy.get_screen("single_girl_rating_menu", layer="master"):
+        use vtmod_preg_check_pane() id "vt_preg_pane"
+
     # Player HUD condom cherry - right side, below the 3 HUD buttons
     if renpy.get_screen("player_hud"):
         use hud_condom_cherry(position="top_right", icon_size=32) id "vt_ph_condom"
