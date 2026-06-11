@@ -9,7 +9,11 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
     $ xanchor_val = 0.5
     $ yanchor_val = 0.5
 
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
@@ -26,11 +30,6 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
         $ xanchor_val = 0.1
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
-        #$ yoffset = 10
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
 
     $ _frame_w = 6 * icon_size + 29 + border_size * 2
 
@@ -330,7 +329,11 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
     $ xanchor_val = 0.5
     $ yanchor_val = 0.5
     
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
@@ -342,10 +345,6 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
         $ yoffset = 10
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
     
     #Single frame with proper sizing and border
     frame:
@@ -625,7 +624,22 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
     $ xanchor_val = 0.5
     $ yanchor_val = 0.5
 
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "convo_menu":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ yanchor_val = 1.0
+    elif position == "girl_review":
+        $ xalign_val = 0.5
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.5
+        $ yanchor_val = 0.0
+        $ xoffset = -120
+        $ yoffset = -50
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
@@ -633,6 +647,16 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
         $ xoffset = -10
+    elif position == "sex_outro":
+        $ xalign_val = 0.5
+        $ xanchor_val = 0.5
+        $ yalign_val = 0.5
+        $ yanchor_val = 0.5
+    elif position == "tooltip":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
@@ -643,27 +667,6 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
         $ yanchor_val = 0.0
         $ yoffset = 9
         $ xoffset = -490
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
-    elif position == "tooltip":
-        $ xalign_val = 0.0
-        $ xanchor_val = 0.0
-        $ yalign_val = 0.0
-        $ yanchor_val = 0.0
-    elif position == "girl_review":
-        $ xalign_val = 0.5
-        $ xanchor_val = 0.0
-        $ yalign_val = 0.5
-        $ yanchor_val = 0.0
-        $ xoffset = -120
-        $ yoffset = -50
-    elif position == "sex_outro":
-        $ xalign_val = 0.5
-        $ xanchor_val = 0.5
-        $ yalign_val = 0.5
-        $ yanchor_val = 0.5
 
     $ _frame_w = 9 * icon_size + 44 + border_size * 2
 
@@ -938,7 +941,16 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
     $ xanchor_val = 0.5
     $ yanchor_val = 0.5
 
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "exam_outro":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
@@ -950,15 +962,6 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
         $ yoffset = 9
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
-    elif position == "exam_outro":
-        $ xalign_val = 0.0
-        $ xanchor_val = 0.0
-        $ yalign_val = 0.0
-        $ yanchor_val = 0.0
 
     $ _frame_h = 9 * icon_size + 44 + border_size * 2
     $ _frame_w = icon_size + 14 + border_size * 2
@@ -1235,10 +1238,17 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
     $ xsize_val = 100
     $ ysize_val = 50
     
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
+    elif position == "player_hud":
+        $ xsize_val = 50
+        $ ysize_val = 100
     elif position == "right":
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
@@ -1258,13 +1268,6 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
         $ yanchor_val = 0.0
         $ yoffset = 20
         $ xoffset = 360
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
-    elif position == "player_hud":
-        $ xsize_val = 50
-        $ ysize_val = 100
     
     #Single frame with proper sizing and border
     frame:
@@ -1386,7 +1389,11 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
     $ xsize_val = 100
     $ ysize_val = 50
     
-    if position == "left":
+    if position == "bottom":
+        $ yalign_val = 1.0
+        $ yanchor_val = 1.0
+        $ yoffset = -10
+    elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
         $ xoffset = 10
@@ -1401,10 +1408,6 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
         $ yanchor_val = 0.0
         $ xoffset = -10
         $ yoffset = 10
-    elif position == "bottom":
-        $ yalign_val = 1.0
-        $ yanchor_val = 1.0
-        $ yoffset = -10
 
     #Single frame with proper sizing and border
     frame:
