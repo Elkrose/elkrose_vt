@@ -6,7 +6,15 @@ init 1:
         zorder 99
         modal False
         sensitive True
-        add "black" alpha 0.001 xalign 0.0 yalign 0.0 xsize 1.0 ysize 1.0
+        # Full-screen click-catcher: click anywhere outside the info box to close
+        button:
+            xalign 0.0
+            yalign 0.0
+            xsize 1.0
+            ysize 1.0
+            background "#00000001"
+            hover_background "#00000001"
+            action Hide("vtmod_ui")
 
         if girl is not None and hasattr(girl, "birth_control"):
             frame:
@@ -42,7 +50,7 @@ init 1:
                             pos(-70,0)
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                            action toggle_virgin_preg_ui(girl=girl)
+                            action Hide("vtmod_ui")
                             #action ToggleScreen("VPMOD_virgin_preg_ui")
                             tooltip f"{{color=#ff0000}}Close Cherry Info.{{/color}}"
                     # CHANGE: Wrapped the conditional content in a vbox for better layout control
