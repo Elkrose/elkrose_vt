@@ -1,4 +1,11 @@
-Virginal Tracker Mod 1.0.4
+Virginal Tracker Mod 1.0.5
+
+1.0.5
+
+- Fixed the clobbering of tooltips.
+- Better image rescaling.
+- General cleanups.
+- Added cherry_window_row to girl convo menus.
 
 1.0.4
 - Reworked screens so that they don't replicate base game screen code. Everything draws on top of base screens.

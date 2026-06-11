@@ -6,7 +6,15 @@ init 1:
         zorder 99
         modal False
         sensitive True
-        add "black" alpha 0.001 xalign 0.0 yalign 0.0 xsize 1.0 ysize 1.0
+        # Full-screen click-catcher: click anywhere outside the info box to close
+        button:
+            xalign 0.0
+            yalign 0.0
+            xsize 1.0
+            ysize 1.0
+            background "#00000001"
+            hover_background "#00000001"
+            action Hide("vtmod_ui")
 
         if girl is not None and hasattr(girl, "birth_control"):
             frame:
@@ -42,7 +50,7 @@ init 1:
                             pos(-70,0)
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                            action toggle_virgin_preg_ui(girl=girl)
+                            action Hide("vtmod_ui")
                             #action ToggleScreen("VPMOD_virgin_preg_ui")
                             tooltip f"{{color=#ff0000}}Close Cherry Info.{{/color}}"
                     # CHANGE: Wrapped the conditional content in a vbox for better layout control
@@ -229,53 +237,3 @@ init 1:
         else:
             # Instead of recursive call, just hide the screen
             $ renpy.hide_screen("vtmod_virgin_preg_ui")
-            $ persistent.vt_virgin_preg_ui_visible = False
-
-init 1 python:
-
-    # def toggle_virgin_preg_ui(girl = None):
-        # # CORRECT: get_screen() doesn't take _layer parameter
-        # if renpy.get_screen("vtmod_virgin_preg_ui"):
-            # renpy.hide_screen("vtmod_virgin_preg_ui")
-        # else:
-            # renpy.show_screen("vtmod_virgin_preg_ui",girl=girl, _layer="master")
-
-    persistent.vt_virgin_preg_ui_visible = False
-
-    def toggle_virgin_preg_ui(girl=None):
-        """Safely toggle the virgin/pregnancy UI screen for Ren'Py 8.3.x"""
-        # Safety check - don't proceed if girl is invalid
-        if girl is None or not hasattr(girl, "birth_control"):
-            # Try to get the currently selected girl if none provided
-            global selected_girl
-            if selected_girl and hasattr(selected_girl, "birth_control"):
-                girl = selected_girl
-            else:
-                return
-
-        try:
-            # Check actual screen state with layer specification
-            screen_visible = renpy.get_screen("vtmod_virgin_preg_ui") is not None
-
-            # Always hide first to ensure clean state
-            if screen_visible:
-                renpy.hide_screen("vtmod_virgin_preg_ui", layer="master")
-                persistent.vt_virgin_preg_ui_visible = False
-            else:
-                # In Ren'Py 8.3.x, to replace a screen we must hide it first
-                # then show with the same tag
-                renpy.show_screen("vtmod_virgin_preg_ui",
-                    girl=girl,
-                    layer="master",
-                    tag="vtmod_virgin_preg_ui")
-                persistent.vt_virgin_preg_ui_visible = True
-
-        except Exception as e:
-            renpy.log(f"VT MOD ERROR in toggle_virgin_preg_ui: {str(e)}")
-            # Reset state on error
-            persistent.vt_virgin_preg_ui_visible = False
-            # Try to hide the screen
-            try:
-                renpy.hide_screen("vtmod_virgin_preg_ui")
-            except:
-                pass

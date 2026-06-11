@@ -32,11 +32,11 @@ screen vt_cherry_overlay():
 
     # Exam classroom
     elif renpy.get_screen("exam_menu", layer="master"):
-        use condom_cherry(position="top") id "vt_ec_condom"
+        use condom_cherry(position="top_left") id "vt_ec_condom"
 
     elif renpy.get_screen("exam_actions_menu", layer="master"):
         if _vt_girl:
-            use condom_cherry(position="top") id "vt_ea_condom"
+            use condom_cherry(position="top_left") id "vt_ea_condom"
             use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
 
     elif renpy.get_screen("exam_outro_screen", layer="master"):
@@ -55,11 +55,15 @@ screen vt_cherry_overlay():
             $ _vt_so_n = len(_vt_so_girls)
             use condom_cherry(position="top") id "vt_so_condom"
             for _vt_so_i, _vt_so_girl in enumerate(_vt_so_girls):
-                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#FF0000", border_size=2) id "vt_so_cherry_{}".format(_vt_so_i)
+                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#FF0000", border_size=2, icon_size=36) id "vt_so_cherry_{}".format(_vt_so_i)
 
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
+
+    # World location conversation menu — girl_hud is hidden on sex entry (line 229 screen_sex_interaction_menu.rpy)
+    elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
+        use cherry_window_row(girl=_vt_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#FF0000", border_size=2, icon_size=36) id "vt_choice_cherry"
 
     # VTMod pregnancy check pane - overlaid over bottom two-thirds of middle panel in girl ratings detail
     if renpy.get_screen("single_girl_rating_menu", layer="master"):
