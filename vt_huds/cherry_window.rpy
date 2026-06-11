@@ -1371,7 +1371,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
             vbox:
                 xsize 50
                 xalign 0.0
-                
+
                 if "Viagra" in player.temporary_stat_changes:
                     imagebutton:
                         focus_mask True
