@@ -55,7 +55,7 @@ screen vt_cherry_overlay():
             $ _vt_so_n = len(_vt_so_girls)
             use condom_cherry(position="top") id "vt_so_condom"
             for _vt_so_i, _vt_so_girl in enumerate(_vt_so_girls):
-                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#FF0000", border_size=2) id "vt_so_cherry_{}".format(_vt_so_i)
+                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#FF0000", border_size=2, icon_size=36) id "vt_so_cherry_{}".format(_vt_so_i)
 
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
