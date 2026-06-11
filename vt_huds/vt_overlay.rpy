@@ -61,6 +61,10 @@ screen vt_cherry_overlay():
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
 
+    # World location conversation menu — girl_hud is hidden on sex entry (line 229 screen_sex_interaction_menu.rpy)
+    elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
+        use cherry_window_row(girl=_vt_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#FF0000", border_size=2, icon_size=36) id "vt_choice_cherry"
+
     # VTMod pregnancy check pane - overlaid over bottom two-thirds of middle panel in girl ratings detail
     if renpy.get_screen("single_girl_rating_menu", layer="master"):
         use vtmod_preg_check_pane() id "vt_preg_pane"
