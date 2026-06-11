@@ -32,11 +32,11 @@ screen vt_cherry_overlay():
 
     # Exam classroom
     elif renpy.get_screen("exam_menu", layer="master"):
-        use condom_cherry(position="top") id "vt_ec_condom"
+        use condom_cherry(position="top_left") id "vt_ec_condom"
 
     elif renpy.get_screen("exam_actions_menu", layer="master"):
         if _vt_girl:
-            use condom_cherry(position="top") id "vt_ea_condom"
+            use condom_cherry(position="top_left") id "vt_ea_condom"
             use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
 
     elif renpy.get_screen("exam_outro_screen", layer="master"):
