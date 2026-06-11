@@ -83,7 +83,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 at Transform(zoom=(icon_size / 50.0))
                                 idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                                 hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                                action Show("vtmod_virgin_preg_ui", girl=girl)
+                                action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                                 tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
 
                         # Birth control status
@@ -390,7 +390,7 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             imagebutton:
                                 idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                                 hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                                action Show("vtmod_virgin_preg_ui", girl=girl)
+                                action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                                 tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
                         
                         # Birth control status
@@ -700,7 +700,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             at Transform(zoom=(icon_size / 50.0))
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                            action Show("vtmod_virgin_preg_ui", girl=girl)
+                            action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                             tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
 
                     # Birth control status
@@ -997,7 +997,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             at Transform(zoom=(icon_size / 50.0))
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
-                            action Show("vtmod_virgin_preg_ui", girl=girl)
+                            action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                             tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
 
                     # Birth control status
