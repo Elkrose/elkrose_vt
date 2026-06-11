@@ -707,8 +707,8 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         xalign 0.0
                         imagebutton:
                             focus_mask True
-                            idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
-                            hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
+                            idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/HUDVT_idle.png", icon_size, icon_size)
+                            hover fit_image_to_size("_mods/content/elkrose_vt/extra_images/HUDVT_hover.png", icon_size, icon_size)
                             action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                             tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
 
@@ -745,7 +745,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                                 $ vt_tt_bc = "No idea if she is on birth control."
                         imagebutton:
                             focus_mask True
-                            idle vt_img_bc
+                            idle fit_image_to_size(vt_img_bc, icon_size, icon_size)
                             action NullAction()
                             tooltip vt_tt_bc
                             xalign 0.0
@@ -772,7 +772,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
 
                         imagebutton:
                             focus_mask True
-                            idle ss_img_vag
+                            idle fit_image_to_size(ss_img_vag, icon_size, icon_size)
                             action NullAction()
                             tooltip ss_tt_vag
 
@@ -803,7 +803,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle oralimg
+                            idle fit_image_to_size(oralimg, icon_size, icon_size)
                             action NullAction()
                             tooltip oraltt
 
@@ -835,7 +835,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle bodyimg
+                            idle fit_image_to_size(bodyimg, icon_size, icon_size)
                             action NullAction()
                             tooltip bodytt
 
@@ -866,7 +866,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle analimg
+                            idle fit_image_to_size(analimg, icon_size, icon_size)
                             action NullAction()
                             tooltip analtt
 
@@ -897,7 +897,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle vaginalimg
+                            idle fit_image_to_size(vaginalimg, icon_size, icon_size)
                             action NullAction()
                             tooltip vaginaltt
 
@@ -912,7 +912,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
-                                idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
+                                idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/fertilitypills50.png", icon_size, icon_size)
                                 action NullAction()
                                 tooltip f"{{color={menu_text_color_valid}}}FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}!{{/color}}"
 
@@ -925,7 +925,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
-                                idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
+                                idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/pregboosters50.png", icon_size, icon_size)
                                 action NullAction()
                                 tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
 
@@ -1004,8 +1004,8 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         yalign 0.0
                         imagebutton:
                             focus_mask True
-                            idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
-                            hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
+                            idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/HUDVT_idle.png", icon_size, icon_size)
+                            hover fit_image_to_size("_mods/content/elkrose_vt/extra_images/HUDVT_hover.png", icon_size, icon_size)
                             action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
                             tooltip f"{{color=#ff0000}}Cherry Info.{{/color}}"
 
@@ -1042,7 +1042,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                                 $ vt_tt_bc = "No idea if she is on birth control."
                         imagebutton:
                             focus_mask True
-                            idle vt_img_bc
+                            idle fit_image_to_size(vt_img_bc, icon_size, icon_size)
                             action NullAction()
                             tooltip vt_tt_bc
                             xalign 0.0
@@ -1069,7 +1069,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
 
                         imagebutton:
                             focus_mask True
-                            idle ss_img_vag
+                            idle fit_image_to_size(ss_img_vag, icon_size, icon_size)
                             action NullAction()
                             tooltip ss_tt_vag
 
@@ -1100,7 +1100,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle oralimg
+                            idle fit_image_to_size(oralimg, icon_size, icon_size)
                             action NullAction()
                             tooltip oraltt
 
@@ -1132,7 +1132,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle bodyimg
+                            idle fit_image_to_size(bodyimg, icon_size, icon_size)
                             action NullAction()
                             tooltip bodytt
 
@@ -1163,7 +1163,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle analimg
+                            idle fit_image_to_size(analimg, icon_size, icon_size)
                             action NullAction()
                             tooltip analtt
 
@@ -1194,7 +1194,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             focus_mask True
                             xalign 0.5
                             yalign 0.5
-                            idle vaginalimg
+                            idle fit_image_to_size(vaginalimg, icon_size, icon_size)
                             action NullAction()
                             tooltip vaginaltt
 
@@ -1209,7 +1209,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
-                                idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
+                                idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/fertilitypills50.png", icon_size, icon_size)
                                 action NullAction()
                                 tooltip f"{{color={menu_text_color_valid}}}FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}!{{/color}}"
 
@@ -1222,7 +1222,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
-                                idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
+                                idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/pregboosters50.png", icon_size, icon_size)
                                 action NullAction()
                                 tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
 
