@@ -80,6 +80,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             xsize icon_size
                             xalign 0.0
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                                 hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
@@ -119,6 +120,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     $ vt_tt_bc = "No idea if she is on birth control."
 
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 idle vt_img_bc
                                 action NullAction()
@@ -146,6 +148,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
 
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 idle ss_img_vag
                                 action NullAction()
@@ -180,6 +183,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ oraltt = "No idea if she wants condom for Oral."
                                 $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
@@ -212,6 +216,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ bodytt = "No idea if she wants condom for Body."
                                 $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
@@ -243,6 +248,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ analtt = "No idea if she wants condom for Anal."
                                 $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
@@ -274,6 +280,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                 $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                                 $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                             imagebutton:
+                                focus_mask True
                                 at Transform(zoom=(icon_size / 50.0))
                                 xalign 0.5
                                 yalign 0.5
@@ -289,6 +296,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             if girl.fertility_boost >= 1:
                                 $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
                                 imagebutton:
+                                    focus_mask True
                                     at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
@@ -302,6 +310,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             # PregnaVITA
                             if girl.prenatal_boost >= 1:
                                 imagebutton:
+                                    focus_mask True
                                     at Transform(zoom=(icon_size / 50.0))
                                     xalign 0.5
                                     yalign 0.5
@@ -697,7 +706,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         xsize icon_size
                         xalign 0.0
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
                             action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
@@ -735,7 +744,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                                 $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bcknown.png"
                                 $ vt_tt_bc = "No idea if she is on birth control."
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle vt_img_bc
                             action NullAction()
                             tooltip vt_tt_bc
@@ -762,7 +771,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                                 $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
 
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle ss_img_vag
                             action NullAction()
                             tooltip ss_tt_vag
@@ -791,7 +800,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             $ oraltt = "No idea if she wants condom for Oral."
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle oralimg
@@ -823,7 +832,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             $ bodytt = "No idea if she wants condom for Body."
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle bodyimg
@@ -854,7 +863,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             $ analtt = "No idea if she wants condom for Anal."
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle analimg
@@ -885,7 +894,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                             $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle vaginalimg
@@ -900,7 +909,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         if girl.fertility_boost >= 1:
                             $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
                             imagebutton:
-                                at Transform(zoom=(icon_size / 50.0))
+                                focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
@@ -913,7 +922,7 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         # PregnaVITA
                         if girl.prenatal_boost >= 1:
                             imagebutton:
-                                at Transform(zoom=(icon_size / 50.0))
+                                focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
@@ -994,7 +1003,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         ysize icon_size
                         yalign 0.0
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle "_mods/content/elkrose_vt/extra_images/HUDVT_idle.png"
                             hover "_mods/content/elkrose_vt/extra_images/HUDVT_hover.png"
                             action Function(renpy.show_screen, "vtmod_virgin_preg_ui", girl=girl)
@@ -1032,7 +1041,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                                 $ vt_img_bc = "_mods/content/elkrose_vt/extra_images/bcknown.png"
                                 $ vt_tt_bc = "No idea if she is on birth control."
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle vt_img_bc
                             action NullAction()
                             tooltip vt_tt_bc
@@ -1059,7 +1068,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                                 $ ss_img_vag = "_mods/content/elkrose_vt/extra_images/sexstatus.png"
 
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             idle ss_img_vag
                             action NullAction()
                             tooltip ss_tt_vag
@@ -1088,7 +1097,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             $ oraltt = "No idea if she wants condom for Oral."
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle oralimg
@@ -1120,7 +1129,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             $ bodytt = "No idea if she wants condom for Body."
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle bodyimg
@@ -1151,7 +1160,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             $ analtt = "No idea if she wants condom for Anal."
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle analimg
@@ -1182,7 +1191,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                             $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
                         imagebutton:
-                            at Transform(zoom=(icon_size / 50.0))
+                            focus_mask True
                             xalign 0.5
                             yalign 0.5
                             idle vaginalimg
@@ -1197,7 +1206,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         if girl.fertility_boost >= 1:
                             $ days_rem_text = "days" if girl.fertility_boost > 1 else "day"
                             imagebutton:
-                                at Transform(zoom=(icon_size / 50.0))
+                                focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle "_mods/content/elkrose_vt/extra_images/fertilitypills50.png"
@@ -1210,7 +1219,7 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         # PregnaVITA
                         if girl.prenatal_boost >= 1:
                             imagebutton:
-                                at Transform(zoom=(icon_size / 50.0))
+                                focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
@@ -1348,6 +1357,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
 
                 # FINAL IMAGEBUTTON - SINGLE DEFINITION
                 imagebutton:
+                    focus_mask True
                     yalign 0.5
                     idle condom_idle_img
                     hover condom_hover_img
@@ -1361,6 +1371,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
                 
                 if "Viagra" in player.temporary_stat_changes:
                     imagebutton:
+                        focus_mask True
                         yalign 0.5
                         idle "_mods/content/elkrose_vt/extra_images/viagra.webp"
                         action NullAction()
@@ -1485,6 +1496,7 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
 
                 # FINAL IMAGEBUTTON - SINGLE DEFINITION
                 imagebutton:
+                    focus_mask True
                     at Transform(zoom=(icon_size / 50.0))
                     yalign 0.5
                     idle condom_idle_img
@@ -1499,6 +1511,7 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
 
                 if "Viagra" in player.temporary_stat_changes:
                     imagebutton:
+                        focus_mask True
                         at Transform(zoom=(icon_size / 50.0))
                         yalign 0.5
                         idle "_mods/content/elkrose_vt/extra_images/viagra.webp"
