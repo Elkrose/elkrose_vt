@@ -1262,7 +1262,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
         $ yoffset = 20
-        $ xoffset = -275
+        $ xoffset = -475
     elif position == "top_right":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0
