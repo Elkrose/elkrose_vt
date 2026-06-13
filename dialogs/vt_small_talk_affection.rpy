@@ -1,7 +1,3 @@
-init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["small_talk_affection"] = "vt_small_talk_affection"
-
 label vt_small_talk_affection:
     "You bring up some topics that might interest her."
 
