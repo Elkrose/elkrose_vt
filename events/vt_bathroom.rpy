@@ -459,7 +459,7 @@ label vt_academy_bathroom_sex:
                                 else:
                                     girl.character "You don't have it on you? Don't waste my time then."
                                     $ girl.apply_impacts({"affection": (-750, -250)})
-                            "Grant her a grade bump of 5 percent?" if is_student:
+                            "Grant her a grade bump of 5 percent?" if hasattr(girl, 'grades'):
                                 if hasattr(girl, 'grades'):
                                     # Check if already at max
                                     if girl.grades >= 100:
