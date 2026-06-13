@@ -1,7 +1,11 @@
 #SPECIFIC CHERRY DIALOGS
 # to catch mothers if not hasattr(self, "daughter"):
 
+# Save-compat shim: redirect the old un-prefixed label name (pre-1.0.6 saves/references) instead of erroring.
 label small_talk_condoms:
+    jump vt_small_talk_condoms
+
+label vt_small_talk_condoms:
     $ time_manager.skip_time(minutes=5)
     
     # Clear identification of relationship types

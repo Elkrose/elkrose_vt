@@ -1,7 +1,3 @@
-init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["small_talk_naturism"] = "vt_small_talk_naturism"
-    
 label vt_small_talk_naturism:
     "You bring up some topics related to nature and natural living."
 

@@ -1,4 +1,26 @@
-Virginal Tracker Mod 1.0.5
+Virginal Tracker Mod 1.0.6
+
+1.0.6
+
+- Removed all label overrides: small-talk, the pre-exam "caught masturbating" event, and the library "between the stacks" scene now repoint through their menu/event databases instead of config.label_overrides, so the mod is eligible for the base game's mod manager. The library repoint is a soft dependency on ggypt_library_expansion (enhances it if present, no-op if absent).
+- Fixed pregnancy fullbody images not showing (fullbody tag helper was not loading as a Ren'Py script; renamed to _ren.py).
+- Fixed library scene bugs: girls now actually leave after rejecting you, and the "Push Her (+2 Grade)" option now grants the grades.
+- Fixed the bathroom stall time-skip never applying (was unreachable code after the scene return).
+- Breast-size aware dialog: the titjob option is now hidden for small-chested girls, and descriptions vary by size (new Girl.boob_description() helper).
+- Prefixed the mod's own small-talk labels (pregnancy / condoms / birth control) with vt_ for namespace safety; pre-1.0.6 saves are covered by redirect stubs.
+- Bathroom stall fixes: the threesome grade-bump offer no longer keys off the wrong girl, and a grade-bump's discipline change is now a proper amount instead of a near-zero value.
+- Fixed the Daddy's Girl trait silently dropping a stat modifier (a duplicate dictionary key).
+
+Known issues / TODO (flagged during audit):
+- SafeDOCK / DryDOCK gift items call girl.apply_planb_pill() / girl.apply_emergency_pill(), which are not defined yet -> crash if gifted. (Main dev to implement.)
+- "trust" impact key in birth-control/condom small-talk is a no-op (no trust stat exists yet) -> intended future feature.
+- Small-talk stat impacts (20-40) are tiny on the XP scale; revisit if visible movement was intended.
+- The vt_ small-talk redirect stubs are a temporary save-compat measure; remove them in a future version once pre-1.0.6 saves are no longer a concern.
+
+1.0.5.1
+
+- Typo, grammar, and punctuation cleanups across the library and pre-exam events.
+- General cleanups.
 
 1.0.5
 

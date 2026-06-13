@@ -2703,6 +2703,27 @@ init -14 python:
             # #renpy.store[self].path_seeds[path] = self.path_seeds[path]
             # setattr(renpy.store, f"{self}.path_seeds['{path}']", new_amount)
         
+        def boob_description(self):
+            # Returns a randomized, flavorful bust descriptor (adjective + noun) based on
+            # the girl's physical-appearance trait. Distinguishes natural vs fake; uses a
+            # size-neutral positive fallback if she has no boob-size trait.
+            nouns = ["tits", "boobs", "breasts"]
+            if self.has_trait("big_boobs"):
+                adjs = ["big", "huge", "massive", "ample", "full"]
+            elif self.has_trait("big_boobs_fake"):
+                adjs = ["big fake", "huge fake", "augmented"]
+            elif self.has_trait("average_boobs"):
+                adjs = ["shapely", "lovely"]
+            elif self.has_trait("average_boobs_fake"):
+                adjs = ["fake", "enhanced"]
+            elif self.has_trait("small_boobs"):
+                adjs = ["small", "tiny", "petite", "perky"]
+            elif self.has_trait("small_boobs_fake"):
+                adjs = ["small fake", "petite enhanced", "perky fake"]
+            else:
+                adjs = ["soft", "supple", "lovely"]
+            return f"{renrandom.choice(adjs)} {renrandom.choice(nouns)}"
+
         # Apply patches
         Girl.__init__ = vt_girl_init
         Girl.daily_update = vt_daily_update
@@ -2732,6 +2753,7 @@ init -14 python:
         Girl.trigger_shower_sex_followup = trigger_shower_sex_followup
         Girl.get_fertility_day_status = get_fertility_day_status
         Girl.get_cycle_day = get_cycle_day
+        Girl.boob_description = boob_description
         #Girl.vt_relationship_change = vt_relationship_change
         #Girl.vt_seed_relationship_path = vt_seed_relationship_path
         print("VT MOD: Successfully patched Girl class with advanced fertility system")

@@ -1,8 +1,3 @@
-init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["small_talk_fear"] = "vt_small_talk_fear"
-    config.label_overrides["small_talk_fear_lower"] = "vt_small_talk_fear_lower"
-
 label vt_small_talk_fear:
     "You bring up some topics as thinly veiled threats trying to scare her."
 

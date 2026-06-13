@@ -1,6 +1,8 @@
 init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["between_the_stacks"] = "vt_between_the_stacks"
+    # Soft dependency on ggypt_library_expansion: if its library menu exists, repoint
+    # "between_the_stacks" to our enhanced version (no label override). No-op if absent.
+    if "database_library_options" in globals():
+        vt_repoint_menu_label(database_library_options, "between_the_stacks", "vt_between_the_stacks")
 
 label vt_between_the_stacks:
     player.character "Would you care to join me in the stacks. I'm sure we can find an interesting book for you."
@@ -50,7 +52,8 @@ label vt_between_the_stacks:
                                 "You pull out and spray your load on the girl's face."
                                 "After a beat the girl, flushed, rushes out of the library, only stopping to gather up her supplies."
 
-                                $selected_girl.apply_impacts({"grade": 2, "corruption": (1000, 1500), "affection": (-2500, -2000), "fear": (1000, 1500)})
+                                $selected_girl.grades = min(100, selected_girl.grades + 2)
+                                $selected_girl.apply_impacts({"corruption": (1000, 1500), "affection": (-2500, -2000), "fear": (1000, 1500)})
                                 $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
 
                             "Don't Push It":
@@ -72,13 +75,14 @@ label vt_between_the_stacks:
                     $selected_girl.apply_impacts({"affection": - 2500, "fear": 1000})
 
 
-            "Ask for a Titjob":
-                player.character "No one will see us back here, why don't you take take those tits out and use them"
+            "Ask for a Titjob" if not (selected_girl.has_trait("small_boobs") or selected_girl.has_trait("small_boobs_fake")):
+                player.character "No one will see us back here, why don't you take those tits out and use them?"
                 $girl_acceptance = selected_girl.get_acceptance_by_name("fuck_boobs")
                 if girl_acceptance >= 40:
                     $time_manager.skip_time(minutes=20)
                     if selected_girl.is_wearing_clothing_in_slots("upper") or selected_girl.is_wearing_clothing_in_slots("bra"):
-                        "She quickly glances around before pulling her tits out of her outfit"
+                        $ _vt_boobs = selected_girl.boob_description()
+                        "She quickly glances around before pulling her [_vt_boobs] out of her outfit."
                     else:
                         selected_girl.character "Well, they are already out, so easy enough to use."
 
@@ -97,7 +101,7 @@ label vt_between_the_stacks:
                     "With that she gathers up her things and heads back out into the school."
 
                     $selected_girl.apply_impacts({"corruption": 1500})
-                    $remove_girl_id_from_location(selected_girl.id, " girls_at_library")
+                    $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
                 elif girl_acceptance >= 20:
                     selected_girl.character "I would prefer not, who knows who could see my boobs if I did that."
                     if "blowjob" in rule_manager.get_all_tolerated_actions(selected_girl):
@@ -145,7 +149,7 @@ label vt_between_the_stacks:
                     "With that she gathers up her things and heads back out into the school."
 
                     $selected_girl.apply_impacts({"corruption": 1500})
-                    $remove_girl_id_from_location(selected_girl.id, " girls_at_library")
+                    $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
                 else:
                     selected_girl.character "No, I don't want to fuck right now, you old horn dog!"
                     "With that, she quickly gathers her stuff and storms out of the library."

@@ -459,7 +459,7 @@ label vt_academy_bathroom_sex:
                                 else:
                                     girl.character "You don't have it on you? Don't waste my time then."
                                     $ girl.apply_impacts({"affection": (-750, -250)})
-                            "Grant her a grade bump of 5 percent?" if is_student:
+                            "Grant her a grade bump of 5 percent?" if hasattr(girl, 'grades'):
                                 if hasattr(girl, 'grades'):
                                     # Check if already at max
                                     if girl.grades >= 100:
@@ -596,16 +596,16 @@ label vt_academy_bathroom_sex:
                                 $ girl.apply_impacts({"affection": (-750, -250)})
 
             # If we got here, we proceed to the sex scene
+            $ time_manager.skip_time(minutes=20)
             scene black with dissolve
             scene bg_stall_bathroom with dissolve
             return "start_sex_interaction"
-            $ time_manager.skip_time(minutes=20)
         else:
             # If we got here, we proceed to the sex scene
+            $ time_manager.skip_time(minutes=20)
             scene black with dissolve
             scene bg_stall_bathroom with dissolve
             return "start_sex_interaction"
-            $ time_manager.skip_time(minutes=20)
     elif final_acceptance >= 20:
         # --- SOFT REJECT FOR FIRST GIRL ---
         $ actions_already_done[selected_girl.id].append("block_talking_bathroom")
@@ -689,10 +689,10 @@ label vt_academy_bathroom_sex:
                         $ se_use_generic_ending = True
                         $ se_remove_girls_from_location = True
                         $ se_additional_webm_sub_tags = ["bathroom"]
+                        $ time_manager.skip_time(minutes=20)
                         scene black with dissolve
                         scene bg_stall_bathroom with dissolve
                         return "start_sex_interaction"
-                        $ time_manager.skip_time(minutes=20)
                     else:
                         selected_girl.character "You don't have it on you? Don't waste my time then."
                         $ selected_girl.apply_impacts({"affection": (-750, -250)})
@@ -707,7 +707,7 @@ label vt_academy_bathroom_sex:
                             $ new_grade = min(100, selected_girl.grades + 5)
                             $ selected_girl.grades = new_grade
                             $ selected_girl.wants_vaginal_condom = False
-                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (950, 1500), "discipline": -30})
+                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (950, 1500), "discipline": (-750, -250)})
                             
                             if is_student:
                                 selected_girl.character "A grade bump? For this? You must really want me in there. Deal."
@@ -723,10 +723,10 @@ label vt_academy_bathroom_sex:
                             $ se_use_generic_ending = True
                             $ se_remove_girls_from_location = True
                             $ se_additional_webm_sub_tags = ["bathroom"]
+                            $ time_manager.skip_time(minutes=20)
                             scene black with dissolve
                             scene bg_stall_bathroom with dissolve
                             return "start_sex_interaction"
-                            $ time_manager.skip_time(minutes=20)
                     else:
                         selected_girl.character "You can't alter my grades. Don't lie to me. Cash or get lost."
                         $ selected_girl.apply_impacts({"affection": (-750, -250)})
