@@ -100,7 +100,7 @@ label vt_between_the_stacks:
                     "With that she gathers up her things and heads back out into the school."
 
                     $selected_girl.apply_impacts({"corruption": 1500})
-                    $remove_girl_id_from_location(selected_girl.id, " girls_at_library")
+                    $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
                 elif girl_acceptance >= 20:
                     selected_girl.character "I would prefer not, who knows who could see my boobs if I did that."
                     if "blowjob" in rule_manager.get_all_tolerated_actions(selected_girl):
@@ -148,7 +148,7 @@ label vt_between_the_stacks:
                     "With that she gathers up her things and heads back out into the school."
 
                     $selected_girl.apply_impacts({"corruption": 1500})
-                    $remove_girl_id_from_location(selected_girl.id, " girls_at_library")
+                    $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
                 else:
                     selected_girl.character "No, I don't want to fuck right now, you old horn dog!"
                     "With that, she quickly gathers her stuff and storms out of the library."
