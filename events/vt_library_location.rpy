@@ -1,6 +1,8 @@
 init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["between_the_stacks"] = "vt_between_the_stacks"
+    # Soft dependency on ggypt_library_expansion: if its library menu exists, repoint
+    # "between_the_stacks" to our enhanced version (no label override). No-op if absent.
+    if "database_library_options" in globals():
+        vt_repoint_menu_label(database_library_options, "between_the_stacks", "vt_between_the_stacks")
 
 label vt_between_the_stacks:
     player.character "Would you care to join me in the stacks. I'm sure we can find an interesting book for you."

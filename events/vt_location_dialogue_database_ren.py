@@ -7,6 +7,14 @@ from main_classes.girl.class_girl_ren import Girl
 init -3 python:
 """
 
+    def vt_repoint_menu_label(options, old_label, new_label):
+        # options: list of (..., label) tuples; repoints the entry whose last element == old_label
+        for i, entry in enumerate(options):
+            if entry[-1] == old_label:
+                options[i] = entry[:-1] + (new_label,)
+                return True
+        return False
+
 #Bathroom
     #Check if database_shop_items exists before modifying it
     if "database_student_bathroom_options" in globals():
@@ -28,31 +36,45 @@ init -3 python:
 
     ## Check if database_small_talk_options exists before modifying it
     if "database_small_talk_options" in globals():
-        marker_label = "small_talk_pregnancy"
+        marker_label = "vt_small_talk_pregnancy"
         if not any(label == marker_label for condition, text, label in database_small_talk_options):
             # The marker is not found, so it's safe to add our new options
-            
-            # Add small_talk_pregnancy
+
+            # Add vt_small_talk_pregnancy
             database_small_talk_options.append(
-                ("True", "Talk about Pregnancy", "small_talk_pregnancy")
+                ("True", "Talk about Pregnancy", "vt_small_talk_pregnancy")
             )
-            
-            # Add small_talk_condoms
+
+            # Add vt_small_talk_condoms
             database_small_talk_options.append(
-                ("True", "Talk about Condoms", "small_talk_condoms")
+                ("True", "Talk about Condoms", "vt_small_talk_condoms")
             )
-            
-            # Add small_talk_birth_control
+
+            # Add vt_small_talk_birth_control
             # database_small_talk_options.append(
-                # ("True", "Talk about Birth Control", "small_talk_birth_control")
+                # ("True", "Talk about Birth Control", "vt_small_talk_birth_control")
             # )
             
             renpy.log("VT MOD: Successfully added small_talk_options preg,condoms,bc, database")
         else:
             # The marker was found, so we do nothing to avoid duplicates
             renpy.log("VT MOD: Small talk options already found. Skipping addition.")
+
+        # Repoint base-game small-talk topics to the enhanced VT versions (no label override)
+        vt_repoint_menu_label(database_small_talk_options, "small_talk_affection",  "vt_small_talk_affection")
+        vt_repoint_menu_label(database_small_talk_options, "small_talk_corruption", "vt_small_talk_corruption")
+        vt_repoint_menu_label(database_small_talk_options, "small_talk_fear",       "vt_small_talk_fear")
+        vt_repoint_menu_label(database_small_talk_options, "small_talk_fear_lower", "vt_small_talk_fear_lower")
+        vt_repoint_menu_label(database_small_talk_options, "small_talk_naturism",   "vt_small_talk_naturism")
     else:
         renpy.log("VT MOD ERROR: small_talk_options not found! Could not add small talk items")
+
+    # Repoint the base-game "caught masturbating" pre-exam event to the enhanced VT version (no label override)
+    if "database_generic_events" in globals():
+        for _ev in database_generic_events:
+            if getattr(_ev, "name", None) == "pre_exam_girl_masturbate":
+                _ev.stages = ["vt_exam_event_girl_caught_masturbating"]
+                break
 
 # ## Teacher's Lounge
 # database_teacher_discussion_options = [

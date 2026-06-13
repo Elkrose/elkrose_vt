@@ -1,7 +1,3 @@
-init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["small_talk_corruption"] = "vt_small_talk_corruption"
-
 label vt_small_talk_corruption:
     "You bring up some topics that might push her boundaries."
 

@@ -1,7 +1,3 @@
-init 5 python:
-#making it a habit to init hijank label lower priority
-    config.label_overrides["exam_event_girl_caught_masturbating"] = "vt_exam_event_girl_caught_masturbating"
-
 label vt_exam_event_girl_caught_masturbating:
     $ selected_girl = current_event.participants[0]
 
@@ -19,10 +15,10 @@ label vt_exam_event_girl_caught_masturbating:
 
     $ descriptions = [
         f"You open the door to find {selected_girl} in an intimate moment with herself. She's so absorbed in her own world that she doesn't notice your presence initially. When she does, her eyes widen with surprise and she hastily attempts to conceal herself.",
-        f"As you push the door open, you discover {selected_girl} engaged in a personal act. She's so immersed in her pleasure that she doesn't realize you're there. When she finally does, her eyes fill with shock and she quickly tries to cover up",
-        f"Upon opening the door, you stumble upon {selected_girl} in a private moment. She's so captivated by her actions that she doesn't notice you at first. When she does, her eyes widen in embarrassment and she hurriedly tries to hide herself",
-        f"The door creaks open to reveal {selected_girl} in a compromising position. She's so engrossed in her own world that she doesn't notice you. When she does, her eyes widen in alarm and she quickly tries to cover herself",
-        f"As the door swings open, you catch {selected_girl} in a moment of self-indulgence. She's so lost in her actions that she doesn't notice you. When she does, her eyes widen in panic and she hastily tries to cover herself"
+        f"As you push the door open, you discover {selected_girl} engaged in a personal act. She's so immersed in her pleasure that she doesn't realize you're there. When she finally does, her eyes fill with shock and she quickly tries to cover up.",
+        f"Upon opening the door, you stumble upon {selected_girl} in a private moment. She's so captivated by her actions that she doesn't notice you at first. When she does, her eyes widen in embarrassment and she hurriedly tries to hide herself.",
+        f"The door creaks open to reveal {selected_girl} in a compromising position. She's so engrossed in her own world that she doesn't notice you. When she does, her eyes widen in alarm and she quickly tries to cover herself.",
+        f"As the door swings open, you catch {selected_girl} in a moment of self-indulgence. She's so lost in her actions that she doesn't notice you. When she does, her eyes widen in panic and she hastily tries to cover herself."
     ]
     $ description = renrandom.choice(descriptions)
     "[description]"
