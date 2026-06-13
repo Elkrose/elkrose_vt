@@ -707,7 +707,7 @@ label vt_academy_bathroom_sex:
                             $ new_grade = min(100, selected_girl.grades + 5)
                             $ selected_girl.grades = new_grade
                             $ selected_girl.wants_vaginal_condom = False
-                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (950, 1500), "discipline": -30})
+                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (950, 1500), "discipline": (-750, -250)})
                             
                             if is_student:
                                 selected_girl.character "A grade bump? For this? You must really want me in there. Deal."
