@@ -52,7 +52,8 @@ label vt_between_the_stacks:
                                 "You pull out and spray your load on the girl's face."
                                 "After a beat the girl, flushed, rushes out of the library, only stopping to gather up her supplies."
 
-                                $selected_girl.apply_impacts({"grade": 2, "corruption": (1000, 1500), "affection": (-2500, -2000), "fear": (1000, 1500)})
+                                $selected_girl.grades = min(100, selected_girl.grades + 2)
+                                $selected_girl.apply_impacts({"corruption": (1000, 1500), "affection": (-2500, -2000), "fear": (1000, 1500)})
                                 $remove_girl_id_from_location(selected_girl.id, "girls_at_library")
 
                             "Don't Push It":
