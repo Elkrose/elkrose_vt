@@ -384,8 +384,8 @@ init -3 python:
                     # Apply fertility boost to the girl
                     girl.apply_emergency_pill()
                     girl.emergency_pill += 1  # 14 day of fertility boost
-                    renpy.log(f"{girl.first_name} was given an DryDOCK!")
-                    vt_preg_notify(f"{girl.first_name} was given an DryDOCK!", duration=3.0)
+                    renpy.log(f"{girl.first_name} was given a DryDOCK!")
+                    vt_preg_notify(f"{girl.first_name} was given a DryDOCK!", duration=3.0)
 
                 # For condoms, we don't need to handle them here since they're not gifts
                 # They should remain as consumables that the player uses from their inventory
@@ -588,7 +588,7 @@ label vt_select_condom:
                     player.condom_active = "raw"
                     queue_notification("Out of BasicShield condoms!", duration=3.0)
         
-        "Use UltraProtect condom([player.condom_premium_count])" if player.condom_premium_count > 0:
+        "Use UltraProtect condom ([player.condom_premium_count])" if player.condom_premium_count > 0:
             python:
                 player.condom_premium_count -= 1
                 player.condom_active = "premium"
