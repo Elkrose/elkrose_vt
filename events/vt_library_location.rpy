@@ -75,13 +75,14 @@ label vt_between_the_stacks:
                     $selected_girl.apply_impacts({"affection": - 2500, "fear": 1000})
 
 
-            "Ask for a Titjob":
-                player.character "No one will see us back here, why don't you take take those tits out and use them"
+            "Ask for a Titjob" if not (selected_girl.has_trait("small_boobs") or selected_girl.has_trait("small_boobs_fake")):
+                player.character "No one will see us back here, why don't you take those tits out and use them?"
                 $girl_acceptance = selected_girl.get_acceptance_by_name("fuck_boobs")
                 if girl_acceptance >= 40:
                     $time_manager.skip_time(minutes=20)
                     if selected_girl.is_wearing_clothing_in_slots("upper") or selected_girl.is_wearing_clothing_in_slots("bra"):
-                        "She quickly glances around before pulling her tits out of her outfit"
+                        $ _vt_boobs = selected_girl.boob_description()
+                        "She quickly glances around before pulling her [_vt_boobs] out of her outfit."
                     else:
                         selected_girl.character "Well, they are already out, so easy enough to use."
 
