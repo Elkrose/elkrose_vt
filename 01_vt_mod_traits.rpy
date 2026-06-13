@@ -355,7 +355,7 @@ init -3 python:
                         "player": {"arousal": 0.15},
                     }
                 },
-                description="She's developed a mild interest on having cum in her mouth.",
+                description="She's developed a mild interest in having cum in her mouth.",
                 sponsor_description="Specializes in facial and creampie mouth scenes, highly enthusiastic performer.",
                 earn_requirements="girl.oral_cum_fetish >= 50",
                 earn_requirements_description="Earned: Oral cum fetish at 50+",
@@ -582,7 +582,7 @@ init -3 python:
                         "player": {"arousal": 0.15},
                     }
                 },
-                description="She's developed a mild interest on having cum inside her pussy.",
+                description="She's developed a mild interest in having cum inside her pussy.",
                 sponsor_description="Specializes in vaginal creampie scenes, highly enthusiastic performer.",
                 earn_requirements="girl.vaginal_cum_fetish >= 50",
                 earn_requirements_description="Earned: Vaginal cum fetish at 50+",
@@ -826,7 +826,7 @@ init -3 python:
                         "player": {"arousal": 0.15},
                     }
                 },
-                description="She's developed a mild interest on having cum in her ass.",
+                description="She's developed a mild interest in having cum in her ass.",
                 sponsor_description="Specializes in anal creampie scenes, highly enthusiastic performer.",
                 earn_requirements="girl.anal_cum_fetish >= 50",
                 earn_requirements_description="Earned: Anal cum fetish at 50+",

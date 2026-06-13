@@ -5,7 +5,7 @@ init -1 python:
         color="#9249F0",
         rarity=0,
         stat_growth_multipliers={"naturism": 0.03,"corruption": 0.03,"pressure": -0.5, "arousal": 0.025},
-        base_stat_modifiers={"mouth_sensitivity": 0.05, "pussy_sensitivity": 0.05, "ass_sensitivity": 0.05, "acceptance": 20,"naturism": 0.05, "corruption": 0.15, "obedience_factor": 0.15, "max_tolerance": 0.15,"discipline": 0.15, "people_skill": 0.25, "max_tolerance": 80,"shoot_proficiency": 0.5, "base_arousal": 20},
+        base_stat_modifiers={"mouth_sensitivity": 0.05, "pussy_sensitivity": 0.05, "ass_sensitivity": 0.05, "acceptance": 20,"naturism": 0.05, "corruption": 0.15, "obedience_factor": 0.15, "discipline": 0.15, "people_skill": 0.25, "max_tolerance": 80,"shoot_proficiency": 0.5, "base_arousal": 20},
         treated_as_tolerated_actions=["exam_action_spank_ass","exam_action_slap_ass", "facial","blowjob",
             "use_mouth", "cum_in_panties","creampie_mouth", "creampie_pussy", "creampie_ass","remove_lower", "remove_panties","remove_pantyhose","tease_clit","finger_pussy", "sleep_facials", "sleep_creampie_mouth", "sleep_creampie_pussy",],
         action_multipliers={
