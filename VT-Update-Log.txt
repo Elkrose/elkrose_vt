@@ -1,4 +1,71 @@
-Virginal Tracker Mod 1.0.6
+Virginal Tracker Mod 1.0.7
+
+1.0.7
+
+- Mid-save install support: the mod can now be added to a save already in
+  progress without crashing. The Player's condom attributes and every girl's
+  full set of VT attributes (pregnancy, fertility, condom, fetish,
+  relationship, and follow-up state) are now backfilled on load via
+  config.after_load_callbacks, plus defensively in the Player's daily update.
+  Girl initialization is shared between Girl.__init__ and the load backfill
+  through one mother-aware helper (vt_ensure_girl_attrs), so newly created
+  girls and girls from a pre-mod save end up with identical, complete
+  attribute sets. This fixes both the original "'Player' object has no
+  attribute 'condom_active'" crash and the follow-on crashes that would have
+  hit when first interacting with a girl on a pre-mod save.
+- Sidecar: VT's per-save state now lives in mod_data["elkrose_vt"] -- a
+  single dict of plain values -- instead of as loose attributes scattered
+  across the Player and each Girl. On the Player that's the condom state; on
+  each girl it's the whole VT attribute set (pregnancy, fertility, condom,
+  fetish, relationship, follow-up, and baby_desire state) plus the pill and
+  condom "ammo" counts. Property accessors keep every call site
+  (player.condom_active, girl.pregnant, etc.) working unchanged, and the data
+  is migrated automatically when an older save loads. The point: if the mod
+  is ever removed, this state is one self-contained, ignorable blob per
+  object rather than stray keys on the Player and girls -- adopting the
+  proposed base-game "mod_data[mod_id]" convention (see
+  VT-Mod-Removal-Proposal.md).
+- Condoms are now "ammo," not inventory items: buying a condom pack converts
+  straight into your condom count (spent from the cherry HUD) instead of
+  dropping a consumable object into your inventory. Packs bought before this
+  update are converted automatically on load. This means condoms leave no
+  inventory residue behind if the mod is removed, and you no longer have to
+  "use" a pack from the inventory to stock up. Your condom count still shows
+  up in the right places -- the shop's "Owned" line and your inventory
+  screen -- fed through the base game's own get_item_quantity /
+  get_items_and_quantity methods, so no base screens are overridden.
+- Gift pills (FertiBOOST / PregnaVITA / SafeDOCK / DryDOCK) are now "ammo"
+  too: buying one adds to a per-pill count in the sidecar instead of a Gift
+  object in your inventory, and any pills bought before this update are
+  converted on load. They still appear in the shop's "Owned" line, the
+  inventory screen, and the give-a-gift menu (with the normal accept chance)
+  -- all via the base game's own item methods, no screen overrides -- and
+  giving one now applies the effect and spends one from the count, without
+  leaving the pill stashed on the girl. Net effect: pills leave no inventory
+  residue on the player OR the girl if the mod is removed. (Note:
+  SafeDOCK/DryDOCK still depend on the base game's
+  apply_planb_pill/apply_emergency_pill, which aren't implemented yet, so
+  those two remain non-functional until the base dev adds them -- unchanged
+  from before.)
+- baby_desire is now a real XP-backed stat. It was always a 0-100 "wants a
+  baby" meter, but the dialogue and bathroom choices that raise it were
+  writing XP-scale amounts (250-750) directly onto the 0-100 value, so a
+  single choice would slam it to max and leave it stuck there. It now carries
+  a baby_desire_xp companion and levels through the base game's own XP
+  machinery (via a fix_stats hook), so those existing dialogue amounts
+  finally read as intended, growth is gradual, and the value stays clamped
+  0-100. Creampies feed desire through the same XP path now (tunable via
+  VT_BABY_DESIRE_XP_PER_POINT), and any older save where the meter had
+  overflowed past 100 is re-seeded from the girl's traits/corruption on load.
+- Gift-pill reactions now vary with the situation. Giving FertiBOOST or
+  PregnaVITA produces a different response depending on how badly the girl
+  wants a baby (her desire band), whether she knows she's pregnant, and
+  whether you know -- including a sly, secret smile when she knows but hasn't
+  told you yet.
+- FertiBOOST is hidden from a girl's give-a-gift menu once a pregnancy is out
+  in the open (she knows AND you know) -- no sense offering fertility pills to
+  someone you both already know is expecting. It still shows in the shop and
+  the inventory screen; it's just filtered out of that one girl's gift list.
 
 1.0.6
 
