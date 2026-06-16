@@ -57,7 +57,6 @@ init -3 python:
                 icon="_mods/content/elkrose_vt/extra_images/pregboosters.png",
                 price=1000,
                 lewdness=3,
-                accept_impacts={"prenatal_boost": 1},
                 description="PregnaVITA! Essential nutrients for healthy fetal development and maternal wellness during pregnancy. Take daily for optimal results.\nPrenatal vitamins that accelerate pregnancy progression.\nSpeeds Pregnancy by 2 times\n{color=#CCCCCC}Pregnancy Speed:{/color} {color=#00FF00}+++++{/color}"
             )
 
@@ -358,20 +357,39 @@ init -3 python:
             original_give_gift = Gift.give_gift
             
             def vt_give_gift(self, girl, apply_impacts=True):
-                # First call the original method for standard gift handling
-                original_give_gift(self, girl, apply_impacts)
-                
+                # VT gift pills are "ammo": they live as a sidecar count, never as Gift objects
+                # in anyone's inventory. So for our pills, apply the impacts directly (skipping
+                # the base flow's player.remove_item / girl.add_item, which would stash the Gift
+                # on the girl). Non-VT gifts fall through to the original behavior unchanged.
+                is_vt_pill = self.id in ("fertility_pill", "prenatal_vitamins", "planb_pill", "emergency_pill")
+
+                if is_vt_pill:
+                    if apply_impacts:
+                        self.apply_gift_impacts(girl, accepted_gift=True)
+                else:
+                    original_give_gift(self, girl, apply_impacts)
+
                 # Now handle our special VT items
                 if self.id == "fertility_pill":
-                    # Apply fertility boost to the girl
-                    girl.fertility_boost += 7  # 7 day of fertility boost
+                    # If she AND the player both know she's pregnant, FertiBOOST is pointless and
+                    # isn't offered (excluded in vt_get_items_and_quantity). Guard here too so a
+                    # stray call can't apply the boost or burn a pill.
+                    if girl.pregnant and getattr(girl, "knows_pregnant", False) and getattr(girl, "player_knows_pregnant", False):
+                        vt_preg_notify(f"{girl.first_name} laughs softly - you both know she's already expecting.", duration=3.0)
+                        return
+                    # Boost only matters before conception; an already-pregnant girl still "takes"
+                    # it (and the reaction reflects her secret/obliviousness) but gains nothing.
+                    if not girl.pregnant:
+                        girl.fertility_boost += 7  # 7 day of fertility boost
                     renpy.log(f"{girl.first_name} was given FertiBOOST!!")
-                    vt_preg_notify(f"{girl.first_name} was given FertiBOOST!!", duration=3.0)
-                
-                elif self.id == "prenatal_vitamins" and girl.pregnant:
-                    # Apply PregnaVITA boost to speed up pregnancy
-                    girl.apply_prenatal_boost()
-                    vt_preg_notify(f"{girl.first_name} was given PregnaVITA!", duration=3.0)
+                    vt_preg_notify(vt_pill_reaction(girl, "fertility_pill"), duration=3.5)
+
+                elif self.id == "prenatal_vitamins":
+                    # Always goes into her PregnaVITA supply when accepted; she only *takes* one
+                    # (on the weekly tick) once she's pregnant and knows it -- apply_prenatal_boost
+                    # gates the actual dose -- so a non-pregnant girl/mother just holds onto it.
+                    girl.prenatal_boost = getattr(girl, "prenatal_boost", 0) + 1
+                    vt_preg_notify(vt_pill_reaction(girl, "prenatal_vitamins"), duration=3.5)
 
                 if self.id == "planb_pill":
                     # Apply planb boost to the girl
@@ -387,8 +405,17 @@ init -3 python:
                     renpy.log(f"{girl.first_name} was given a DryDOCK!")
                     vt_preg_notify(f"{girl.first_name} was given a DryDOCK!", duration=3.0)
 
-                # For condoms, we don't need to handle them here since they're not gifts
-                # They should remain as consumables that the player uses from their inventory
+                # Spend one unit of pill "ammo" now that the gift has been applied.
+                if is_vt_pill:
+                    try:
+                        counts = vt_player_pill_counts(player)
+                        if counts.get(self.id, 0) > 0:
+                            counts[self.id] -= 1
+                    except Exception:
+                        pass
+
+                # Condoms aren't gifts -- they're auto-converted to counts at purchase and
+                # spent from the cherry HUD, so they're not handled here.
 
             # Replace the method
             Gift.give_gift = vt_give_gift

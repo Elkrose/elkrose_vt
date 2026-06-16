@@ -163,6 +163,85 @@ init python:
         # Show our styled notification
         renpy.show_screen("vt_relationals_notification", message=message, duration=duration)
 
+    def vt_baby_desire_band(girl):
+        """Resolve baby_desire into the mod's desire tiers.
+
+        Mirrors the ladder in the creampie-roll notifier (this file, ~3470-3500) so all
+        baby-desire copy speaks the same language. Clamps defensively on read because the
+        apply_impacts write-path can push baby_desire past 100 (see VT-Pregnancy-System.md).
+        """
+        d = max(0, min(100, getattr(girl, "baby_desire", 0)))
+        if d >= 99:
+            return "obsession"
+        if d >= 90:
+            return "fixation"
+        if d >= 75:
+            return "obsessed"
+        if d >= 50:
+            return "thinking"
+        if d >= 25:
+            return "curious"
+        return "none"
+
+    def vt_pill_reaction(girl, pill_id):
+        """Player-facing reaction text for a VT fertility-pill gift.
+
+        Varies by the girl's baby_desire band, her pregnancy/awareness state
+        (pregnant / knows_pregnant / player_knows_pregnant), and whether she already
+        carries the player's child (kids_with_player) -- the latter reuses the existing
+        "already a parent" axis from the creampie ladder instead of separate mother copy.
+        Returns a string for vt_preg_notify.
+        """
+        name = girl.first_name
+        pregnant = getattr(girl, "pregnant", False)
+        knows = getattr(girl, "knows_pregnant", False)
+        player_knows = getattr(girl, "player_knows_pregnant", False)
+        has_player_kid = getattr(girl, "kids_with_player", 0) > 0
+
+        if pill_id == "fertility_pill":
+            if pregnant:
+                # both-know is excluded from the give menu, so only two cases reach here.
+                if knows and not player_knows:
+                    return f"{name} takes the FertiBOOST with a sly little smile, keeping her secret to herself."
+                return f"{name} takes the FertiBOOST without a clue her body is already ahead of it."
+            band = vt_baby_desire_band(girl)
+            if band == "obsession":
+                if has_player_kid:
+                    return f"{name} clutches the FertiBOOST like treasure - she wants to give you more babies, now."
+                return f"{name} clutches the FertiBOOST like treasure, desperate to carry your child."
+            if band == "fixation":
+                if has_player_kid:
+                    return f"{name} swallows the FertiBOOST at once - she can't wait to grow your family."
+                return f"{name} swallows the FertiBOOST at once, already picturing the swell of your baby."
+            if band == "obsessed":
+                return f"{name} takes the FertiBOOST eagerly, biting her lip at the thought."
+            if band == "thinking":
+                return f"{name} takes the FertiBOOST thoughtfully, her hand drifting to her stomach."
+            if band == "curious":
+                return f"{name} studies the FertiBOOST a moment, a flicker of curiosity behind her blush."
+            return f"{name} eyes the FertiBOOST warily, and only swallows it because you asked."
+
+        if pill_id == "prenatal_vitamins":
+            high = vt_baby_desire_band(girl) in ("obsessed", "fixation", "obsession") or has_player_kid
+            if not pregnant:
+                if high:
+                    return f"{name} tucks the PregnaVITA away, already daydreaming of the day she'll need them."
+                return f"{name} frowns - 'I won't be needing these' - but tucks the PregnaVITA away anyway."
+            if knows and player_knows:
+                if high:
+                    return f"{name} beams, and promises to take PregnaVITA at her next check-up, glowing."
+                return f"{name} accepts the PregnaVITA with a tight nod - she'll take it for the baby's sake."
+            if knows and not player_knows:
+                if high:
+                    return f"{name} takes the PregnaVITA with a secret, radiant smile."
+                return f"{name} pockets the PregnaVITA quickly, her secret heavy behind her eyes."
+            # pregnant but doesn't know it yet
+            if high:
+                return f"{name} pockets the PregnaVITA, puzzled but quietly pleased."
+            return f"{name} pockets the PregnaVITA, puzzled why you'd give her vitamins."
+
+        return f"{name} accepts the {pill_id}."
+
     def check_pregnancy_followups():
         current_day = time_manager.total_days
         all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
@@ -1493,7 +1572,9 @@ init -4 python:
             if not hasattr(self, 'fertility_boost'):
                 self.fertility_boost = 0  # Days remaining for fertility boost
             if not hasattr(self, 'prenatal_boost'):
-                self.prenatal_boost = 0  # Days remaining for prenatal boost
+                self.prenatal_boost = 0  # PregnaVITA supply: pills on hand, taken 1/week
+            if not hasattr(self, 'prenatal_doses'):
+                self.prenatal_doses = 0  # PregnaVITA doses taken (compression factor, capped)
 
             #Followup triggers
             if not hasattr(self, 'has_pregnancy_followup'):
@@ -1710,55 +1791,31 @@ init -4 python:
             return (self.effective_fertility() / 100) * (100 - self.birthcontrol_efficiency())  # NO PARENTHESES!
 
         def apply_prenatal_boost(self):
-            """Speeds up pregnancy progression by 5x, with minimum 2 days remaining"""
-
-            #if not pregnant...don't use a boost.
-            if not self.pregnant:
+            # Consume one PregnaVITA dose (called from the weekly tick). Gated: only if
+            # pregnant, she knows, she has supply (prenatal_boost), and she is below the dose
+            # ceiling. Each dose raises the daily progress speed (1 + doses) and pulls the due
+            # date in -- no progress jump; compression happens via the daily speed.
+            if not self.pregnant or not self.knows_pregnant:
+                return
+            if self.prenatal_boost <= 0 or getattr(self, 'prenatal_doses', 0) >= VT_PRENATAL_DOSE_CEILING:
                 return
 
-            # Prenatal boost countdown
-            if self.prenatal_boost > 0:
-                self.prenatal_boost -= 1
-            
-            # Safely access time_manager
             current_day = 0
             try:
-                # Use the global 'time_manager' instance that was created in game_init.rpy
                 current_day = time_manager.total_days
             except NameError:
-                # This should not happen if game_init.rpy is loaded correctly
                 renpy.log(f"VT MOD ERROR: apply_prenatal_boost failed because 'time_manager' is not defined for {self.first_name}.")
-                return # Exit the function can't get current day
-       
-            # Calculate remaining days
-            remaining_days = self.preg_end_day - current_day
-            
-            # Apply 5x speed boost (round up to ensure minimum 2 days)
-            new_remaining_days = max(2, (remaining_days + 1) // 2)  # Integer division with ceiling
-            
-            #Need to determine  self.preg_progress_days
-            
-            # Update pregnancy end day
-            self.preg_end_day = current_day + new_remaining_days
-            
-            # Calculate the preg_progress_days based on the accelerated progression
-            self.preg_progress_days = (260 - new_remaining_days)
-            
-            if self.preg_progress_days >= 210:
-                self.pregnancy_phase = 3
-                self.preg_body = True
-            elif self.preg_progress_days >= 105:
-                self.pregnancy_phase = 2
-                self.preg_body = True
-            elif self.preg_progress_days >= 35:
-                self.pregnancy_phase = 1
-                self.preg_body = True
-            else:
-                self.pregnancy_phase = 1
-                self.preg_body = False
+                return
 
-            vt_preg_notify(f"Pregnancy sped up for {self.first_name} - now ends in {new_remaining_days} days!", duration=3.0)
-            renpy.log(f"VT MOD: Pregnancy sped up for {self.first_name} - now ends in {new_remaining_days} days")
+            self.prenatal_doses = getattr(self, 'prenatal_doses', 0) + 1
+            self.prenatal_boost -= 1   # consume one pill from supply
+
+            speed = 1 + min(self.prenatal_doses, VT_PRENATAL_DOSE_CEILING)
+            remaining = max(VT_MIN_PREG_DAYS_LEFT, ((260 - self.preg_progress_days) + speed - 1) // speed)
+            self.preg_end_day = current_day + remaining
+
+            vt_preg_notify(f"{self.first_name} took PregnaVITA (dose {self.prenatal_doses}/{VT_PRENATAL_DOSE_CEILING}) - pregnancy accelerating.", duration=3.0)
+            renpy.log(f"VT MOD: {self.first_name} PregnaVITA dose {self.prenatal_doses}, speed {speed}x, due day {self.preg_end_day}")
 
         # Create patched daily_update
         def vt_mother_daily_update(self):
@@ -1810,10 +1867,12 @@ init -4 python:
                             self.pregnancy_phase = 1
                             self.preg_announce = False
                             self.days_since_last_birth = 0
-                            self.preg_end_day = self.preg_start_day + 250 + renpy.random.randint(0, 10)
+                            self.preg_end_day = self.preg_start_day + (260 - self.preg_progress_days)
                             
                             # SET FATHER TYPE - CRITICAL ADDITION
                             self.preg_father = "player"  # This pregnancy is from the player
+                            self.prenatal_doses = 0  # fresh pregnancy: no meds yet
+                            self.prenatal_boost = 0  # no pill supply yet
                             
                             vt_preg_notify(f"{self.first_name} might be pregnant!", duration=3)
 
@@ -1822,11 +1881,10 @@ init -4 python:
 
             # Pregnancy progression
             if self.pregnant:
-                self.preg_progress_days += 1
+                speed = 1 + min(getattr(self, 'prenatal_doses', 0), VT_PRENATAL_DOSE_CEILING)
+                self.preg_progress_days += speed
                 
-                #apply_prenatal_boost if any
-                if  self.knows_pregnant and self.prenatal_boost > 0:
-                    apply_prenatal_boost(self)
+                # (PregnaVITA dosing moved to the weekly tick -- see vt_*_weekly_update.)
                 
                 current_day = 0
                 try:
@@ -1835,8 +1893,14 @@ init -4 python:
                     # This should not happen if game_init.rpy is loaded correctly
                     renpy.log("vt_mother_daily_update # Pregnancy progression ERROR: Global 'time_manager' variable not found!")
                     return
+                # Awareness: a fixed real-day delay after conception, independent of meds;
+                # latches regardless of trimester band (fixes the old prenatal-boost skip).
+                if (current_day - self.preg_start_day) >= VT_KNOWS_AFTER_DAYS:
+                    self.knows_pregnant = True
+                    self.birth_control = False
+
                 # Pregnancy ended - baby born
-                if self.preg_progress_days >= 260 or (current_day>=self.preg_end_day):
+                if self.preg_progress_days >= 260:
                     # Increment appropriate counter based on father type
                     if self.preg_father == "player":
                         self.kids_with_player += 1
@@ -1855,6 +1919,8 @@ init -4 python:
                     self.just_had_baby = True
                     self.days_since_last_birth = 1
                     self.preg_father = None  # Clear father type after birth
+                    self.prenatal_doses = 0  # clear meds acceleration
+                    self.prenatal_boost = 0  # clear leftover pill supply
                   # Visible pregnancy body after 30 days
                 # After 30 weeks, she will start showing third trimester, very obvious now
                 elif self.preg_progress_days >= 210:
@@ -2026,6 +2092,21 @@ init -4 python:
         # Apply patches to Mother
         Mother.__init__ = vt_mother_init
         Mother.daily_update = vt_mother_daily_update
+
+        # Patched weekly_update (mothers): same weekly PregnaVITA dosing, awareness-gated.
+        original_mother_weekly_update = Mother.weekly_update
+        def vt_mother_weekly_update(self):
+            original_mother_weekly_update(self)
+            if self.pregnant:
+                try:
+                    _cd = time_manager.total_days
+                except NameError:
+                    _cd = 0
+                if _cd and (_cd - self.preg_start_day) >= VT_KNOWS_AFTER_DAYS:
+                    self.knows_pregnant = True
+                    self.birth_control = False
+                self.apply_prenatal_boost()
+        Mother.weekly_update = vt_mother_weekly_update
         Mother.days_from_ideal_fertility = days_from_ideal_fertility
         Mother.on_birth_control = on_birth_control
         Mother.is_highly_fertile = is_highly_fertile
@@ -2086,26 +2167,40 @@ init -14 python:
         original_girl_init = Girl.__init__
         original_daily_update = Girl.daily_update
 
-        # Create patched __init__
-        def vt_girl_init(self, *args, **kwargs):
-            # ===== PHASE 1: MINIMAL VT ATTRIBUTES NEEDED FOR CORE GAME =====
-            # Initialize ONLY attributes that are used in trait requirements
-            # BEFORE core init (to prevent the previous error)
-            vt_minimal_attributes = [
-                'boob_cum_fetish', 'thigh_cum_fetish', 'ass_cum_fetish', 'pussy_cum_fetish',
-                'oral_cum_fetish', 'vaginal_cum_fetish', 'anal_cum_fetish', 'baby_desire'
-            ]
-            
-            for attr in vt_minimal_attributes:
-                if not hasattr(self, attr):
-                    setattr(self, attr, 0)
-            
-            original_girl_init(self, *args, **kwargs)
-            
-            # ===== RELATIONSHIP TRACKING SYSTEM =====
-            # Initialize relationship-specific metrics (separate from personality traits)
-            if not hasattr(self, 'player_relationship'):
-                self.player_relationship = {
+        # ===== PregnaVITA / pregnancy tuning knobs =====
+        VT_PRENATAL_DOSE_CEILING = 4   # max stacked doses (max speed = 1 + this = 5x)
+        VT_KNOWS_AFTER_DAYS = 10       # real days after conception before she knows (girl & mother)
+        VT_MIN_PREG_DAYS_LEFT = 1      # floor on the derived due date after a dose
+
+        # Shared, idempotent backfill of every VT attribute. Called from __init__ (for
+        # newly created girls) AND from the after-load backfill loop (for girls in saves
+        # created before the mod was installed -- mid-save install). Every assignment is
+        # hasattr-guarded, so it never clobbers existing values and is safe to call
+        # repeatedly. Mother-aware: mothers diverge from students on a handful of defaults.
+        def vt_girl_bucket(self):
+            # Return (creating if needed) this mod's primitives-only sidecar dict on a girl.
+            md = getattr(self, "mod_data", None)
+            if md is None:
+                md = {}
+                self.mod_data = md
+            return md.setdefault("elkrose_vt", {})
+
+        def vt_ensure_girl_attrs(self):
+            is_mother = is_mother_character(self)
+            bucket = vt_girl_bucket(self)
+
+            # ----- Sidecar-migrated keys -----
+            # Migrate any loose copies (from pre-sidecar saves) into the bucket, then strip
+            # them so the property accessors govern. This list grows as later batches move
+            # more attributes into the sidecar.
+            for _k in VT_GIRL_SIDECAR_KEYS:
+                if _k in self.__dict__:
+                    bucket.setdefault(_k, self.__dict__[_k])
+                    del self.__dict__[_k]
+
+            # ===== RELATIONSHIP TRACKING SYSTEM (sidecar) =====
+            if "player_relationship" not in bucket:
+                bucket["player_relationship"] = {
                     "control": 0,          # How much the player dominates the relationship
                     "greed": 0,            # Player's financial/material interest
                     "lust": 0,             # Player's sexual interest
@@ -2116,8 +2211,8 @@ init -14 python:
                     "is_poly": False,
                     "path":"neutral"
                 }
-            if not hasattr(self, 'path_seeds'):
-                self.path_seeds = {
+            if "path_seeds" not in bucket:
+                bucket["path_seeds"] = {
                     "slave": 0,
                     "girlfriend": 0,
                     "fwb": 0,
@@ -2711,55 +2806,31 @@ init -14 python:
             return (self.effective_fertility() / 100) * (100 - self.birthcontrol_efficiency())  # NO PARENTHESES!
 
         def apply_prenatal_boost(self):
-            """Speeds up pregnancy progression by 5x, with minimum 2 days remaining"""
-
-            #if not pregnant...don't use a boost.
-            if not self.pregnant:
+            # Consume one PregnaVITA dose (called from the weekly tick). Gated: only if
+            # pregnant, she knows, she has supply (prenatal_boost), and she is below the dose
+            # ceiling. Each dose raises the daily progress speed (1 + doses) and pulls the due
+            # date in -- no progress jump; compression happens via the daily speed.
+            if not self.pregnant or not self.knows_pregnant:
+                return
+            if self.prenatal_boost <= 0 or getattr(self, 'prenatal_doses', 0) >= VT_PRENATAL_DOSE_CEILING:
                 return
 
-            # Prenatal boost countdown
-            if self.prenatal_boost > 0:
-                self.prenatal_boost -= 1
-            
-            # Safely access time_manager
             current_day = 0
             try:
-                # Use the global 'time_manager' instance that was created in game_init.rpy
                 current_day = time_manager.total_days
             except NameError:
-                # This should not happen if game_init.rpy is loaded correctly
                 renpy.log(f"VT MOD ERROR: apply_prenatal_boost failed because 'time_manager' is not defined for {self.first_name}.")
-                return # Exit the function can't get current day
-       
-            # Calculate remaining days
-            remaining_days = self.preg_end_day - current_day
-            
-            # Apply 5x speed boost (round up to ensure minimum 2 days)
-            new_remaining_days = max(2, (remaining_days + 1) // 2)  # Integer division with ceiling
-            
-            #Need to determine  self.preg_progress_days
-            
-            # Update pregnancy end day
-            self.preg_end_day = current_day + new_remaining_days
-            
-            # Calculate the preg_progress_days based on the accelerated progression
-            self.preg_progress_days = (260 - new_remaining_days)
-            
-            if self.preg_progress_days >= 210:
-                self.pregnancy_phase = 3
-                self.preg_body = True
-            elif self.preg_progress_days >= 105:
-                self.pregnancy_phase = 2
-                self.preg_body = True
-            elif self.preg_progress_days >= 35:
-                self.pregnancy_phase = 1
-                self.preg_body = True
-            else:
-                self.pregnancy_phase = 1
-                self.preg_body = False
+                return
 
-            vt_preg_notify(f"Pregnancy sped up for {self.first_name} - now ends in {new_remaining_days} days!", duration=3.0)
-            renpy.log(f"VT MOD: Pregnancy sped up for {self.first_name} - now ends in {new_remaining_days} days")
+            self.prenatal_doses = getattr(self, 'prenatal_doses', 0) + 1
+            self.prenatal_boost -= 1   # consume one pill from supply
+
+            speed = 1 + min(self.prenatal_doses, VT_PRENATAL_DOSE_CEILING)
+            remaining = max(VT_MIN_PREG_DAYS_LEFT, ((260 - self.preg_progress_days) + speed - 1) // speed)
+            self.preg_end_day = current_day + remaining
+
+            vt_preg_notify(f"{self.first_name} took PregnaVITA (dose {self.prenatal_doses}/{VT_PRENATAL_DOSE_CEILING}) - pregnancy accelerating.", duration=3.0)
+            renpy.log(f"VT MOD: {self.first_name} PregnaVITA dose {self.prenatal_doses}, speed {speed}x, due day {self.preg_end_day}")
 
         # Create patched daily_update
         def vt_daily_update(self):
@@ -2814,10 +2885,12 @@ init -14 python:
                             self.pregnancy_phase = 1
                             self.preg_announce = False
                             self.days_since_last_birth = 0
-                            self.preg_end_day = self.preg_start_day + 250 + renpy.random.randint(0, 10)
+                            self.preg_end_day = self.preg_start_day + (260 - self.preg_progress_days)
                             
                             # SET FATHER TYPE - CRITICAL ADDITION
                             self.preg_father = "player"  # This pregnancy is from the player
+                            self.prenatal_doses = 0  # fresh pregnancy: no meds yet
+                            self.prenatal_boost = 0  # no pill supply yet
                             
                             vt_preg_notify(f"{self.first_name} might be pregnant!", duration=3)
 
@@ -2827,11 +2900,10 @@ init -14 python:
 
             # Pregnancy progression
             if self.pregnant:
-                self.preg_progress_days += 1
+                speed = 1 + min(getattr(self, 'prenatal_doses', 0), VT_PRENATAL_DOSE_CEILING)
+                self.preg_progress_days += speed
                 
-                #apply_prenatal_boost if any
-                if  self.knows_pregnant and self.prenatal_boost > 0:
-                    apply_prenatal_boost(self)
+                # (PregnaVITA dosing moved to the weekly tick -- see vt_*_weekly_update.)
                 
                 current_day = 0
                 try:
@@ -2840,8 +2912,14 @@ init -14 python:
                     # This should not happen if game_init.rpy is loaded correctly
                     renpy.log("vt_daily_update # Pregnancy progression ERROR: Global 'time_manager' variable not found!")
                     return
+                # Awareness: a fixed real-day delay after conception, independent of meds;
+                # latches regardless of trimester band (fixes the old prenatal-boost skip).
+                if (current_day - self.preg_start_day) >= VT_KNOWS_AFTER_DAYS:
+                    self.knows_pregnant = True
+                    self.birth_control = False
+
                 # Pregnancy ended - baby born
-                if self.preg_progress_days >= 260 or (current_day>=self.preg_end_day):
+                if self.preg_progress_days >= 260:
                     # Increment appropriate counter based on father type
                     if self.preg_father == "player":
                         self.kids_with_player += 1
@@ -2860,6 +2938,8 @@ init -14 python:
                     self.just_had_baby = True
                     self.days_since_last_birth = 1
                     self.preg_father = None  # Clear father type after birth
+                    self.prenatal_doses = 0  # clear meds acceleration
+                    self.prenatal_boost = 0  # clear leftover pill supply
                   # Visible pregnancy body after 30 days
                 # After 30 weeks, she will start showing third trimester, very obvious now
                 elif self.preg_progress_days >= 210:
@@ -3031,6 +3111,22 @@ init -14 python:
         # Apply patches
         Girl.__init__ = vt_girl_init
         Girl.daily_update = vt_daily_update
+
+        # Patched weekly_update: PregnaVITA is taken once per week (Monday tick), gated on
+        # awareness. Re-check awareness here first so a Monday discovery still doses that day.
+        original_weekly_update = Girl.weekly_update
+        def vt_weekly_update(self):
+            original_weekly_update(self)
+            if self.pregnant:
+                try:
+                    _cd = time_manager.total_days
+                except NameError:
+                    _cd = 0
+                if _cd and (_cd - self.preg_start_day) >= VT_KNOWS_AFTER_DAYS:
+                    self.knows_pregnant = True
+                    self.birth_control = False
+                self.apply_prenatal_boost()   # gated internally (knows + supply + under cap)
+        Girl.weekly_update = vt_weekly_update
         Girl.days_from_ideal_fertility = days_from_ideal_fertility
         Girl.on_birth_control = on_birth_control
         Girl.is_highly_fertile = is_highly_fertile
@@ -3184,6 +3280,26 @@ init -14 python:
             setattr(Girl, _gk, _vt_make_girl_property(_gk))
         #Girl.vt_relationship_change = vt_relationship_change
         #Girl.vt_seed_relationship_path = vt_seed_relationship_path
+
+        # baby_desire is now an XP-backed stat (it has a baby_desire_xp sidecar companion), so the
+        # (250,750)-scale dialogue/creampie impacts route through the XP economy exactly like
+        # corruption/affection. Base fix_stats only levels its six hard-coded stats, so drive
+        # baby_desire's leveling here, then clamp. Mother inherits Girl.fix_stats (no override).
+        # NOTE: clamp to a literal 100 -- get_stat_limit("baby_desire") returns 0 (no stat_limits
+        # entry) and would zero the stat. level-up notification stays suppressed; the mod's own
+        # desire ladder (vt_handle_baby_desire) is the player-facing feedback.
+        if not getattr(Girl.fix_stats, "_vt_baby_desire", False):
+            _vt_orig_fix_stats = Girl.fix_stats
+
+            def vt_fix_stats(self, hide_notification=False):
+                _vt_orig_fix_stats(self, hide_notification=hide_notification)
+                if hasattr(self, "baby_desire_xp"):
+                    self.level_up_attribute("baby_desire", hide_notification=True)
+                    self.baby_desire = int(max(min(self.baby_desire, 100), 0))
+
+            vt_fix_stats._vt_baby_desire = True
+            Girl.fix_stats = vt_fix_stats
+
         print("VT MOD: Successfully patched Girl class with advanced fertility system")
 
 # Define the vaginal sex and creampie handlers inside a python block
@@ -3406,6 +3522,12 @@ init -3 python:
                 # FIRST NOTICEABLE INTEREST
                 vt_fetish_notify(f"{target_girl.first_name} seems curious about cum {body_part_term}...", duration=3.0)
 
+    # Tuning knob: baby_desire is XP-backed, but the per-creampie amounts below were authored as
+    # old 0-100 "points". Multiply them by this to get XP. ~50 makes a high-fetish creampie land
+    # in the ballpark of a deliberate dialogue choice (250,750), with typical ones smaller. Adjust
+    # here to make creampies push pregnancy desire faster or slower.
+    VT_BABY_DESIRE_XP_PER_POINT = 50
+
     def vt_handle_baby_desire(action_name: str, target_girl: Girl, creampie_type: str) -> None:
         """
         Handles baby desire increases with fetish integration
@@ -3468,8 +3590,11 @@ init -3 python:
             }
             
             increase_amount = increase_amounts[creampie_type]
-            target_girl.baby_desire = min(100, target_girl.baby_desire + increase_amount)
-            
+            # Route through the XP economy (modify_stat -> patched fix_stats levels + clamps it,
+            # with the base level-up popup suppressed). The band thresholds below then read the
+            # freshly-leveled 0-100 value.
+            target_girl.modify_stat("baby_desire", increase_amount * VT_BABY_DESIRE_XP_PER_POINT, hide_notification=True)
+
             renpy.log(f"VT MOD: {target_girl.first_name}'s baby desire increased to {target_girl.baby_desire}")
             vt_fetish_notify(f"{target_girl.first_name}'s desire for pregnancy increased!", duration=2.0)
             
