@@ -866,44 +866,275 @@ init -3 python:
     else:
         original_player_init = Player.__init__
         original_player_daily_update = Player.daily_update
-        
+
+        # ===== SIDECAR IMPLEMENTATION ======================================
+        # The player's condom state lives in player.mod_data["elkrose_vt"] -- a dict of
+        # primitives -- instead of as loose attributes on the Player. This mirrors the
+        # proposed base-game "mod_data[mod_id]" convention: if the mod is removed, the
+        # blob is just inert leftover data that the base game never looks at (and that a
+        # one-line `del player.mod_data["elkrose_vt"]` could wipe), rather than ~6 loose
+        # keys welded onto the Player object.
+        #
+        # Access stays ergonomic: property accessors (defined below) make
+        # `player.condom_active` transparently read/write the sidecar, so the ~200
+        # existing `player.condom_*` call sites are unchanged. Properties are class-level,
+        # so they are NEVER pickled -- the only thing saved is the mod_data dict, and the
+        # properties vanish cleanly with the mod.
+        VT_MOD_ID = "elkrose_vt"
+        VT_PLAYER_CONDOM_DEFAULTS = {
+            "condom_active": "raw",
+            "condom_cheap_count": 0,
+            "condom_premium_count": 0,
+            "condom_broke": False,
+            "condom_cum": 0,        # times unloaded in the CURRENT condom
+            "condom_dirty": False,  # whether the current condom has cum
+        }
+
+        def vt_player_bucket(p):
+            # Return (creating if needed) this mod's primitives-only sidecar dict on p.
+            md = getattr(p, "mod_data", None)
+            if md is None:
+                md = {}
+                p.mod_data = md
+            return md.setdefault(VT_MOD_ID, {})
+
+        # Gift "ammo": pills are bought into a per-id count in the sidecar instead of sitting
+        # in the inventory as Gift objects (same idea as condoms). They surface as virtual
+        # giftable items in the give-gift menu (see get_items_and_quantity / vt_give_gift).
+        VT_PILL_IDS = ("fertility_pill", "prenatal_vitamins", "planb_pill", "emergency_pill")
+
+        def vt_player_pill_counts(p):
+            # Return (creating if needed) the pill ammo dict {pill_id: count} in the sidecar.
+            return vt_player_bucket(p).setdefault("pill_counts", {})
+
+        def vt_ensure_player_condom_attrs(p=None):
+            # Ensure the sidecar exists and is fully populated. Idempotent. Also MIGRATES
+            # any legacy loose attributes (from saves made before this mod, or before the
+            # sidecar migration) into the sidecar, then strips them so the property accessors govern.
+            # Called with no args by config.after_load_callbacks -> falls back to store.player.
+            if p is None:
+                p = getattr(renpy.store, "player", None)
+            if p is None:
+                return
+            bucket = vt_player_bucket(p)
+            for key, default in VT_PLAYER_CONDOM_DEFAULTS.items():
+                # Pull a legacy loose attribute into the sidecar if one is present.
+                if key in p.__dict__:
+                    bucket.setdefault(key, p.__dict__[key])
+                    del p.__dict__[key]
+                bucket.setdefault(key, default)
+
+            # Convert any legacy condom packs / gift pills already sitting in the inventory
+            # (bought before the auto-convert at purchase) into counts, so older saves get
+            # cleaned up too.
+            pill_counts = bucket.setdefault("pill_counts", {})
+            inv = getattr(p, "inventory", None)
+            if inv:
+                for it in list(inv):
+                    iid = getattr(it, "id", None)
+                    if iid in ("condoms", "condoms_premium"):
+                        sc = getattr(it, "applied_buff", None)
+                        sc = sc.get("stat_changes", {}) if isinstance(sc, dict) else {}
+                        if iid == "condoms":
+                            bucket["condom_cheap_count"] = bucket.get("condom_cheap_count", 0) + sc.get("condom_cheap_count", 10)
+                        else:
+                            bucket["condom_premium_count"] = bucket.get("condom_premium_count", 0) + sc.get("condom_premium_count", 10)
+                    elif iid in VT_PILL_IDS:
+                        pill_counts[iid] = pill_counts.get(iid, 0) + 1
+                    else:
+                        continue
+                    try:
+                        p.remove_item(it)
+                    except Exception:
+                        pass
+
+        # Property accessors: keep `player.condom_active` ergonomics, store in the sidecar.
+        def _vt_make_condom_property(key, default):
+            def _getter(self):
+                md = getattr(self, "mod_data", None)
+                if md and key in md.get(VT_MOD_ID, {}):
+                    return md[VT_MOD_ID][key]
+                # Legacy fallback: a not-yet-migrated loose value (data descriptor would
+                # otherwise shadow it). vt_ensure_player_condom_attrs cleans this up.
+                if key in self.__dict__:
+                    return self.__dict__[key]
+                return default
+            def _setter(self, value):
+                vt_player_bucket(self)[key] = value
+            return property(_getter, _setter)
+
+        for _key, _default in VT_PLAYER_CONDOM_DEFAULTS.items():
+            setattr(Player, _key, _vt_make_condom_property(_key, _default))
+
         def vt_player_init(self, character: Character, color: str):
             original_player_init(self, character, color)
-
-            # Initialize condom attributes ONLY if not already present
-            if not hasattr(self, "condom_active"):
-                self.condom_active = "raw"
-            if not hasattr(self, "condom_cheap_count"):
-                self.condom_cheap_count = 0
-            if not hasattr(self, "condom_premium_count"):
-                self.condom_premium_count = 0
-            if not hasattr(self, "condom_broke"):
-                self.condom_broke = False
-            # ADD minimal creampie tracking for CURRENT condom
-            if not hasattr(self, "condom_cum"):
-                self.condom_cum = 0  # Number of times cummed in current condom
-            if not hasattr(self, "condom_dirty"):
-                self.condom_dirty = False  # Whether current condom has cum
-
-            # Mark as patched to prevent duplicate initialization
-            self._vt_condom_patched = True
+            vt_ensure_player_condom_attrs(self)
 
         def vt_player_daily_update(self):
+            # Defensive: a Player loaded from a pre-mod / pre-sidecar save is normalized here.
+            vt_ensure_player_condom_attrs(self)
             original_player_daily_update(self)
             # Remove condom states if still wearing one when went to sleep
-            if self.condom_active != "raw": 
+            if self.condom_active != "raw":
                 self.condom_active = "raw"
                 self.condom_broke = False
                 self.condom_cum = 0
                 self.condom_dirty = False
             else:
                 self.condom_dirty = False
-                
+
         Player.__init__ = vt_player_init
         Player.vt_player_daily_update = vt_player_daily_update
-        Player.daily_update = vt_player_daily_update  
-        
-        print("VT MOD: Added condom tracking to Player class (patched daily_update)")
+        Player.daily_update = vt_player_daily_update
+
+        # Auto-convert bought condom packs into sidecar "ammo" at the moment of purchase,
+        # so they never sit in player.inventory as ConsumableItem objects. The cherry HUD
+        # spends these counts directly, so the inventory object is pointless -- and this way
+        # nothing lingers in the base inventory if the mod is removed. Player.add_item is the
+        # single chokepoint (purchase_item -> add_item). Guarded so a Shift+R reload doesn't
+        # double-wrap the method.
+        if not getattr(Player.add_item, "_vt_addon", False):
+            original_player_add_item = Player.add_item
+
+            def vt_player_add_item(self, item):
+                item_id = getattr(item, "id", None)
+                if item_id in ("condoms", "condoms_premium"):
+                    buff = getattr(item, "applied_buff", None)
+                    stat_changes = buff.get("stat_changes", {}) if isinstance(buff, dict) else {}
+                    if item_id == "condoms":
+                        qty = stat_changes.get("condom_cheap_count", 10)
+                        self.condom_cheap_count += qty
+                        label = "BasicShield"
+                    else:
+                        qty = stat_changes.get("condom_premium_count", 10)
+                        self.condom_premium_count += qty
+                        label = "UltraProtect"
+                    word = "condom" if qty == 1 else "condoms"
+                    try:
+                        queue_notification(f"{qty} {label} {word} added to your stash!", duration=3.0)
+                    except Exception:
+                        pass
+                    renpy.restart_interaction()
+                    return
+                if item_id in VT_PILL_IDS:
+                    counts = vt_player_pill_counts(self)
+                    counts[item_id] = counts.get(item_id, 0) + 1
+                    try:
+                        queue_notification(f"{getattr(item, 'name', 'Item')} added to your stash!", duration=3.0)
+                    except Exception:
+                        pass
+                    renpy.restart_interaction()
+                    return
+                original_player_add_item(self, item)
+
+            vt_player_add_item._vt_addon = True
+            Player.add_item = vt_player_add_item
+
+        # Surface condom "ammo" in the base UI WITHOUT overriding any screen, by feeding the
+        # plain Player methods those screens already call:
+        #  - get_item_quantity()       -> the shop's "Owned: N" (screen_ubuy_menu.rpy:176)
+        #  - get_items_and_quantity()  -> the inventory listing (screen_player_inventory.rpy:63)
+        # The inventory entry is a plain StoreItem (NOT a ConsumableItem), so the inventory
+        # screen renders it but the click is a harmless no-op (the ConsumableItem branch, which
+        # would "consume" it, is skipped) -- condoms are equipped from the cherry HUD, not used
+        # from the inventory. These display items are transient: rebuilt each call, never stored
+        # or saved.
+        if not getattr(Player.get_item_quantity, "_vt_addon", False):
+            original_get_item_quantity = Player.get_item_quantity
+
+            def vt_get_item_quantity(self, item_id):
+                if item_id == "condoms":
+                    return self.condom_cheap_count
+                if item_id == "condoms_premium":
+                    return self.condom_premium_count
+                if item_id in VT_PILL_IDS:
+                    # Read-only: never create sidecar keys during a render-path call.
+                    md = getattr(self, "mod_data", None)
+                    if md:
+                        return md.get(VT_MOD_ID, {}).get("pill_counts", {}).get(item_id, 0)
+                    return 0
+                return original_get_item_quantity(self, item_id)
+
+            vt_get_item_quantity._vt_addon = True
+            Player.get_item_quantity = vt_get_item_quantity
+
+        if not getattr(Player.get_items_and_quantity, "_vt_addon", False):
+            original_get_items_and_quantity = Player.get_items_and_quantity
+
+            # Cache the condom display items so the SAME object identity is returned on every
+            # call. Building a fresh StoreItem each evaluation makes the inventory screen look
+            # "changed" every frame, which drives Ren'Py into a restart_interaction loop.
+            # (Pills already reuse the stable database Gift objects, so they're fine.)
+            _vt_condom_display_items = {}
+
+            def _vt_condom_display_item(item_id, name, icon, description):
+                cached = _vt_condom_display_items.get(item_id)
+                if cached is not None:
+                    return cached
+                SI = getattr(renpy.store, "StoreItem", None)
+                if SI is None:
+                    return None
+                try:
+                    obj = SI(id=item_id, name=name, icon=icon, price=0, item_type="misc", description=description)
+                except Exception:
+                    return None
+                _vt_condom_display_items[item_id] = obj
+                return obj
+
+            def vt_get_items_and_quantity(self):
+                items = original_get_items_and_quantity(self)
+                if self.condom_cheap_count > 0:
+                    disp = _vt_condom_display_item(
+                        "condoms", "BasicShield Condoms",
+                        "_mods/content/elkrose_vt/extra_images/condom.png",
+                        "Stored condoms. Equip them from the cherry indicator at the top of the screen.")
+                    if disp is not None:
+                        items.append((disp, self.condom_cheap_count))
+                if self.condom_premium_count > 0:
+                    disp = _vt_condom_display_item(
+                        "condoms_premium", "UltraProtect Condoms",
+                        "_mods/content/elkrose_vt/extra_images/condom_premium.png",
+                        "Stored premium condoms. Equip them from the cherry indicator at the top of the screen.")
+                    if disp is not None:
+                        items.append((disp, self.condom_premium_count))
+                # Virtual gift pills: reuse the real Gift objects from the shop database so the
+                # give-gift menu shows them (is_giftable=True) with the correct accept chance and
+                # effects. In the inventory screen they're Gifts (not ConsumableItems) -> no-op
+                # click. The count comes from the sidecar; the Gift object itself is never stored
+                # in anyone's inventory. Read-only: don't create sidecar keys during render.
+                md = getattr(self, "mod_data", None)
+                pill_counts = md.get(VT_MOD_ID, {}).get("pill_counts", {}) if md else {}
+                if pill_counts:
+                    gifts_db = getattr(renpy.store, "database_shop_items", {}).get("gifts", {})
+                    # Once she AND the player both know she's pregnant, FertiBOOST is pointless,
+                    # so don't even offer it for that girl. Scoped to the give-gift screen via
+                    # selected_girl -- the plain inventory listing (no target girl) still shows
+                    # owned pills. Read-only: getattr defaults avoid creating sidecar keys here.
+                    hide_ferti = False
+                    if renpy.get_screen("gift_selection_screen") is not None:
+                        tgt = getattr(renpy.store, "selected_girl", None)
+                        if tgt is not None and getattr(tgt, "pregnant", False) \
+                                and getattr(tgt, "knows_pregnant", False) \
+                                and getattr(tgt, "player_knows_pregnant", False):
+                            hide_ferti = True
+                    for pid, cnt in pill_counts.items():
+                        if cnt > 0:
+                            if pid == "fertility_pill" and hide_ferti:
+                                continue
+                            gift_obj = gifts_db.get(pid)
+                            if gift_obj is not None:
+                                items.append((gift_obj, cnt))
+                return items
+
+            vt_get_items_and_quantity._vt_addon = True
+            Player.get_items_and_quantity = vt_get_items_and_quantity
+
+        # Backfill/migrate on every load so a pre-mod/pre-sidecar save's Player is converted
+        # to the sidecar before any gameplay runs.
+        if vt_ensure_player_condom_attrs not in config.after_load_callbacks:
+            config.after_load_callbacks.append(vt_ensure_player_condom_attrs)
+
+        print("VT MOD: Player condom state moved to sidecar player.mod_data['elkrose_vt']")
 
     def trigger_npc_pregnancy(target_girl):
         """Handles pregnancy from NPC interactions"""
