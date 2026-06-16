@@ -1531,6 +1531,11 @@ init -4 python:
             if not hasattr(self, 'has_shower_sex_followup'):
                 self.has_shower_sex_followup = False
 
+            # Initialize the sidecar-migrated keys (relationship, etc.) for mothers too.
+            # Runs last so the inline loose inits above are untouched; vt_ensure_girl_attrs'
+            # hasattr guards skip the still-loose attrs and only fills the sidecar bucket.
+            vt_ensure_girl_attrs(self)
+
             #original_mother_init(self, mother_config, daughter)
 
         #Followup triggers
@@ -2120,8 +2125,308 @@ init -14 python:
                     "paramour": 0,
                     "mistress": 0
                 }
-            if not hasattr(self, 'initial_reaction'):
-                self.initial_reaction = "neutral"
+            if "initial_reaction" not in bucket:
+                bucket["initial_reaction"] = "neutral"
+
+            # Initialize VT properties with proper defaults
+            if "oral_cum" not in bucket:
+                bucket["oral_cum"] = 0
+            if "vaginal_cum" not in bucket:
+                bucket["vaginal_cum"] = 0
+            if "anal_cum" not in bucket:
+                bucket["anal_cum"] = 0
+            if "oral_sex_count" not in bucket:
+                bucket["oral_sex_count"] = 0
+            if "last_oral_sex" not in bucket:
+                bucket["last_oral_sex"] = -1
+            if "vaginal_sex_count" not in bucket:
+                bucket["vaginal_sex_count"] = 0
+            if "last_vaginal_sex" not in bucket:
+                bucket["last_vaginal_sex"] = -1
+            if "anal_sex_count" not in bucket:
+                bucket["anal_sex_count"] = 0
+            if "last_anal_sex" not in bucket:
+                bucket["last_anal_sex"] = -1
+            if "first_time_oral" not in bucket:
+                bucket["first_time_oral"] =  True
+            if "first_time_pussy" not in bucket:
+                bucket["first_time_pussy"] =  True
+            if "first_time_anal" not in bucket:
+                bucket["first_time_anal"] =  True
+            if "aware_vaginal_condom" not in bucket:
+                bucket["aware_vaginal_condom"] = False
+            if "aware_oral_condom" not in bucket:
+                bucket["aware_oral_condom"] = False
+            if "aware_anal_condom" not in bucket:
+                bucket["aware_anal_condom"] = False
+            if "oral_cum_fetish" not in bucket:
+                bucket["oral_cum_fetish"] = get_cum_fetish_level(self, "oral")
+            if "vaginal_cum_fetish" not in bucket:
+                bucket["vaginal_cum_fetish"] = get_cum_fetish_level(self, "vaginal")
+            if "anal_cum_fetish" not in bucket:
+                bucket["anal_cum_fetish"] = get_cum_fetish_level(self, "anal")
+            if "baby_desire" not in bucket:
+                bucket["baby_desire"] = get_baby_desire(self)  # Start with baseline baby desire
+            if "baby_desire_xp" not in bucket:
+                bucket["baby_desire_xp"] = 0  # XP companion so baby_desire levels like a base stat
+            # Heal saves from before baby_desire was XP-backed: the old apply_impacts write-path
+            # could push the level past 100. Re-seed from traits+corruption so the now-XP-backed
+            # stat starts from a sane level instead of a stuck max.
+            if bucket["baby_desire"] > 100:
+                bucket["baby_desire"] = get_baby_desire(self)
+                bucket["baby_desire_xp"] = 0
+
+            if "hymen" not in bucket:
+                bucket["hymen"] = False if is_mother else True
+            if "kids" not in bucket:
+                bucket["kids"] = 1 if is_mother else 0  # Total children
+            if "kids_with_player" not in bucket:
+                bucket["kids_with_player"] = 0  # Only children from player
+            if "kids_with_npc" not in bucket:
+                bucket["kids_with_npc"] = 0  # Children from NPCs
+            if "original_daughter" not in bucket:
+                bucket["original_daughter"] = is_mother  # Mothers have their daughter; students don't
+            if "preg_father" not in bucket:
+                bucket["preg_father"] = None  # "player", "npc", or None if not pregnant
+
+
+            #active sex tracking
+            if "had_sex_today" not in bucket:
+                bucket["had_sex_today"] = False
+            if "having_oral_sex" not in bucket:
+                bucket["having_oral_sex"] = False
+            if "having_vaginal_sex" not in bucket:
+                bucket["having_vaginal_sex"] = False
+
+            if "boob_cum_fetish" not in bucket:
+                bucket["boob_cum_fetish"] = get_cum_fetish_level(self, "boobs")
+            if "boob_sex_count" not in bucket:
+                bucket["boob_sex_count"] = 0
+            if "last_boob_sex" not in bucket:
+                bucket["last_boob_sex"] = -1
+            if "first_time_boobs" not in bucket:
+                bucket["first_time_boobs"] = True
+            if "aware_boob_condom" not in bucket:
+                bucket["aware_boob_condom"] = False
+
+            if "thigh_cum_fetish" not in bucket:
+                bucket["thigh_cum_fetish"] = get_cum_fetish_level(self, "thighs")
+            if "thigh_sex_count" not in bucket:
+                bucket["thigh_sex_count"] = 0
+            if "last_thigh_sex" not in bucket:
+                bucket["last_thigh_sex"] = -1
+            if "first_time_thighs" not in bucket:
+                bucket["first_time_thighs"] = True
+            if "aware_thigh_condom" not in bucket:
+                bucket["aware_thigh_condom"] = False
+
+            if "ass_cum_fetish" not in bucket:
+                bucket["ass_cum_fetish"] =  get_cum_fetish_level(self, "ass_cum")
+            if "ass_cumshot_count" not in bucket:
+                bucket["ass_cumshot_count"] = 0
+            if "last_ass_cumshot" not in bucket:
+                bucket["last_ass_cumshot"] = -1
+            if "first_time_ass_cumshot" not in bucket:
+                bucket["first_time_ass_cumshot"] = True
+            if "aware_ass_cumshot_condom" not in bucket:
+                bucket["aware_ass_cumshot_condom"] = False
+
+            if "pussy_cum_fetish" not in bucket:
+                bucket["pussy_cum_fetish"] =  get_cum_fetish_level(self, "pussy_cum")
+            if "impreg_fetish" not in bucket:
+                bucket["impreg_fetish"] = 0
+            if "pussy_cumshot_count" not in bucket:
+                bucket["pussy_cumshot_count"] = 0
+            if "last_pussy_cumshot" not in bucket:
+                bucket["last_pussy_cumshot"] = -1
+            if "first_time_pussy_cumshot" not in bucket:
+                bucket["first_time_pussy_cumshot"] = True
+            if "aware_pussy_cumshot_condom" not in bucket:
+                bucket["aware_pussy_cumshot_condom"] = False
+
+            #Condoms Only the 4 types, vaginal, anal, oral, body
+            if "player_knows_vaginal_condom" not in bucket:
+                bucket["player_knows_vaginal_condom"] = False
+            if "player_knows_anal_condom" not in bucket:
+                bucket["player_knows_anal_condom"] = False
+            if "player_knows_oral_condom" not in bucket:
+                bucket["player_knows_oral_condom"] = False
+            if "player_knows_body_condom" not in bucket:
+                bucket["player_knows_body_condom"] = False
+            if "wants_vaginal_condom" not in bucket:
+                bucket["wants_vaginal_condom"] = wants_condom(self, "vaginal")
+            if "wants_anal_condom" not in bucket:
+                bucket["wants_anal_condom"] = wants_condom(self, "anal")
+            if "wants_oral_condom" not in bucket:
+                bucket["wants_oral_condom"] = wants_condom(self, "oral")
+            if "wants_body_condom" not in bucket:
+                bucket["wants_body_condom"] = wants_condom(self, "body")
+
+
+
+            # Birth control system
+            # #self.male_condom = False #85% effective, 94% with spermicide
+            # self.spermicide = False #70% by itself, need to apply 15-30min before sex, 1 hour effectiveness, vaginal irritation
+            # self.female_condom = False #79% effective, 88% with spermicide
+            # self.female_diaphragm = False #87%, 94% with spermicide, apply 2hrs before, 24hours after sex
+            # self.cervical_cap = False #75%, 85% with spermicide, 6hrs before, 48 hours
+            # self.cervical_sponge = False #76%, 91% with spermicide, day, if expecting sex, max one day, vaginal irritation
+            # self.bc_implant = False #100% - 3 years, removable
+            # self.intrauterine_device = False #100% - 3  years, removable
+            # self.fertility_awareness = False #88% avoid sex 2 weeks before ideal day,
+            # self.cervical_mucus = False #88% avoid sex 2 weeks before ideal day,
+            # self.morning_after_pill = False #90% effective within 3 days of sex, will not work on ideal day.
+            # self.tubal_ligation = False #100% effective, reversabile
+            # self.salpingectomy = False #100% effective, reversabile
+            # self.pulling_out = False #20% effective
+            if "bc_chance" not in bucket:
+                bucket["bc_chance"] = 100
+            if "birth_control" not in bucket:
+                bucket["birth_control"] = renpy.random.randint(0, 100) < (10 if is_mother else 69)
+            if "bc_status_known" not in bucket:
+                bucket["bc_status_known"] = False
+            if "bc_penalty" not in bucket:
+                bucket["bc_penalty"] = 0
+
+            # Fertility cycle system
+            if "fertility_percent" not in bucket:
+                bucket["fertility_percent"] = 5.0 if is_mother else 25.0
+            if "ideal_fertile_day" not in bucket:
+                bucket["ideal_fertile_day"] = renpy.random.randint(0, 30)
+
+            # Conversation Tracking System
+            if "has_met_before" not in bucket:
+                bucket["has_met_before"] = False
+            if "has_discussed_pregnancy_before" not in bucket:
+                bucket["has_discussed_pregnancy_before"] = False
+            if "has_discussed_birth_control_before" not in bucket:
+                bucket["has_discussed_birth_control_before"] = False
+            if "has_discussed_condoms_before" not in bucket:
+                bucket["has_discussed_condoms_before"] = False
+
+            # Pregnancy tracking (sidecar)
+            if "pregnant" not in bucket:
+                bucket["pregnant"] = False
+            if "preg_body" not in bucket:
+                bucket["preg_body"] = False
+            if "knows_pregnant" not in bucket:
+                bucket["knows_pregnant"] = False
+            if "player_knows_pregnant" not in bucket:
+                bucket["player_knows_pregnant"] = False
+            if "preg_progress_days" not in bucket:
+                bucket["preg_progress_days"] = 0
+            if "preg_start_day" not in bucket:
+                bucket["preg_start_day"] = 0
+            if "preg_end_day" not in bucket:
+                bucket["preg_end_day"] = 0
+            if "preg_announce" not in bucket:
+                bucket["preg_announce"] = False
+            if "days_since_last_birth" not in bucket:
+                bucket["days_since_last_birth"] = 0
+            if "just_had_baby" not in bucket:
+                bucket["just_had_baby"] = False
+            if "pregnancy_phase" not in bucket:
+                bucket["pregnancy_phase"] = 0
+
+            # Add fertility boost attribute
+            if "fertility_boost" not in bucket:
+                bucket["fertility_boost"] = 0  # Days remaining for fertility boost
+            if "prenatal_boost" not in bucket:
+                bucket["prenatal_boost"] = 0  # PregnaVITA supply: pills on hand, taken 1/week
+            if "prenatal_doses" not in bucket:
+                bucket["prenatal_doses"] = 0  # PregnaVITA doses taken (compression factor, capped)
+            # SafeDOCK / DryDOCK state -- sidecar slots ready; the base dev still needs to
+            # implement apply_planb_pill / apply_emergency_pill that drive these.
+            if "planb_pills" not in bucket:
+                bucket["planb_pills"] = 0      # SafeDOCK: conception-block days remaining
+            if "emergency_pill" not in bucket:
+                bucket["emergency_pill"] = 0   # DryDOCK: effect days remaining
+            if "planb_boost" not in bucket:
+                bucket["planb_boost"] = 0
+
+            #Followup triggers
+            if "has_pregnancy_followup" not in bucket:
+                bucket["has_pregnancy_followup"] = False
+            if "has_birth_control_followup" not in bucket:
+                bucket["has_birth_control_followup"] = False
+            if "has_condoms_followup" not in bucket:
+                bucket["has_condoms_followup"] = False
+            if "has_corruption_followup" not in bucket:
+                bucket["has_corruption_followup"] = False
+            if "has_naturism_followup" not in bucket:
+                bucket["has_naturism_followup"] = False
+            if "has_fear_followup" not in bucket:
+                bucket["has_fear_followup"] = False
+            if "has_blowjob_followup" not in bucket:
+                bucket["has_blowjob_followup"] = False
+            if "has_strip_tease_followup" not in bucket:
+                bucket["has_strip_tease_followup"] = False
+            if "has_get_dressed_followup" not in bucket:
+                bucket["has_get_dressed_followup"] = False
+            if "has_strip_to_underwear_followup" not in bucket:
+                bucket["has_strip_to_underwear_followup"] = False
+            if "has_naked_followup" not in bucket:
+                bucket["has_naked_followup"] = False
+            if "has_milk_followup" not in bucket:
+                bucket["has_milk_followup"] = False
+            if "has_creamer_followup" not in bucket:
+                bucket["has_creamer_followup"] = False
+            if "has_toppings_followup" not in bucket:
+                bucket["has_toppings_followup"] = False
+            if "has_small_talk_followup" not in bucket:
+                bucket["has_small_talk_followup"] = False
+            if "has_masturbation_tips_followup" not in bucket:
+                bucket["has_masturbation_tips_followup"] = False
+            if "has_shower_sex_followup" not in bucket:
+                bucket["has_shower_sex_followup"] = False
+
+            # ---- one-time pregnancy migration to the dose-based PregnaVITA model ----
+            # Runs once per girl (version-flagged). For a girl already pregnant under the old
+            # model: infer how many PregnaVITA doses she had (the old boost halved her remaining
+            # time per dose), keep her preserved progress/phase, recompute her due date for that
+            # inferred speed so the display is honest, and make sure she knows if she's far
+            # enough along. We deliberately don't try to "correct" her progress.
+            if bucket.get("preg_model_version", 0) < 2:
+                bucket["preg_model_version"] = 2
+                if self.pregnant:
+                    try:
+                        _cd = time_manager.total_days
+                    except NameError:
+                        _cd = self.preg_start_day
+                    # Infer doses: how many times 250 (the ~conception remaining) can be halved
+                    # and still cover her remaining progress. Matches round(log2(...)), capped.
+                    _rem = max(1, 260 - self.preg_progress_days)
+                    _doses = 0
+                    _r = 250.0
+                    while _doses < VT_PRENATAL_DOSE_CEILING and (_r / 2.0) >= _rem:
+                        _r /= 2.0
+                        _doses += 1
+                    self.prenatal_doses = _doses
+                    self.prenatal_boost = 0      # old "boost days" field repurposed as supply -> clear it
+                    # Recompute the due date for her preserved progress at the inferred speed.
+                    _speed = 1 + self.prenatal_doses
+                    self.preg_end_day = _cd + max(VT_MIN_PREG_DAYS_LEFT, ((260 - self.preg_progress_days) + _speed - 1) // _speed)
+                    # Make sure she knows she's pregnant if she's far enough along.
+                    if (_cd - self.preg_start_day) >= VT_KNOWS_AFTER_DAYS:
+                        self.knows_pregnant = True
+                        self.birth_control = False
+
+        # Create patched __init__
+        def vt_girl_init(self, *args, **kwargs):
+            # ===== PHASE 1: MINIMAL VT ATTRIBUTES NEEDED FOR CORE GAME =====
+            # Initialize ONLY attributes that are used in trait requirements
+            # BEFORE core init (to prevent the previous error)
+            vt_minimal_attributes = [
+                'boob_cum_fetish', 'thigh_cum_fetish', 'ass_cum_fetish', 'pussy_cum_fetish',
+                'oral_cum_fetish', 'vaginal_cum_fetish', 'anal_cum_fetish', 'baby_desire'
+            ]
+            
+            for attr in vt_minimal_attributes:
+                if not hasattr(self, attr):
+                    setattr(self, attr, 0)
+            
+            original_girl_init(self, *args, **kwargs)
+
             # ===== TOP-3 STAT BOOSTING WITH TRAIT PRIORITIZATION =====
             # Get all core personality stats after traits have been applied
             stats = {
@@ -2226,239 +2531,7 @@ init -14 python:
                 self.last_pussy_cumshot = -1
             # ===== END VIRGINITY SYSTEM =====
 
-            # Initialize VT properties with proper defaults
-            if not hasattr(self, 'oral_cum'):
-                self.oral_cum = 0
-            if not hasattr(self, 'vaginal_cum'):
-                self.vaginal_cum = 0
-            if not hasattr(self, 'anal_cum'):
-                self.anal_cum = 0
-            if not hasattr(self, 'oral_sex_count'):
-                self.oral_sex_count = 0
-            if not hasattr(self, 'last_oral_sex'):
-                self.last_oral_sex = -1
-            if not hasattr(self, 'vaginal_sex_count'):
-                self.vaginal_sex_count = 0
-            if not hasattr(self, 'last_vaginal_sex'):
-                self.last_vaginal_sex = -1
-            if not hasattr(self, 'anal_sex_count'):
-                self.anal_sex_count = 0
-            if not hasattr(self, 'last_anal_sex'):
-                self.last_anal_sex = -1
-            if not hasattr(self, 'first_time_oral'):
-                self.first_time_oral =  True
-            if not hasattr(self, 'first_time_pussy'):
-                self.first_time_pussy =  True
-            if not hasattr(self, 'first_time_anal'):
-                self.first_time_anal =  True
-            if not hasattr(self, 'aware_vaginal_condom'):
-                self.aware_vaginal_condom = False
-            if not hasattr(self, 'aware_oral_condom'):
-                self.aware_oral_condom = False
-            if not hasattr(self, 'aware_anal_condom'):
-                self.aware_anal_condom = False
-            if not hasattr(self, 'oral_cum_fetish'):
-                self.oral_cum_fetish = get_cum_fetish_level(self, "oral")
-            if not hasattr(self, 'vaginal_cum_fetish'):
-                self.vaginal_cum_fetish = get_cum_fetish_level(self, "vaginal")
-            if not hasattr(self, 'anal_cum_fetish'):
-                self.anal_cum_fetish = get_cum_fetish_level(self, "anal")
-            if not hasattr(self, 'baby_desire'):
-                self.baby_desire = get_baby_desire(self)  # Start with baseline baby desire
-            
-            if not hasattr(self, 'hymen'):
-                self.hymen = True
-            if not hasattr(self, 'kids'):
-                self.kids = 0  # Total children
-            if not hasattr(self, 'kids_with_player'):
-                self.kids_with_player = 0  # Only children from player
-            if not hasattr(self, 'kids_with_npc'):
-                self.kids_with_npc = 0  # Children from NPCs
-            if not hasattr(self, 'original_daughter'):
-                self.original_daughter = False  # Students don't have original daughters
-            if not hasattr(self, 'preg_father'):
-                self.preg_father = None  # Will be "player", "npc", or None if not pregnant
-            
-            
-            #active sex tracking
-            if not hasattr(self, 'had_sex_today'):
-                self.had_sex_today = False
-            if not hasattr(self, 'having_oral_sex'):
-                self.having_oral_sex = False
-            if not hasattr(self, 'having_vaginal_sex'):
-                self.having_vaginal_sex = False
-            
-            if not hasattr(self, 'boob_cum_fetish'):
-                self.boob_cum_fetish = get_cum_fetish_level(self, "boobs")
-            if not hasattr(self, 'boob_sex_count'):
-                self.boob_sex_count = 0
-            if not hasattr(self, 'last_boob_sex'):
-                self.last_boob_sex = -1
-            if not hasattr(self, 'first_time_boobs'):
-                self.first_time_boobs = True
-            if not hasattr(self, 'aware_boob_condom'):
-                self.aware_boob_condom = False
-            
-            if not hasattr(self, 'thigh_cum_fetish'):
-                self.thigh_cum_fetish = get_cum_fetish_level(self, "thighs")
-            if not hasattr(self, 'thigh_sex_count'):
-                self.thigh_sex_count = 0
-            if not hasattr(self, 'last_thigh_sex'):
-                self.last_thigh_sex = -1
-            if not hasattr(self, 'first_time_thighs'):
-                self.first_time_thighs = True
-            if not hasattr(self, 'aware_thigh_condom'):
-                self.aware_thigh_condom = False
-            
-            if not hasattr(self, 'ass_cum_fetish'):
-                self.ass_cum_fetish =  get_cum_fetish_level(self, "ass_cum")
-            if not hasattr(self, 'ass_cumshot_count'):
-                self.ass_cumshot_count = 0
-            if not hasattr(self, 'last_ass_cumshot'):
-                self.last_ass_cumshot = -1
-            if not hasattr(self, 'first_time_ass_cumshot'):
-                self.first_time_ass_cumshot = True
-            if not hasattr(self, 'aware_ass_cumshot_condom'):
-                self.aware_ass_cumshot_condom = False
-            
-            if not hasattr(self, 'pussy_cum_fetish'):
-                self.pussy_cum_fetish =  get_cum_fetish_level(self, "pussy_cum")
-            if not hasattr(self, 'impreg_fetish'):
-                self.impreg_fetish = 0
-            if not hasattr(self, 'pussy_cumshot_count'):
-                self.pussy_cumshot_count = 0
-            if not hasattr(self, 'last_pussy_cumshot'):
-                self.last_pussy_cumshot = -1
-            if not hasattr(self, 'first_time_pussy_cumshot'):
-                self.first_time_pussy_cumshot = True
-            if not hasattr(self, 'aware_pussy_cumshot_condom'):
-                self.aware_pussy_cumshot_condom = False
-            
-            #Condoms Only the 4 types, vaginal, anal, oral, body
-            if not hasattr(self, 'player_knows_vaginal_condom'):
-                self.player_knows_vaginal_condom = False
-            if not hasattr(self, 'player_knows_anal_condom'):
-                self.player_knows_anal_condom = False
-            if not hasattr(self, 'player_knows_oral_condom'):
-                self.player_knows_oral_condom = False
-            if not hasattr(self, 'player_knows_body_condom'):
-                self.player_knows_body_condom = False
-            if not hasattr(self, 'wants_vaginal_condom'):
-                self.wants_vaginal_condom = wants_condom(self, "vaginal")
-            if not hasattr(self, 'wants_anal_condom'):
-                self.wants_anal_condom = wants_condom(self, "anal")
-            if not hasattr(self, 'wants_oral_condom'):
-                self.wants_oral_condom = wants_condom(self, "oral")
-            if not hasattr(self, 'wants_body_condom'):
-                self.wants_body_condom = wants_condom(self, "body")
-            
-            
-            
-            # Birth control system
-            # #self.male_condom = False #85% effective, 94% with spermicide
-            # self.spermicide = False #70% by itself, need to apply 15-30min before sex, 1 hour effectiveness, vaginal irritation
-            # self.female_condom = False #79% effective, 88% with spermicide
-            # self.female_diaphragm = False #87%, 94% with spermicide, apply 2hrs before, 24hours after sex
-            # self.cervical_cap = False #75%, 85% with spermicide, 6hrs before, 48 hours
-            # self.cervical_sponge = False #76%, 91% with spermicide, day, if expecting sex, max one day, vaginal irritation
-            # self.bc_implant = False #100% - 3 years, removable
-            # self.intrauterine_device = False #100% - 3  years, removable
-            # self.fertility_awareness = False #88% avoid sex 2 weeks before ideal day,
-            # self.cervical_mucus = False #88% avoid sex 2 weeks before ideal day,
-            # self.morning_after_pill = False #90% effective within 3 days of sex, will not work on ideal day.
-            # self.tubal_ligation = False #100% effective, reversabile
-            # self.salpingectomy = False #100% effective, reversabile
-            # self.pulling_out = False #20% effective
-            if not hasattr(self, 'bc_chance'):
-                self.bc_chance = 100
-            if not hasattr(self, 'birth_control'):
-                self.birth_control = renpy.random.randint(0, 100) < 69
-            if not hasattr(self, 'bc_status_known'):
-                self.bc_status_known = False
-            if not hasattr(self, 'bc_penalty'):
-                self.bc_penalty = 0
-
-            # Fertility cycle system
-            if not hasattr(self, 'fertility_percent'):
-                self.fertility_percent = 25.0
-            if not hasattr(self, 'ideal_fertile_day'):
-                self.ideal_fertile_day = renpy.random.randint(0, 30)
-            
-            # Conversation Tracking System
-            if not hasattr(self, 'has_met_before'):
-                self.has_met_before = False
-            if not hasattr(self, 'has_discussed_pregnancy_before'):
-                self.has_discussed_pregnancy_before = False
-            if not hasattr(self, 'has_discussed_birth_control_before'):
-                self.has_discussed_birth_control_before = False
-            if not hasattr(self, 'has_discussed_condoms_before'):
-                self.has_discussed_condoms_before = False
-            
-            # Pregnancy tracking
-            if not hasattr(self, 'pregnant'):
-                self.pregnant = False
-            if not hasattr(self, 'preg_body'):
-                self.preg_body = False
-            if not hasattr(self, 'knows_pregnant'):
-                self.knows_pregnant = False
-            if not hasattr(self, 'player_knows_pregnant'):
-                self.player_knows_pregnant = False
-            if not hasattr(self, 'preg_progress_days'):
-                self.preg_progress_days = 0
-            if not hasattr(self, 'preg_start_day'):
-                self.preg_start_day = 0
-            if not hasattr(self, 'preg_end_day'):
-                self.preg_end_day = 0
-            if not hasattr(self, 'preg_announce'):
-                self.preg_announce = False
-            if not hasattr(self, 'days_since_last_birth'):
-                self.days_since_last_birth = 0
-            if not hasattr(self, 'just_had_baby'):
-                self.just_had_baby = False
-            if not hasattr(self, 'pregnancy_phase'):
-                self.pregnancy_phase = 0
-            
-            # Add fertility boost attribute
-            if not hasattr(self, 'fertility_boost'):
-                self.fertility_boost = 0  # Days remaining for fertility boost
-            if not hasattr(self, 'prenatal_boost'):
-                self.prenatal_boost = 0  # Days remaining for prenatal boost
-
-            #Followup triggers
-            if not hasattr(self, 'has_pregnancy_followup'):
-                self.has_pregnancy_followup = False
-            if not hasattr(self, 'has_birth_control_followup'):
-                self.has_birth_control_followup = False
-            if not hasattr(self, 'has_condoms_followup'):
-                self.has_condoms_followup = False
-            if not hasattr(self, 'has_corruption_followup'):
-                self.has_corruption_followup = False
-            if not hasattr(self, 'has_naturism_followup'):
-                self.has_naturism_followup = False
-            if not hasattr(self, 'has_fear_followup'):
-                self.has_fear_followup = False
-            if not hasattr(self, 'has_blowjob_followup'):
-                self.has_blowjob_followup = False
-            if not hasattr(self, 'has_strip_tease_followup'):
-                self.has_strip_tease_followup = False
-            if not hasattr(self, 'has_get_dressed_followup'):
-                self.has_get_dressed_followup = False
-            if not hasattr(self, 'has_strip_to_underwear_followup'):
-                self.has_strip_to_underwear_followup = False
-            if not hasattr(self, 'has_naked_followup'):
-                self.has_naked_followup = False
-            if not hasattr(self, 'has_milk_followup'):
-                self.has_milk_followup = False
-            if not hasattr(self, 'has_creamer_followup'):
-                self.has_creamer_followup = False
-            if not hasattr(self, 'has_toppings_followup'):
-                self.has_toppings_followup = False
-            if not hasattr(self, 'has_small_talk_followup'):
-                self.has_small_talk_followup = False
-            if not hasattr(self, 'has_masturbation_tips_followup'):
-                self.has_masturbation_tips_followup = False
-            if not hasattr(self, 'has_shower_sex_followup'):
-                self.has_shower_sex_followup = False
+            vt_ensure_girl_attrs(self)
 
             #original_girl_init(self, *args, **kwargs)
 
@@ -2985,6 +3058,130 @@ init -14 python:
         Girl.get_fertility_day_status = get_fertility_day_status
         Girl.get_cycle_day = get_cycle_day
         Girl.boob_description = boob_description
+
+        # ===== SIDECAR PROPERTY ACCESSORS (girl) =====
+        # Batch 1: relationship keys. Each keeps `girl.<key>` working unchanged at every call
+        # site and eval string, but stores the value in girl.mod_data["elkrose_vt"]. Getters
+        # are READ-ONLY (render-path safe). For dict-valued keys the getter returns the SAME
+        # dict object from the bucket, so in-place mutations persist. Inherited by Mother.
+        # This list grows per batch; vt_ensure_girl_attrs migrates/initializes these keys.
+        VT_GIRL_SIDECAR_KEYS = [
+            # batch 1: relationship
+            "player_relationship", "path_seeds", "initial_reaction",
+            # batch 2: pregnancy
+            "pregnant", "preg_body", "knows_pregnant", "player_knows_pregnant",
+            "preg_progress_days", "preg_start_day", "preg_end_day", "preg_announce",
+            "pregnancy_phase", "just_had_baby", "days_since_last_birth", "preg_father",
+            # batch 3: fertility + birth control
+            "bc_chance", "birth_control", "bc_status_known", "bc_penalty",
+            "fertility_percent", "ideal_fertile_day",
+            "fertility_boost", "prenatal_boost", "prenatal_doses",
+            # SafeDOCK / DryDOCK (pending base-dev implementation)
+            "planb_pills", "emergency_pill", "planb_boost",
+            # batch 4: fetishes
+            "oral_cum_fetish", "vaginal_cum_fetish", "anal_cum_fetish", "boob_cum_fetish",
+            "thigh_cum_fetish", "ass_cum_fetish", "pussy_cum_fetish", "impreg_fetish", "baby_desire", "baby_desire_xp",
+            # batch 5: sex history
+            "oral_cum", "vaginal_cum", "anal_cum",
+            "oral_sex_count", "last_oral_sex", "vaginal_sex_count", "last_vaginal_sex",
+            "anal_sex_count", "last_anal_sex", "first_time_oral", "first_time_pussy", "first_time_anal",
+            "boob_sex_count", "last_boob_sex", "first_time_boobs",
+            "thigh_sex_count", "last_thigh_sex", "first_time_thighs",
+            "ass_cumshot_count", "last_ass_cumshot", "first_time_ass_cumshot",
+            "pussy_cumshot_count", "last_pussy_cumshot", "first_time_pussy_cumshot",
+            "hymen", "kids", "kids_with_player", "kids_with_npc", "original_daughter",
+            # batch 6: condom awareness
+            "aware_vaginal_condom", "aware_oral_condom", "aware_anal_condom", "aware_boob_condom",
+            "aware_thigh_condom", "aware_ass_cumshot_condom", "aware_pussy_cumshot_condom",
+            "player_knows_vaginal_condom", "player_knows_anal_condom", "player_knows_oral_condom", "player_knows_body_condom",
+            "wants_vaginal_condom", "wants_anal_condom", "wants_oral_condom", "wants_body_condom",
+            # batch 7: misc flags / follow-ups
+            "had_sex_today", "having_oral_sex", "having_vaginal_sex",
+            "has_met_before", "has_discussed_pregnancy_before", "has_discussed_birth_control_before", "has_discussed_condoms_before",
+            "has_pregnancy_followup", "has_birth_control_followup", "has_condoms_followup", "has_corruption_followup",
+            "has_naturism_followup", "has_fear_followup", "has_blowjob_followup", "has_strip_tease_followup",
+            "has_get_dressed_followup", "has_strip_to_underwear_followup", "has_naked_followup", "has_milk_followup",
+            "has_creamer_followup", "has_toppings_followup", "has_small_talk_followup", "has_masturbation_tips_followup",
+            "has_shower_sex_followup",
+        ]
+        # Fallback returned by the getter only in the brief pre-init window (before
+        # vt_ensure_girl_attrs has populated the bucket). A callable is invoked to produce a
+        # fresh value (use for mutable defaults like dicts); any other value is returned as-is.
+        _VT_GIRL_SIDECAR_FALLBACKS = {
+            # batch 1: relationship
+            "player_relationship": dict,   # called -> fresh {} (only hit pre-init; not mutated then)
+            "path_seeds": dict,
+            "initial_reaction": "neutral",
+            # batch 2: pregnancy (plain immutable values)
+            "pregnant": False,
+            "preg_body": False,
+            "knows_pregnant": False,
+            "player_knows_pregnant": False,
+            "preg_progress_days": 0,
+            "preg_start_day": 0,
+            "preg_end_day": 0,
+            "preg_announce": False,
+            "pregnancy_phase": 0,
+            "just_had_baby": False,
+            "days_since_last_birth": 0,
+            "preg_father": None,
+            # batch 3: fertility + birth control
+            "bc_chance": 100,
+            "birth_control": False,
+            "bc_status_known": False,
+            "bc_penalty": 0,
+            "fertility_percent": 25.0,
+            "ideal_fertile_day": 0,
+            "fertility_boost": 0,
+            "prenatal_boost": 0,
+            "prenatal_doses": 0,
+            # SafeDOCK / DryDOCK (pending base-dev implementation)
+            "planb_pills": 0, "emergency_pill": 0, "planb_boost": 0,
+            # batch 4: fetishes
+            "oral_cum_fetish": 0, "vaginal_cum_fetish": 0, "anal_cum_fetish": 0, "boob_cum_fetish": 0,
+            "thigh_cum_fetish": 0, "ass_cum_fetish": 0, "pussy_cum_fetish": 0, "impreg_fetish": 0, "baby_desire": 0, "baby_desire_xp": 0,
+            # batch 5: sex history
+            "oral_cum": 0, "vaginal_cum": 0, "anal_cum": 0,
+            "oral_sex_count": 0, "last_oral_sex": -1, "vaginal_sex_count": 0, "last_vaginal_sex": -1,
+            "anal_sex_count": 0, "last_anal_sex": -1,
+            "first_time_oral": True, "first_time_pussy": True, "first_time_anal": True,
+            "boob_sex_count": 0, "last_boob_sex": -1, "first_time_boobs": True,
+            "thigh_sex_count": 0, "last_thigh_sex": -1, "first_time_thighs": True,
+            "ass_cumshot_count": 0, "last_ass_cumshot": -1, "first_time_ass_cumshot": True,
+            "pussy_cumshot_count": 0, "last_pussy_cumshot": -1, "first_time_pussy_cumshot": True,
+            "hymen": True, "kids": 0, "kids_with_player": 0, "kids_with_npc": 0, "original_daughter": False,
+            # batch 6: condom awareness
+            "aware_vaginal_condom": False, "aware_oral_condom": False, "aware_anal_condom": False, "aware_boob_condom": False,
+            "aware_thigh_condom": False, "aware_ass_cumshot_condom": False, "aware_pussy_cumshot_condom": False,
+            "player_knows_vaginal_condom": False, "player_knows_anal_condom": False, "player_knows_oral_condom": False, "player_knows_body_condom": False,
+            "wants_vaginal_condom": False, "wants_anal_condom": False, "wants_oral_condom": False, "wants_body_condom": False,
+            # batch 7: misc flags / follow-ups
+            "had_sex_today": False, "having_oral_sex": False, "having_vaginal_sex": False,
+            "has_met_before": False, "has_discussed_pregnancy_before": False, "has_discussed_birth_control_before": False, "has_discussed_condoms_before": False,
+            "has_pregnancy_followup": False, "has_birth_control_followup": False, "has_condoms_followup": False, "has_corruption_followup": False,
+            "has_naturism_followup": False, "has_fear_followup": False, "has_blowjob_followup": False, "has_strip_tease_followup": False,
+            "has_get_dressed_followup": False, "has_strip_to_underwear_followup": False, "has_naked_followup": False, "has_milk_followup": False,
+            "has_creamer_followup": False, "has_toppings_followup": False, "has_small_talk_followup": False, "has_masturbation_tips_followup": False,
+            "has_shower_sex_followup": False,
+        }
+
+        def _vt_make_girl_property(key):
+            _fb = _VT_GIRL_SIDECAR_FALLBACKS.get(key)
+            def _getter(self):
+                md = getattr(self, "mod_data", None)
+                if md:
+                    b = md.get("elkrose_vt")
+                    if b is not None and key in b:
+                        return b[key]
+                if key in self.__dict__:   # not-yet-migrated loose value (pre-load-backfill)
+                    return self.__dict__[key]
+                return _fb() if callable(_fb) else _fb
+            def _setter(self, value):
+                vt_girl_bucket(self)[key] = value
+            return property(_getter, _setter)
+
+        for _gk in VT_GIRL_SIDECAR_KEYS:
+            setattr(Girl, _gk, _vt_make_girl_property(_gk))
         #Girl.vt_relationship_change = vt_relationship_change
         #Girl.vt_seed_relationship_path = vt_seed_relationship_path
         print("VT MOD: Successfully patched Girl class with advanced fertility system")
@@ -4799,32 +4996,24 @@ init 999 python:
             # Reset retry counter on success
             renpy.store._vt_retry_count = 0
             
-            all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
-            renpy.log(f"VT MOD: Processing {len(all_girls)} girls for VT compatibility")
+            # Include mothers too: they get their own daily/weekly updates (via mother_manager)
+            # and need the same sidecar + pregnancy-model migration on load, so they must be in
+            # the backfill. (girl_manager.get_all_possible_girls is girls-only.)
+            if hasattr(renpy.store.academy, "get_all_possible_girls_and_mothers"):
+                all_girls = renpy.store.academy.get_all_possible_girls_and_mothers(include_pending=True)
+            else:
+                all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
+            renpy.log(f"VT MOD: Processing {len(all_girls)} girls/mothers for VT compatibility")
             
             for girl in all_girls:
                 is_mother = is_mother_character(girl)
-                
-                # Fertility attributes
-                if not hasattr(girl, "fertility_percent"):
-                    girl.fertility_percent = 5.0 if is_mother else 25.0
-                
-                # Sexual history attributes
-                if not hasattr(girl, "hymen"):
-                    girl.hymen = False if is_mother else True
-                
-                # Kids attribute - CRITICAL MOTHER FIX
-                if not hasattr(girl, "kids"):
-                    girl.kids = 1 if is_mother else 0
-                if not hasattr(girl, "kids_with_player"):
-                    girl.kids_with_player = 0
-                if not hasattr(girl, "kids_with_npc"):
-                    girl.kids_with_npc = 0
-                if not hasattr(girl, "original_daughter"):
-                    girl.original_daughter = is_mother and (girl.kids > 0)
-                if not hasattr(girl, "preg_father"):
-                    girl.preg_father = None
-                # Ensure proper initialization
+
+                # Full idempotent backfill -- covers every VT attribute, not just a
+                # subset. Critical for mid-save installs: these girls predate the mod,
+                # so the patched __init__ never ran for them. Shared with Girl.__init__.
+                vt_ensure_girl_attrs(girl)
+
+                # Mother kids reconciliation (runs each load, not a one-time default).
                 if is_mother:
                     # Base mothers must have at least 1 kid (their daughter)
                     girl.kids = max(1, girl.kids)
@@ -4837,35 +5026,7 @@ init 999 python:
                 else:
                     # Students start with 0 kids
                     girl.kids = max(0, girl.kids_with_player + girl.kids_with_npc)
-                
-                # cum in her from MC
-                if not hasattr(girl, "vaginal_cum"):
-                    girl.vaginal_cum = 0
-                
-                if not hasattr(girl, "vaginal_sex_count"):
-                    girl.vaginal_sex_count = 0  # Sex with MC
-                
-                if not hasattr(girl, "last_vaginal_sex"):
-                    girl.last_vaginal_sex = -1
-                
-                if not hasattr(girl, "first_time_pussy"):
-                    # First time sex with MC dialog flag, not  girl/mother sex experience
-                        girl.first_time_pussy = True
 
-                # Pregnancy attributes
-                if not hasattr(girl, "pregnant"):
-                    girl.pregnant = False
-                if not hasattr(girl, "just_had_baby"):
-                    #  this directly tied to MC baby
-                    girl.just_had_baby = False
-                if not hasattr(girl, "days_since_last_birth"):
-                    # tied to MC baby
-                    girl.days_since_last_birth = 0
-
-                # Birth control defaults (mothers less likely to use)
-                if not hasattr(girl, "birth_control"):
-                    girl.birth_control = renpy.random.randint(0, 100) < (10 if is_mother else 69)
-                
                 renpy.log("VT MOD: Successfully added VT attributes to all girls")
         except Exception as e:
             renpy.log(f"VT MOD ERROR: {str(e)}")
@@ -4897,3 +5058,13 @@ init 999 python:
     renpy.store._vt_retry_count = 0
     renpy.invoke_in_new_context(register_compatibility, 0.1)
     print("VT MOD: Scheduled compatibility update (recursion-safe)")
+
+    # CRITICAL for mid-save installs: the init-time run above sees the *fresh* academy
+    # (before any save is loaded). Re-run the backfill on every load so the *loaded*
+    # save's girls get the attributes too. (Base game has no compatibility_updates hook.)
+    def vt_after_load_backfill():
+        renpy.store._vt_retry_count = 0
+        vt_add_missing_attributes()
+
+    if vt_after_load_backfill not in config.after_load_callbacks:
+        config.after_load_callbacks.append(vt_after_load_backfill)
