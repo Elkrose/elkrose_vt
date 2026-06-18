@@ -1,4 +1,19 @@
-Virginal Tracker Mod 1.0.7
+Virginal Tracker Mod 1.0.8
+
+1.0.8
+
+- Cherry status now shows on the "Arranging Home Visit" call menu. A compact
+  cherry row is floated under the Fear bar for both the mother (left panel)
+  and her daughter (right panel) on every card, across all pages, so you can
+  read everyone's pregnancy / birth-control / condom-preference state while
+  deciding who to call. Like the rest of the VT HUD it's drawn as an overlay
+  on top of the base screen -- no base screen is overridden.
+- The four condom-preference icons (oral, body, anal, vaginal) now carry a
+  small O / B / A / V letter so they can be told apart at a glance -- they
+  otherwise look identical whenever they share a state. The label is a
+  subdued, semi-transparent watermark that scales with the icon size, and it
+  was added to every cherry window variant (row, column, minimum, and the
+  legacy window).
 
 1.0.7
 
