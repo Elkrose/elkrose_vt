@@ -1,5 +1,4 @@
 ## VT overlay - floats cherry widgets over base game screens without overriding them
-
 init python:
     config.overlay_screens.append("vt_cherry_overlay")
 
@@ -61,19 +60,26 @@ screen vt_cherry_overlay():
         if _vt_girl:
             use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
 
-    # World location conversation menu — girl_hud is hidden on sex entry (line 229 screen_sex_interaction_menu.rpy)
+    elif renpy.get_screen("home_visit_call_menu", layer="master"):
+        $ _vt_hv_girls = getattr(store, "callable_girls", [])
+        $ _vt_hv_per   = getattr(store, "home_visit_per_page", 9)
+        $ _vt_hv_page  = getattr(store, "home_visit_page", 0)
+        $ _vt_hv_slice = _vt_hv_girls[_vt_hv_page * _vt_hv_per : _vt_hv_page * _vt_hv_per + _vt_hv_per]
+        for _vt_hv_i, _vt_hv_girl in enumerate(_vt_hv_slice):
+            $ _vt_hv_cx = 22 + (_vt_hv_i % 3) * 630   # card left edge
+            $ _vt_hv_cy = 95 + (_vt_hv_i // 3) * 325  # card top edge
+            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 110, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_m_{}".format(_vt_hv_i)
+            use cherry_window_row(girl=_vt_hv_girl, position="tooltip", xoffset=_vt_hv_cx + 415, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_d_{}".format(_vt_hv_i)
+
     elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
         use cherry_window_row(girl=_vt_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#FF0000", border_size=2, icon_size=36) id "vt_choice_cherry"
 
-    # VTMod pregnancy check pane - overlaid over bottom two-thirds of middle panel in girl ratings detail
     if renpy.get_screen("single_girl_rating_menu", layer="master"):
         use vtmod_preg_check_pane() id "vt_preg_pane"
 
-    # Player HUD condom cherry - right side, below the 3 HUD buttons
     if renpy.get_screen("player_hud"):
         use hud_condom_cherry(position="top_right", icon_size=32) id "vt_ph_condom"
 
-    # Tooltip cherry info - mirrors base game Girl tooltip x-clamping (screen_tooltip_overlay.rpy)
     if isinstance(_vt_tooltip, Girl):
         $ _tt_mx, _tt_my = renpy.get_mouse_pos()
         $ _tt_xoffset = max(min(_tt_mx, 1920 - max_tooltip_width), 5)

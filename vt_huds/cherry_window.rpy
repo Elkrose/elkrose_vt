@@ -181,14 +181,23 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             else:
                                 $ oraltt = "No idea if she wants condom for Oral."
                                 $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
-                                focus_mask True
-                                at Transform(zoom=(icon_size / 50.0))
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (icon_size, icon_size)
                                 xalign 0.5
-                                yalign 0.5
-                                idle oralimg
-                                action NullAction()
-                                tooltip oraltt
+                                imagebutton:
+                                    focus_mask True
+                                    at Transform(zoom=(icon_size / 50.0))
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle oralimg
+                                    action NullAction()
+                                    tooltip oraltt
+                                text "O":
+                                    align (0.5, 0.5)
+                                    size max(7, int(icon_size * 0.55))
+                                    color "#FFFFFFAA"
+                                    outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                         #Body Status
                         vbox:
@@ -214,14 +223,23 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             else:
                                 $ bodytt = "No idea if she wants condom for Body."
                                 $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
-                                focus_mask True
-                                at Transform(zoom=(icon_size / 50.0))
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (icon_size, icon_size)
                                 xalign 0.5
-                                yalign 0.5
-                                idle bodyimg
-                                action NullAction()
-                                tooltip bodytt
+                                imagebutton:
+                                    focus_mask True
+                                    at Transform(zoom=(icon_size / 50.0))
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle bodyimg
+                                    action NullAction()
+                                    tooltip bodytt
+                                text "B":
+                                    align (0.5, 0.5)
+                                    size max(7, int(icon_size * 0.55))
+                                    color "#FFFFFFAA"
+                                    outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                         #Anal Status
                         vbox:
@@ -246,14 +264,23 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             else:
                                 $ analtt = "No idea if she wants condom for Anal."
                                 $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
-                                focus_mask True
-                                at Transform(zoom=(icon_size / 50.0))
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (icon_size, icon_size)
                                 xalign 0.5
-                                yalign 0.5
-                                idle analimg
-                                action NullAction()
-                                tooltip analtt
+                                imagebutton:
+                                    focus_mask True
+                                    at Transform(zoom=(icon_size / 50.0))
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle analimg
+                                    action NullAction()
+                                    tooltip analtt
+                                text "A":
+                                    align (0.5, 0.5)
+                                    size max(7, int(icon_size * 0.55))
+                                    color "#FFFFFFAA"
+                                    outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                         #Vaginal Status
                         vbox:
@@ -278,14 +305,23 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             else:
                                 $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                                 $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
-                                focus_mask True
-                                at Transform(zoom=(icon_size / 50.0))
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (icon_size, icon_size)
                                 xalign 0.5
-                                yalign 0.5
-                                idle vaginalimg
-                                action NullAction()
-                                tooltip vaginaltt
+                                imagebutton:
+                                    focus_mask True
+                                    at Transform(zoom=(icon_size / 50.0))
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle vaginalimg
+                                    action NullAction()
+                                    tooltip vaginaltt
+                                text "V":
+                                    align (0.5, 0.5)
+                                    size max(7, int(icon_size * 0.55))
+                                    color "#FFFFFFAA"
+                                    outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                         vbox:
                             xsize icon_size
@@ -491,12 +527,21 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             else:
                                 $ oraltt = "No idea if she wants condom for Oral."
                                 $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (50, 50)
                                 xalign 0.5
-                                yalign 0.5
-                                idle oralimg
-                                action NullAction()
-                                tooltip oraltt
+                                imagebutton:
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle oralimg
+                                    action NullAction()
+                                    tooltip oraltt
+                                text "O":
+                                    align (0.5, 0.5)
+                                    size 27
+                                    color "#FFFFFFAA"
+                                    outlines [(3, "#000000AA", 0, 0)]
                        
                         #Body Status
                         vbox:
@@ -522,12 +567,21 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             else:
                                 $ bodytt = "No idea if she wants condom for Body."
                                 $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (50, 50)
                                 xalign 0.5
-                                yalign 0.5
-                                idle bodyimg
-                                action NullAction()
-                                tooltip bodytt
+                                imagebutton:
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle bodyimg
+                                    action NullAction()
+                                    tooltip bodytt
+                                text "B":
+                                    align (0.5, 0.5)
+                                    size 27
+                                    color "#FFFFFFAA"
+                                    outlines [(3, "#000000AA", 0, 0)]
                        
                         #Anal Status
                         vbox:
@@ -552,12 +606,21 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             else:
                                 $ analtt = "No idea if she wants condom for Anal."
                                 $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (50, 50)
                                 xalign 0.5
-                                yalign 0.5
-                                idle analimg
-                                action NullAction()
-                                tooltip analtt
+                                imagebutton:
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle analimg
+                                    action NullAction()
+                                    tooltip analtt
+                                text "A":
+                                    align (0.5, 0.5)
+                                    size 27
+                                    color "#FFFFFFAA"
+                                    outlines [(3, "#000000AA", 0, 0)]
                         
                         #Vaginal Status
                         vbox:
@@ -582,12 +645,21 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             else:
                                 $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                                 $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                            imagebutton:
+                            # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                            fixed:
+                                xysize (50, 50)
                                 xalign 0.5
-                                yalign 0.5
-                                idle vaginalimg
-                                action NullAction()
-                                tooltip vaginaltt
+                                imagebutton:
+                                    xalign 0.5
+                                    yalign 0.5
+                                    idle vaginalimg
+                                    action NullAction()
+                                    tooltip vaginaltt
+                                text "V":
+                                    align (0.5, 0.5)
+                                    size 27
+                                    color "#FFFFFFAA"
+                                    outlines [(3, "#000000AA", 0, 0)]
                         
                         vbox:
                             xsize 50
@@ -802,13 +874,22 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         else:
                             $ oraltt = "No idea if she wants condom for Oral."
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(oralimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip oraltt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(oralimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip oraltt
+                            text "O":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Body Status
                     vbox:
@@ -834,13 +915,22 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         else:
                             $ bodytt = "No idea if she wants condom for Body."
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(bodyimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip bodytt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(bodyimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip bodytt
+                            text "B":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Anal Status
                     vbox:
@@ -865,13 +955,22 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         else:
                             $ analtt = "No idea if she wants condom for Anal."
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(analimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip analtt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(analimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip analtt
+                            text "A":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Vaginal Status
                     vbox:
@@ -896,13 +995,22 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         else:
                             $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(vaginalimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip vaginaltt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(vaginalimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip vaginaltt
+                            text "V":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     vbox:
                         xsize icon_size
@@ -1099,13 +1207,22 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         else:
                             $ oraltt = "No idea if she wants condom for Oral."
                             $ oralimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(oralimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip oraltt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(oralimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip oraltt
+                            text "O":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Body Status
                     hbox:
@@ -1131,13 +1248,22 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         else:
                             $ bodytt = "No idea if she wants condom for Body."
                             $ bodyimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(bodyimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip bodytt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(bodyimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip bodytt
+                            text "B":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Anal Status
                     hbox:
@@ -1162,13 +1288,22 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         else:
                             $ analtt = "No idea if she wants condom for Anal."
                             $ analimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(analimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip analtt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(analimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip analtt
+                            text "A":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     #Vaginal Status
                     hbox:
@@ -1193,13 +1328,22 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         else:
                             $ vaginaltt = "No idea if she uses condoms for vaginal sex."
                             $ vaginalimg = "_mods/content/elkrose_vt/extra_images/nocondom.png"
-                        imagebutton:
-                            focus_mask True
+                        # PROTOTYPE: single-letter slot label (O/B/A/V) drawn over the icon
+                        fixed:
+                            xysize (icon_size, icon_size)
                             xalign 0.5
-                            yalign 0.5
-                            idle fit_image_to_size(vaginalimg, icon_size, icon_size)
-                            action NullAction()
-                            tooltip vaginaltt
+                            imagebutton:
+                                focus_mask True
+                                xalign 0.5
+                                yalign 0.5
+                                idle fit_image_to_size(vaginalimg, icon_size, icon_size)
+                                action NullAction()
+                                tooltip vaginaltt
+                            text "V":
+                                align (0.5, 0.5)
+                                size max(7, int(icon_size * 0.55))
+                                color "#FFFFFFAA"
+                                outlines [(max(1, icon_size // 14), "#000000AA", 0, 0)]
 
                     hbox:
                         ysize icon_size
