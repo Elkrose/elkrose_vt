@@ -2,6 +2,15 @@ Virginal Tracker Mod 1.0.9
 
 1.0.9
 
+- Fixed pregnancy small talk treating a girl as if she already knew she was
+  pregnant. A girl who was pregnant but hadn't found out yet (e.g. only a few
+  days along, before the discovery roll succeeds) would still open with lines
+  like "your baby growing inside me" and answer condom-preference questions
+  with "I'm already carrying your baby." Her opening dialogue and the
+  vaginal / anal / oral condom responses now require that she actually knows
+  she's pregnant; until she does, she gives the speculative not-yet-pregnant
+  dialogue instead. Her knowing lines return automatically once discovery or
+  confession flips her awareness on.
 - Aligned pregnancy self-awareness between mothers and students. A pregnant
   mother used to realize she was pregnant after only 2 progress days while a
   student took 10; both now use the same 10-day latch (matching the
