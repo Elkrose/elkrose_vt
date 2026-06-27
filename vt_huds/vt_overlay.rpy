@@ -2,6 +2,28 @@
 init python:
     config.overlay_screens.append("vt_cherry_overlay")
 
+# Labels whose conversation menu is addressed to the mother (talker = mother) even
+# though selected_girl stays the daughter. Used by the convo_menu cherry below.
+define vt_mother_convo_labels = {"home_visit_mother_discussion"}
+
+# Last label reached at runtime, so the overlay can tell which conversation it is
+# floating over. Set by the chained config.label_callback installed below.
+default vt_active_label = ""
+
+# Install a chained label_callback (runs late so it wraps any callback the base
+# game or another mod registered). Underscore-prefixed names are not saved.
+init 100 python:
+    def _vt_label_callback(name, abnormal):
+        store.vt_active_label = name
+        _prev = getattr(store, "_vt_prev_label_callback", None)
+        if _prev is not None:
+            _prev(name, abnormal)
+
+    if not getattr(store, "_vt_label_callback_installed", False):
+        store._vt_prev_label_callback = config.label_callback
+        config.label_callback = _vt_label_callback
+        store._vt_label_callback_installed = True
+
 transform vt_appear_after_popup:
     alpha 0.0
     pause 0.5
@@ -72,7 +94,12 @@ screen vt_cherry_overlay():
             use cherry_window_row(girl=_vt_hv_girl, position="tooltip", xoffset=_vt_hv_cx + 415, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_d_{}".format(_vt_hv_i)
 
     elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
-        use cherry_window_row(girl=_vt_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#FF0000", border_size=2, icon_size=36) id "vt_choice_cherry"
+        # On the home-visit mother discussion the player is talking to the mother,
+        # but selected_girl stays the daughter — show the mother's cherry data there.
+        $ _vt_convo_girl = _vt_girl
+        if vt_active_label in vt_mother_convo_labels and _vt_girl.mother:
+            $ _vt_convo_girl = _vt_girl.mother
+        use cherry_window_row(girl=_vt_convo_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#664444", border_size=2, icon_size=36) id "vt_choice_cherry"
 
     if renpy.get_screen("single_girl_rating_menu", layer="master"):
         use vtmod_preg_check_pane() id "vt_preg_pane"

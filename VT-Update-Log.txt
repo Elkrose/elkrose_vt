@@ -1,4 +1,13 @@
-Virginal Tracker Mod 1.0.9
+Virginal Tracker Mod 1.0.10
+
+1.0.10
+
+- Fixed the home-visit cherry window showing the daughter's data while you're
+  talking to the mother. On the mother's conversation menu the base game keeps
+  selected_girl pointed at the daughter, so the cherry was reading her stats
+  instead of the mother's; the overlay now shows the mother there. Hovering
+  either person still shows that person's data, and no base screen or label is
+  overridden -- a chained config.label_callback tracks the active conversation.
 
 1.0.9
 
