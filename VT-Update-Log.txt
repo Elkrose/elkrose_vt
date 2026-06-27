@@ -2,6 +2,10 @@ Virginal Tracker Mod 1.0.9
 
 1.0.9
 
+- Aligned pregnancy self-awareness between mothers and students. A pregnant
+  mother used to realize she was pregnant after only 2 progress days while a
+  student took 10; both now use the same 10-day latch (matching the
+  VT_KNOWS_AFTER_DAYS setting), so no one finds out unrealistically early.
 - Fixed the FertiBOOST gift reaction leaking a hidden pregnancy. Giving
   FertiBOOST to a girl who was already (secretly) pregnant but whom nobody knew
   about yet popped "takes the FertiBOOST without a clue her body is already

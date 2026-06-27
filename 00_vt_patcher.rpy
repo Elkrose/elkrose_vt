@@ -1952,8 +1952,8 @@ init -4 python:
                 elif self.preg_progress_days >= 35:
                     self.pregnancy_phase = 1
                     #self.preg_body = True
-                # After 2 days, she will know if she's pregnant and in her first trimester
-                elif self.preg_progress_days >= 2:
+                # After 10 days, she will know if she's pregnant and in her first trimester
+                elif self.preg_progress_days >= 10:
                     self.pregnancy_phase = 1
                     self.knows_pregnant = True
                     self.birth_control = False
@@ -2971,7 +2971,7 @@ init -14 python:
                 elif self.preg_progress_days >= 35:
                     self.pregnancy_phase = 1
                     #self.preg_body = True
-                # After 2 days, she will know if she's pregnant and in her first trimester
+                # After 10 days, she will know if she's pregnant and in her first trimester
                 elif self.preg_progress_days >= 10:
                     self.pregnancy_phase = 1
                     self.knows_pregnant = True
