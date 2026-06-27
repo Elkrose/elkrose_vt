@@ -90,8 +90,10 @@ screen vt_cherry_overlay():
         for _vt_hv_i, _vt_hv_girl in enumerate(_vt_hv_slice):
             $ _vt_hv_cx = 22 + (_vt_hv_i % 3) * 630   # card left edge
             $ _vt_hv_cy = 95 + (_vt_hv_i // 3) * 325  # card top edge
-            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 110, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_m_{}".format(_vt_hv_i)
-            use cherry_window_row(girl=_vt_hv_girl, position="tooltip", xoffset=_vt_hv_cx + 415, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_d_{}".format(_vt_hv_i)
+            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 81, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=18) id "vt_hv_m_{}".format(_vt_hv_i)
+            # Daughter's widget runs as a column down the far-right edge of the card so
+            # it clears the base-game status text (grades / grace / "Currently at ...").
+            use cherry_window_column(girl=_vt_hv_girl, position="call_menu", xoffset=_vt_hv_cx + 575, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=16) id "vt_hv_d_{}".format(_vt_hv_i)
 
     elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
         # On the home-visit mother discussion the player is talking to the mother,

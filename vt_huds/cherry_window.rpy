@@ -1066,6 +1066,11 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
         $ xalign_val = 1.0
         $ xanchor_val = 1.0
         $ xoffset = -10
+    elif position == "call_menu":
+        $ xalign_val = 0.0
+        $ xanchor_val = 0.0
+        $ yalign_val = 0.0
+        $ yanchor_val = 0.0
     elif position == "top":
         $ yalign_val = 0.0
         $ yanchor_val = 0.0

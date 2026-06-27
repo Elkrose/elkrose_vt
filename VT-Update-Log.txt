@@ -8,6 +8,13 @@ Virginal Tracker Mod 1.0.10
   instead of the mother's; the overlay now shows the mother there. Hovering
   either person still shows that person's data, and no base screen or label is
   overridden -- a chained config.label_callback tracks the active conversation.
+- Reworked the cherry widgets on the "Arranging Home Visit" call menu so they no
+  longer cover the base game's own card text. The daughter's widget used to be a
+  horizontal row that sat on top of her grades / grace / "Currently at home /
+  work" status; it is now a vertical column pinned to the far-right edge of each
+  card, clear of that text, and the mother's row was repositioned and resized to
+  match. (A new "call_menu" layout option was added to cherry_window_column for
+  this.)
 
 1.0.9
 
