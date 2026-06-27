@@ -16,21 +16,29 @@ screen vt_firsttime_notification(message, duration=3.0):
     
     timer duration action Hide("vt_firsttime_notification")
 
-screen vt_preg_notification(message, duration=3.0):
+# Queue of messages currently stacked in the preg popup. Lets several
+# notifications that fire within one interaction (e.g. multiple pregnant girls
+# taking PregnaVITA on the weekly tick) show together instead of clobbering.
+default vt_preg_notify_queue = []
+
+screen vt_preg_notification(duration=3.0):
     modal False
     zorder 100
-    
+
     frame:
         style "vt_notify_frame"
         xalign 0.5
         yalign 0.65
         padding (20, 15)
-        
-        text message:
-            style "vt_notify_text"
-            text_align 0.5
-    
-    timer duration action Hide("vt_preg_notification")
+
+        vbox:
+            spacing 6
+            for vt_msg in vt_preg_notify_queue:
+                text vt_msg:
+                    style "vt_notify_text"
+                    text_align 0.5
+
+    timer duration action [SetVariable("vt_preg_notify_queue", []), Hide("vt_preg_notification")]
 
 screen vt_relationals_notification(message, duration=3.0):
     modal False
@@ -143,11 +151,20 @@ init python:
         renpy.show_screen("vt_fetish_notification", message=message, duration=duration)
     
     def vt_preg_notify(message, duration=3.0):
-        """Custom VT notification with styled popup"""
-        # First hide any existing VT notification
+        """Custom VT notification with styled popup.
+
+        Stacks messages that fire within the same burst (e.g. several pregnant
+        girls each taking PregnaVITA on the weekly tick) instead of showing only
+        the last one. A burst is "fresh" whenever the popup isn't already showing;
+        the screen's timer clears the queue when it fades.
+        """
+        # Start a fresh queue only when no popup is currently up
+        if renpy.get_screen("vt_preg_notification") is None:
+            store.vt_preg_notify_queue = []
+        store.vt_preg_notify_queue.append(message)
+        # Re-show so the screen re-reads the queue and the fade timer resets
         renpy.hide_screen("vt_preg_notification")
-        # Show our styled notification
-        renpy.show_screen("vt_preg_notification", message=message, duration=duration)
+        renpy.show_screen("vt_preg_notification", duration=duration)
 
     def vt_firsttime_notify(message, duration=3.0):
         """Custom VT notification with styled popup"""

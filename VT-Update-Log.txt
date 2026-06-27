@@ -1,4 +1,15 @@
-Virginal Tracker Mod 1.0.8
+Virginal Tracker Mod 1.0.9
+
+1.0.9
+
+- Fixed the PregnaVITA weekly-tick popup showing only one girl when several
+  took it at once. Because every pregnant girl's weekly update fired the
+  notification inside the same interaction, each call replaced the previous
+  one and only the last girl's "took PregnaVITA" message ever rendered. The
+  preg notification now stacks messages that arrive in the same burst and
+  shows them together (one line per girl); the popup clears itself when it
+  fades, so a later, unrelated notification still starts fresh. Dose and
+  due-date logic is unchanged -- this is purely a display fix.
 
 1.0.8
 
