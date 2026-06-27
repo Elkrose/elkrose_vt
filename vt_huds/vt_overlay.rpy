@@ -111,7 +111,7 @@ screen vt_cherry_overlay():
 
     if isinstance(_vt_tooltip, Girl):
         $ _tt_mx, _tt_my = renpy.get_mouse_pos()
-        $ _tt_xoffset = max(min(_tt_mx, 1920 - max_tooltip_width), 5)
-        $ _tt_yoffset = int(1080 * 0.15) + 474
+        $ _tt_xoffset = max(min(_tt_mx, 1928 - max_tooltip_width), 5)
+        $ _tt_yoffset = int(1080 * 0.15) + 478
         fixed at tooltip_fade_in:
             use cherry_window_row(girl=_vt_tooltip, position="tooltip", xoffset=_tt_xoffset, yoffset=_tt_yoffset, border_color="#664444", border_size=2, icon_size=36) id "vt_tt_cherry"
