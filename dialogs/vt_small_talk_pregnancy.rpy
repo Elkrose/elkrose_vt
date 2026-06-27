@@ -355,7 +355,7 @@ label vt_small_talk_pregnancy:
 
     # ROLE-BASED OPENINGS WITH BABY DESIRE INTEGRATION
     if is_base_mother:
-        if selected_girl.pregnant and selected_girl.preg_father == "player":
+        if selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player":
             if kids_with_player > 0:
                 if selected_girl.baby_desire > 80:
                     if selected_girl.dominant_approach == "compassionate":
@@ -460,7 +460,7 @@ label vt_small_talk_pregnancy:
                     selected_girl.character "As a mother, I understand pregnancy well... but I'm not looking to have more right now."
 
     elif is_student:
-        if selected_girl.pregnant and selected_girl.preg_father == "player":
+        if selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player":
             if kids_with_player > 0:
                 if selected_girl.baby_desire > 70:
                     if selected_girl.dominant_approach == "compassionate":
@@ -854,7 +854,7 @@ label vt_small_talk_pregnancy:
             player.character "What are your thoughts on condoms for vaginal sex?"
             # Response based on dominant_approach, role, and pregnancy context
             $ selected_girl.player_knows_vaginal_condom = True
-            if selected_girl.pregnant and selected_girl.preg_father == "player": # Already pregnant with player's baby
+            if selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player": # Already pregnant with player's baby
                 $ selected_girl.wants_vaginal_condom = False
                 if selected_girl.dominant_approach == "compassionate":
                     if is_base_mother:
@@ -1620,9 +1620,9 @@ label vt_small_talk_pregnancy:
                                     selected_girl.character "I'm not comfortable with that. Let's stick to condoms for now."
         
         # ANAL CONDOM PREFERENCES
-        "What about for anal sex?": 
+        "What about for anal sex?":
             # Response based on dominant_approach, role, and pregnancy context
-            if selected_girl.pregnant and selected_girl.preg_father == "player":
+            if selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player":
                 # Already pregnant with player's baby
                 if selected_girl.dominant_approach == "compassionate":
                     if is_base_mother:
@@ -1864,9 +1864,9 @@ label vt_small_talk_pregnancy:
                                 selected_girl.character "I'm not comfortable with that. Let's stick to condoms for anal sex."
         
         # ORAL CONDOM PREFERENCES
-        "And for oral sex?": 
+        "And for oral sex?":
             # Response based on dominant_approach, role, and pregnancy context
-            if selected_girl.pregnant and selected_girl.preg_father == "player":
+            if selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player":
                 # Already pregnant with player's baby
                 if selected_girl.dominant_approach == "compassionate":
                     if is_base_mother:
