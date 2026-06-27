@@ -216,11 +216,12 @@ init python:
         has_player_kid = getattr(girl, "kids_with_player", 0) > 0
 
         if pill_id == "fertility_pill":
-            if pregnant:
-                # both-know is excluded from the give menu, so only two cases reach here.
-                if knows and not player_knows:
-                    return f"{name} takes the FertiBOOST with a sly little smile, keeping her secret to herself."
-                return f"{name} takes the FertiBOOST without a clue her body is already ahead of it."
+            if pregnant and knows:
+                # She knows but hasn't told you yet (the player can never find out
+                # before she does, and the both-know case is excluded from the give
+                # menu). If *neither* of you knows, fall through to the baby_desire
+                # bands so the reaction doesn't quietly reveal the pregnancy.
+                return f"{name} happily takes the FertiBOOST with a subtle smile."
             band = vt_baby_desire_band(girl)
             if band == "obsession":
                 if has_player_kid:

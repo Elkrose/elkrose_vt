@@ -2,6 +2,14 @@ Virginal Tracker Mod 1.0.9
 
 1.0.9
 
+- Fixed the FertiBOOST gift reaction leaking a hidden pregnancy. Giving
+  FertiBOOST to a girl who was already (secretly) pregnant but whom nobody knew
+  about yet popped "takes the FertiBOOST without a clue her body is already
+  ahead of it" -- quietly telling the player she was pregnant before he could
+  legitimately know. Since the player can never find out before she does, that
+  reaction now only fires when she herself knows (and is keeping it from you);
+  when neither of you knows, she reacts based on how much she wants a baby,
+  giving nothing away.
 - Fixed the PregnaVITA weekly-tick popup showing only one girl when several
   took it at once. Because every pregnant girl's weekly update fired the
   notification inside the same interaction, each call replaced the previous
