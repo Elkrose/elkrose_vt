@@ -18,6 +18,8 @@ Virginal Tracker Mod 1.0.10
 - Softened the cherry widget borders mod-wide from bright red to a muted tone
   (#FF0000 -> #664444) so they sit more quietly over the base UI.
 - Small position nudge to the cherry that follows the mouse when hovering a girl.
+- Relocated cherry_windows_row on girl_review screen. It was covering base game
+  elements.
 
 1.0.9
 

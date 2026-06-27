@@ -709,8 +709,8 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
         $ xanchor_val = 0.0
         $ yalign_val = 0.5
         $ yanchor_val = 0.0
-        $ xoffset = -120
-        $ yoffset = -50
+        $ xoffset = -460
+        $ yoffset = -35
     elif position == "left":
         $ xalign_val = 0.0
         $ xanchor_val = 0.0
