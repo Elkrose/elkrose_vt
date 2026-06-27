@@ -2,6 +2,28 @@
 init python:
     config.overlay_screens.append("vt_cherry_overlay")
 
+# Labels whose conversation menu is addressed to the mother (talker = mother) even
+# though selected_girl stays the daughter. Used by the convo_menu cherry below.
+define vt_mother_convo_labels = {"home_visit_mother_discussion"}
+
+# Last label reached at runtime, so the overlay can tell which conversation it is
+# floating over. Set by the chained config.label_callback installed below.
+default vt_active_label = ""
+
+# Install a chained label_callback (runs late so it wraps any callback the base
+# game or another mod registered). Underscore-prefixed names are not saved.
+init 100 python:
+    def _vt_label_callback(name, abnormal):
+        store.vt_active_label = name
+        _prev = getattr(store, "_vt_prev_label_callback", None)
+        if _prev is not None:
+            _prev(name, abnormal)
+
+    if not getattr(store, "_vt_label_callback_installed", False):
+        store._vt_prev_label_callback = config.label_callback
+        config.label_callback = _vt_label_callback
+        store._vt_label_callback_installed = True
+
 transform vt_appear_after_popup:
     alpha 0.0
     pause 0.5
@@ -27,7 +49,7 @@ screen vt_cherry_overlay():
                 $ _vt_qo_yoffset = 480
 
             fixed at vt_appear_after_popup:
-                use cherry_window_row(girl=_vt_qo_girl, position="tooltip", xoffset=343, yoffset=_vt_qo_yoffset, border_color="#FF0000", border_size=2, icon_size=36) id "vt_qo_cherry"
+                use cherry_window_row(girl=_vt_qo_girl, position="tooltip", xoffset=343, yoffset=_vt_qo_yoffset, border_color="#664444", border_size=2, icon_size=36) id "vt_qo_cherry"
 
     # Exam classroom
     elif renpy.get_screen("exam_menu", layer="master"):
@@ -36,17 +58,17 @@ screen vt_cherry_overlay():
     elif renpy.get_screen("exam_actions_menu", layer="master"):
         if _vt_girl:
             use condom_cherry(position="top_left") id "vt_ea_condom"
-            use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#FF0000", border_size=2, icon_size=36) id "vt_ea_cherry"
+            use cherry_window_row(girl=_vt_girl, position="top", yoffset=100, border_color="#664444", border_size=2, icon_size=36) id "vt_ea_cherry"
 
     elif renpy.get_screen("exam_outro_screen", layer="master"):
         $ _vt_eo_girls = exam_manager.girls_in_exam.get("player", []) + exam_manager.girls_who_left_early
         for _vt_eo_i, _vt_eo_girl in enumerate(_vt_eo_girls):
-            use cherry_window_column(girl=_vt_eo_girl, position="exam_outro", xoffset=76+_vt_eo_i*625, yoffset=135, border_color="#FF0000", border_size=2, icon_size=24) id "vt_eo_cherry_{}".format(_vt_eo_i)
+            use cherry_window_column(girl=_vt_eo_girl, position="exam_outro", xoffset=76+_vt_eo_i*625, yoffset=120, border_color="#664444", border_size=2, icon_size=25) id "vt_eo_cherry_{}".format(_vt_eo_i)
 
     elif renpy.get_screen("sex_interaction_menu", layer="master"):
         if _vt_girl:
             use condom_cherry(position="top_right") id "vt_si_condom"
-            use cherry_window_row(girl=_vt_girl, position="top_left", border_color="#FF0000", border_size=2, icon_size=36) id "vt_si_cherry"
+            use cherry_window_row(girl=_vt_girl, position="top_left", border_color="#664444", border_size=2, icon_size=36) id "vt_si_cherry"
 
     elif renpy.get_screen("sex_outro_screen", layer="master"):
         $ _vt_so_girls = [p for p in getattr(store, "se_participants", []) if isinstance(p, Girl)]
@@ -54,11 +76,11 @@ screen vt_cherry_overlay():
             $ _vt_so_n = len(_vt_so_girls)
             use condom_cherry(position="top") id "vt_so_condom"
             for _vt_so_i, _vt_so_girl in enumerate(_vt_so_girls):
-                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#FF0000", border_size=2, icon_size=36) id "vt_so_cherry_{}".format(_vt_so_i)
+                use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#664444", border_size=2, icon_size=36) id "vt_so_cherry_{}".format(_vt_so_i)
 
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
-            use cherry_window_row(girl=_vt_girl, position="girl_review", yoffset=-150, border_color="#FF0000", border_size=2) id "vt_gr_cherry"
+            use cherry_window_row(girl=_vt_girl, position="girl_review", border_color="#664444", border_size=2, icon_size=32) id "vt_gr_cherry"
 
     elif renpy.get_screen("home_visit_call_menu", layer="master"):
         $ _vt_hv_girls = getattr(store, "callable_girls", [])
@@ -68,11 +90,18 @@ screen vt_cherry_overlay():
         for _vt_hv_i, _vt_hv_girl in enumerate(_vt_hv_slice):
             $ _vt_hv_cx = 22 + (_vt_hv_i % 3) * 630   # card left edge
             $ _vt_hv_cy = 95 + (_vt_hv_i // 3) * 325  # card top edge
-            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 110, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_m_{}".format(_vt_hv_i)
-            use cherry_window_row(girl=_vt_hv_girl, position="tooltip", xoffset=_vt_hv_cx + 415, yoffset=_vt_hv_cy + 111, border_color="#FF0000", border_size=1, icon_size=12) id "vt_hv_d_{}".format(_vt_hv_i)
+            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 81, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=18) id "vt_hv_m_{}".format(_vt_hv_i)
+            # Daughter's widget runs as a column down the far-right edge of the card so
+            # it clears the base-game status text (grades / grace / "Currently at ...").
+            use cherry_window_column(girl=_vt_hv_girl, position="call_menu", xoffset=_vt_hv_cx + 575, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=16) id "vt_hv_d_{}".format(_vt_hv_i)
 
     elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
-        use cherry_window_row(girl=_vt_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#FF0000", border_size=2, icon_size=36) id "vt_choice_cherry"
+        # On the home-visit mother discussion the player is talking to the mother,
+        # but selected_girl stays the daughter — show the mother's cherry data there.
+        $ _vt_convo_girl = _vt_girl
+        if vt_active_label in vt_mother_convo_labels and _vt_girl.mother:
+            $ _vt_convo_girl = _vt_girl.mother
+        use cherry_window_row(girl=_vt_convo_girl, position="convo_menu", xoffset=17, yoffset=-85, border_color="#664444", border_size=2, icon_size=36) id "vt_choice_cherry"
 
     if renpy.get_screen("single_girl_rating_menu", layer="master"):
         use vtmod_preg_check_pane() id "vt_preg_pane"
@@ -82,7 +111,7 @@ screen vt_cherry_overlay():
 
     if isinstance(_vt_tooltip, Girl):
         $ _tt_mx, _tt_my = renpy.get_mouse_pos()
-        $ _tt_xoffset = max(min(_tt_mx, 1920 - max_tooltip_width), 5)
-        $ _tt_yoffset = int(1080 * 0.15) + 474
+        $ _tt_xoffset = max(min(_tt_mx, 1928 - max_tooltip_width), 5)
+        $ _tt_yoffset = int(1080 * 0.15) + 478
         fixed at tooltip_fade_in:
-            use cherry_window_row(girl=_vt_tooltip, position="tooltip", xoffset=_tt_xoffset, yoffset=_tt_yoffset, border_size=2, icon_size=36) id "vt_tt_cherry"
+            use cherry_window_row(girl=_vt_tooltip, position="tooltip", xoffset=_tt_xoffset, yoffset=_tt_yoffset, border_color="#664444", border_size=2, icon_size=36) id "vt_tt_cherry"
