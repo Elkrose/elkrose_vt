@@ -1,4 +1,12 @@
-Virginal Tracker Mod 1.0.10
+Virginal Tracker Mod
+
+1.0.11
+
+- Fixed a small placement issue on the cherry_window_row where it draws with
+  respect to the tooltip popup that's drawn when hovering over a girl/mother.
+  Now aligns properly with left-bottom edge.
+- General fix for how the cherry_window_* overlays look with respect to the
+  centering of icons in the drawn box. Looks cleaner in general.
 
 1.0.10
 
