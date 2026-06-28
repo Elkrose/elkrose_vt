@@ -90,10 +90,10 @@ screen vt_cherry_overlay():
         for _vt_hv_i, _vt_hv_girl in enumerate(_vt_hv_slice):
             $ _vt_hv_cx = 22 + (_vt_hv_i % 3) * 630   # card left edge
             $ _vt_hv_cy = 95 + (_vt_hv_i // 3) * 325  # card top edge
-            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 81, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=18) id "vt_hv_m_{}".format(_vt_hv_i)
+            use cherry_window_row(girl=_vt_hv_girl.mother, position="tooltip", xoffset=_vt_hv_cx + 77, yoffset=_vt_hv_cy + 112, border_color="#664444", border_size=1, icon_size=18) id "vt_hv_m_{}".format(_vt_hv_i)
             # Daughter's widget runs as a column down the far-right edge of the card so
             # it clears the base-game status text (grades / grace / "Currently at ...").
-            use cherry_window_column(girl=_vt_hv_girl, position="call_menu", xoffset=_vt_hv_cx + 575, yoffset=_vt_hv_cy + 115, border_color="#664444", border_size=1, icon_size=16) id "vt_hv_d_{}".format(_vt_hv_i)
+            use cherry_window_column(girl=_vt_hv_girl, position="call_menu", xoffset=_vt_hv_cx + 575, yoffset=_vt_hv_cy + 112, border_color="#664444", border_size=1, icon_size=16) id "vt_hv_d_{}".format(_vt_hv_i)
 
     elif renpy.get_screen("choice") and isinstance(_vt_girl, Girl) and renpy.get_screen("girl_hud"):
         # On the home-visit mother discussion the player is talking to the mother,
@@ -111,7 +111,11 @@ screen vt_cherry_overlay():
 
     if isinstance(_vt_tooltip, Girl):
         $ _tt_mx, _tt_my = renpy.get_mouse_pos()
-        $ _tt_xoffset = max(min(_tt_mx, 1928 - max_tooltip_width), 5)
+        # Mirror the base tooltip's xpos exactly (screen_tooltip_overlay.rpy), then add
+        # the +6 left padding of that screen's outer frame (gui.frame_borders = 6) which
+        # the popup sits inside but our bare `fixed` does not -- so the cherry box stays
+        # left-justified with the popup.
+        $ _tt_xoffset = max(min(int(_tt_mx), 1920 - max_tooltip_width), 5) + 6
         $ _tt_yoffset = int(1080 * 0.15) + 478
         fixed at tooltip_fade_in:
             use cherry_window_row(girl=_vt_tooltip, position="tooltip", xoffset=_tt_xoffset, yoffset=_tt_yoffset, border_color="#664444", border_size=2, icon_size=36) id "vt_tt_cherry"

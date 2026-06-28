@@ -740,7 +740,8 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
         $ yoffset = 9
         $ xoffset = -490
 
-    $ _frame_w = 9 * icon_size + 44 + border_size * 2
+    # 9 icons + 8 gaps (spacing 5) + content padding (5 each side) = symmetric box
+    $ _frame_w = 9 * icon_size + 8 * 5 + 5 * 2 + border_size * 2
 
     #Single frame with proper sizing and border
     frame:
@@ -770,10 +771,10 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                 background Frame("_mods/content/elkrose_vt/extra_images/Cherry_Background.png", xborder=1, yborder=1, xzoom=0.199, yzoom=0.201)
 
                 hbox:
-                    xsize (_frame_w - border_size * 2 - 4)
+                    xsize (_frame_w - border_size * 2 - 5 * 2)
                     spacing 5
                     ysize icon_size
-                    xalign 0.0
+                    xalign 0.5
                     yalign 0.0
 
                     # Cherry Status
@@ -1076,8 +1077,9 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
         $ yanchor_val = 0.0
         $ yoffset = 9
 
-    $ _frame_h = 9 * icon_size + 44 + border_size * 2
-    $ _frame_w = icon_size + 14 + border_size * 2
+    # 9 icons + 8 gaps (spacing 5) + content padding (5 each side) = symmetric box
+    $ _frame_h = 9 * icon_size + 8 * 5 + 5 * 2 + border_size * 2
+    $ _frame_w = icon_size + 5 * 2 + border_size * 2
 
     #Single frame with proper sizing and border
     frame:
@@ -1108,11 +1110,11 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                 background Frame("_mods/content/elkrose_vt/extra_images/Cherry_Background.png", xborder=1, yborder=1, xzoom=0.199, yzoom=0.201)
 
                 vbox:
-                    ysize (_frame_h - border_size * 2 - 4)
+                    ysize (_frame_h - border_size * 2 - 5 * 2)
                     spacing 5
                     xsize icon_size
-                    xalign 0.0
-                    yalign 0.0
+                    xalign 0.5
+                    yalign 0.5
 
                     # Cherry Status
                     hbox:
