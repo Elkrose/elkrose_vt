@@ -1,5 +1,19 @@
 Virginal Tracker Mod
 
+1.0.12
+
+- Fixed days_from_ideal_fertility so ovulation timing keeps working past the
+  first month. It was differencing the raw total_days counter (not reduced to a
+  day-of-month) against ideal_fertile_day, so the single-step normalization
+  failed once total_days grew large and the fertile window collapsed to the 1%
+  floor for the rest of the game. Now reduces total_days mod 30 before
+  differencing.
+- Tightened the same normalization to >= 15 so the day opposite ovulation no
+  longer leaks a +15 outside the documented -15..+14 range (no fertility change).
+- Removed two dead, overwritten copies of days_from_ideal_fertility and renamed
+  its local cycle_day to day_of_month to stop it being confused with the
+  menstrual-phase get_cycle_day helper.
+
 1.0.11
 
 - Fixed a small placement issue on the cherry_window_row where it draws with
