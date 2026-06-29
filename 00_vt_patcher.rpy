@@ -923,19 +923,26 @@ init -34 python:
         Example: -2 = 2 days before ovulation, +1 = 1 day after ovulation
         """
         # Safely access time_manager
-        cycle_day = 0
+        day_of_month = 0
         try:
             # Use the global 'time_manager' instance that was created in game_init.rpy
-            cycle_day = time_manager.total_days
+            # total_days is an unbounded counter; reduce mod 30 to get the day of the
+            # (30-day) month. ideal_fertile_day lives in this same day-of-month space
+            # (randint(0, 29)), so the two are directly comparable. Without the mod the
+            # single-step normalization below can't pull large values back into range
+            # and the fertile window stops firing after ~day 45.
+            day_of_month = time_manager.total_days % 30
         except NameError:
             # This should not happen if game_init.rpy is loaded correctly
             renpy.log(f"VT MOD ERROR: apply_prenatal_boost failed because 'time_manager' is not defined for {self.first_name}.")
             return # Exit the function can't get current day
-            
-        day_difference = cycle_day - self.ideal_fertile_day
-        
-        # Normalize to -15 to +14 range
-        if day_difference > 15:
+
+        day_difference = day_of_month - self.ideal_fertile_day
+
+        # Normalize to -15 to +14 range. Use >= 15 (not > 15) so the day exactly
+        # opposite ovulation -- which is both +15 and -15 on a 30-day wheel -- always
+        # resolves to -15 and never leaks a +15 outside the documented range.
+        if day_difference >= 15:
             day_difference -= 30
         elif day_difference < -15:
             day_difference += 30
@@ -1721,32 +1728,6 @@ init -4 python:
             self.fear = min(100, self.fear + 3)
             renpy.log(f"Shower sex follow-up triggered for {self.first_name}")
 
-        # Apply the same property definitions to Mother
-        def days_from_ideal_fertility(self, with_direction=False):
-            """
-            Returns days from ideal fertile day
-            Negative = before ideal day, Positive = after ideal day
-            Example: -2 = 2 days before ovulation, +1 = 1 day after ovulation
-            """
-            # Safely access time_manager
-            cycle_day = 0
-            try:
-                cycle_day = time_manager.total_days % 30
-            except NameError:
-                # This should not happen if game_init.rpy is loaded correctly
-                renpy.log("days_from_ideal_fertility ERROR: Global 'time_manager' variable not found!")
-                return
-                
-            day_difference = cycle_day - self.ideal_fertile_day
-            
-            # Normalize to -15 to +14 range
-            if day_difference > 15:
-                day_difference -= 30
-            elif day_difference < -15:
-                day_difference += 30
-                
-            return day_difference if with_direction else abs(day_difference)
-
         def on_birth_control(self):
             return self.fertility_percent < 0 or self.birth_control
 
@@ -2125,7 +2106,6 @@ init -4 python:
                     self.birth_control = False
                 self.apply_prenatal_boost()
         Mother.weekly_update = vt_mother_weekly_update
-        Mother.days_from_ideal_fertility = days_from_ideal_fertility
         Mother.on_birth_control = on_birth_control
         Mother.is_highly_fertile = is_highly_fertile
         Mother.effective_fertility = effective_fertility
@@ -2733,33 +2713,6 @@ init -14 python:
             self.fear = min(100, self.fear + 3)
             renpy.log(f"Shower sex follow-up triggered for {self.first_name}")
 
-        # Add fertility calculation methods (since Ren'Py doesn't handle properties well in patching)
-        def days_from_ideal_fertility(self, with_direction=False):
-            """
-            Returns days from ideal fertile day
-            Negative = before ideal day, Positive = after ideal day
-            Example: -2 = 2 days before ovulation, +1 = 1 day after ovulation
-            """
-            # Safely access time_manager
-            cycle_day = 0
-            try:
-                # Use the global 'time_manager' instance that was created in game_init.rpy
-                cycle_day = time_manager.total_days
-            except NameError:
-                # This should not happen if game_init.rpy is loaded correctly
-                renpy.log("get_cycle_day ERROR: Global 'time_manager' variable not found!")
-                return 1
-            
-            day_difference = cycle_day - self.ideal_fertile_day
-            
-            # Normalize to -15 to +14 range
-            if day_difference > 15:
-                day_difference -= 30
-            elif day_difference < -15:
-                day_difference += 30
-                
-            return day_difference if with_direction else abs(day_difference)
-
         def on_birth_control(self):
             return self.fertility_percent < 0 or self.birth_control
 
@@ -3145,7 +3098,6 @@ init -14 python:
                     self.birth_control = False
                 self.apply_prenatal_boost()   # gated internally (knows + supply + under cap)
         Girl.weekly_update = vt_weekly_update
-        Girl.days_from_ideal_fertility = days_from_ideal_fertility
         Girl.on_birth_control = on_birth_control
         Girl.is_highly_fertile = is_highly_fertile
         Girl.effective_fertility = effective_fertility
