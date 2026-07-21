@@ -1,5 +1,14 @@
 Virginal Tracker Mod
 
+1.0.13
+
+- Fixed the condom cherry blanking the HUD (and sometimes crashing) when opened
+  over the city map or school. It invoked a label via ShowMenu, which routed
+  through the game menu (suppress_overlay on) with no modal backdrop, leaving
+  the location buttons live under the picker; clicking one jumped away mid-menu
+  and orphaned the screen. It's now a modal screen shown in place -- condom
+  selection logic unchanged.
+
 1.0.12
 
 - Fixed days_from_ideal_fertility so ovulation timing keeps working past the

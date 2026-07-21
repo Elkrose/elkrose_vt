@@ -598,54 +598,87 @@ init -3 python:
 
 
 # ADD THIS AFTER THE CONSUMABLEITEM PATCH
-label vt_select_condom:
-    menu:
-        "Use BasicShield condom ([player.condom_cheap_count])" if player.condom_cheap_count > 0:
-            python:
-                player.condom_cheap_count -= 1
-                player.condom_active = "cheap"
-                player.condom_cum = 0
-                player.condom_dirty = False
-                player.condom_broke = False
-                queue_notification("Equipped BasicShield condom", duration=2.0)
-                renpy.log(f"VT MOD: Consumed 1 cheap condom. Remaining: {player.condom_cheap_count}")
-                
-                # If we ran out of condoms, automatically switch to raw
-                if player.condom_cheap_count <= 0 and player.condom_active == "cheap":
-                    player.condom_active = "raw"
-                    queue_notification("Out of BasicShield condoms!", duration=3.0)
-        
-        "Use UltraProtect condom ([player.condom_premium_count])" if player.condom_premium_count > 0:
-            python:
-                player.condom_premium_count -= 1
-                player.condom_active = "premium"
-                player.condom_cum = 0
-                player.condom_dirty = False
-                player.condom_broke = False
-                queue_notification("Equipped UltraProtect condom", duration=2.0)
-                renpy.log(f"VT MOD: Consumed 1 premium condom. Remaining: {player.condom_premium_count}")
-                
-                # If we ran out of condoms, automatically switch to raw
-                if player.condom_premium_count <= 0 and player.condom_active == "premium":
-                    player.condom_active = "raw"
-                    queue_notification("Out of UltraProtect condoms!", duration=3.0)
-        
-        "Go bareback (no protection)":
-            python:
-                player.condom_active = "raw"
-                player.condom_cum = 0
-                player.condom_dirty = False
-                player.condom_broke = False
-                queue_notification("Removed condom - going bareback", duration=2.0)
-        
-        "Clean up (wash your berries/Remove condom)" if player.condom_dirty or player.condom_active == "raw":
-            python:
-                player.condom_cum = 0
-                player.condom_dirty = False
-                player.condom_broke = False
-                player.condom_active = "raw"
-                queue_notification("Cleaned up", duration=2.0)
-                renpy.log("VT MOD: Cleaned up after creampie")
+#
+# Condom selector. Modal screen shown in the current context. Was a
+# `label vt_select_condom` menu opened via ShowMenu; because the target was a
+# label it routed through the game menu (suppress_overlay on) with no modal
+# backdrop, leaving location buttons live under the picker -- clicking one
+# jumped away mid-menu and orphaned the screen. Selection logic below is a
+# verbatim port of the old menu branches.
+init python:
+    def vt_equip_cheap_condom():
+        player.condom_cheap_count -= 1
+        player.condom_active = "cheap"
+        player.condom_cum = 0
+        player.condom_dirty = False
+        player.condom_broke = False
+        queue_notification("Equipped BasicShield condom", duration=2.0)
+        renpy.log(f"VT MOD: Consumed 1 cheap condom. Remaining: {player.condom_cheap_count}")
 
-        "Close Condom Selection":
-            return
+        # If we ran out of condoms, automatically switch to raw
+        if player.condom_cheap_count <= 0 and player.condom_active == "cheap":
+            player.condom_active = "raw"
+            queue_notification("Out of BasicShield condoms!", duration=3.0)
+
+    def vt_equip_premium_condom():
+        player.condom_premium_count -= 1
+        player.condom_active = "premium"
+        player.condom_cum = 0
+        player.condom_dirty = False
+        player.condom_broke = False
+        queue_notification("Equipped UltraProtect condom", duration=2.0)
+        renpy.log(f"VT MOD: Consumed 1 premium condom. Remaining: {player.condom_premium_count}")
+
+        # If we ran out of condoms, automatically switch to raw
+        if player.condom_premium_count <= 0 and player.condom_active == "premium":
+            player.condom_active = "raw"
+            queue_notification("Out of UltraProtect condoms!", duration=3.0)
+
+    def vt_go_bareback():
+        player.condom_active = "raw"
+        player.condom_cum = 0
+        player.condom_dirty = False
+        player.condom_broke = False
+        queue_notification("Removed condom - going bareback", duration=2.0)
+
+    def vt_clean_up_condom():
+        player.condom_cum = 0
+        player.condom_dirty = False
+        player.condom_broke = False
+        player.condom_active = "raw"
+        queue_notification("Cleaned up", duration=2.0)
+        renpy.log("VT MOD: Cleaned up after creampie")
+
+screen vt_select_condom():
+    modal True
+    zorder 200
+    style_prefix "choice"
+
+    # Left, vertically centered -- matches the base choice menu. modal True
+    # blocks the map underneath; no dimming overlay needed.
+    frame:
+        xpos 10
+        yalign 0.5
+        background None
+
+        vbox:
+            spacing 5
+            xalign 0.0
+
+            if player.condom_cheap_count > 0:
+                textbutton "Use BasicShield condom ([player.condom_cheap_count])":
+                    action [Function(vt_equip_cheap_condom), Hide("vt_select_condom")]
+
+            if player.condom_premium_count > 0:
+                textbutton "Use UltraProtect condom ([player.condom_premium_count])":
+                    action [Function(vt_equip_premium_condom), Hide("vt_select_condom")]
+
+            textbutton "Go bareback (no protection)":
+                action [Function(vt_go_bareback), Hide("vt_select_condom")]
+
+            if player.condom_dirty or player.condom_active == "raw":
+                textbutton "Clean up (wash your berries/Remove condom)":
+                    action [Function(vt_clean_up_condom), Hide("vt_select_condom")]
+
+            textbutton "Close Condom Selection":
+                action Hide("vt_select_condom")
