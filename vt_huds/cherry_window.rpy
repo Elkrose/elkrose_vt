@@ -1515,7 +1515,7 @@ screen condom_cherry(position="center", xoffset=0, yoffset=0):
                     yalign 0.5
                     idle condom_idle_img
                     hover condom_hover_img
-                    action ShowMenu("vt_select_condom")
+                    action Function(renpy.show_screen, "vt_select_condom")
                     tooltip condom_tooltip
 
             #Viagra Effects
@@ -1655,7 +1655,7 @@ screen hud_condom_cherry(position="center", xoffset=0, yoffset=0, icon_size=50):
                     yalign 0.5
                     idle condom_idle_img
                     hover condom_hover_img
-                    action ShowMenu("vt_select_condom")
+                    action Function(renpy.show_screen, "vt_select_condom")
                     tooltip condom_tooltip
 
             #Viagra Effects
