@@ -139,11 +139,13 @@ init -3 python:
 
     
 
+init -1 python:
+    # Compose after clothing integrations (init -2) replace action requirements.
     def add_requirements(original, new_requirement):
         if not original or original.strip() == "True":
             return new_requirement
         else:
-            return f"({original}) and {new_requirement}"
+            return f"({original}) and ({new_requirement})"
 
     def update_requirement_description(action, new_requirement):
         if not action.requirement_description or action.requirement_description.strip() == "":
@@ -379,6 +381,7 @@ init -3 python:
     else:
         renpy.log("VT MOD ERROR: database_sex_options not found! Could not patch sex actions")
 
+init -3 python:
     # Route the "Creampie her pussy" climax choice through the pull-out gate (03_vt_pullout_coercion.rpy),
     # same idea as the condom gate on database_sex_options: point the cum-target's option_label at our gate,
     # which resolves the pull-out interjection then plays the real creampie (or the external cumshot).
