@@ -2584,8 +2584,8 @@ label vt_preg_pregnancy_submenu_loop:
                                 # Apply 25 point increase (not 25% of current grade)
                                 $ new_grade = min(100, selected_girl.grades + 25)
                                 $ selected_girl.grades = new_grade
-                                $ selected_girl.apply_impacts({"baby_desire": (750, 1000), "corruption": (950, 1500)})
-                                selected_girl.character "Grade bump for having your baby? As a student, that's perfect security! Fine, you can put a baby in me... but I want this in writing!"
+                                $ selected_girl.apply_impacts({"prenatal_boost": 1, "baby_desire": (750, 1000), "corruption": (950, 1500)})
+                                selected_girl.character "A grade bump for taking the prenatal vitamins? That works for me. Fine, I will take them... but I want the grade agreement in writing!"
                         else:
                             # Missing grade attributes
                             $ _took_vitamins = False
