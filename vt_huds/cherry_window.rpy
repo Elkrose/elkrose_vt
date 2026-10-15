@@ -336,7 +336,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                             xsize icon_size
                             xalign 0.0
                             # PregnaVITA
-                            if girl.prenatal_boost >= 1:
+                            if vt_prenatal_status(girl):
                                 imagebutton:
                                     focus_mask True
                                     at Transform(zoom=(icon_size / 50.0))
@@ -344,7 +344,7 @@ screen cherry_minimum_window(girl=None, position="center", xoffset=0, yoffset=0,
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
                                     action NullAction()
-                                    tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
+                                    tooltip f"{{color={menu_text_color_valid}}}{vt_prenatal_status(girl)}{{/color}}"
 
 screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, current_day=None):
     $ girl = girl 
@@ -665,13 +665,13 @@ screen cherry_window(girl=None, position="center", xoffset=0, yoffset=0, border_
                             xsize 50
                             xalign 0.0                            
                             # PregnaVITA
-                            if girl.prenatal_boost >= 1:
+                            if vt_prenatal_status(girl):
                                 imagebutton:
                                     xalign 0.5
                                     yalign 0.5
                                     idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
                                     action NullAction()
-                                    tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
+                                    tooltip f"{{color={menu_text_color_valid}}}{vt_prenatal_status(girl)}{{/color}}"
 
 screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, current_day=None, icon_size=50):
     $ girl = girl
@@ -1011,14 +1011,14 @@ screen cherry_window_row(girl=None, position="center", xoffset=0, yoffset=0, bor
                         xsize icon_size
                         xalign 0.0
                         # PregnaVITA
-                        if girl.prenatal_boost >= 1:
+                        if vt_prenatal_status(girl):
                             imagebutton:
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/pregboosters50.png", icon_size, icon_size)
                                 action NullAction()
-                                tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
+                                tooltip f"{{color={menu_text_color_valid}}}{vt_prenatal_status(girl)}{{/color}}"
 
 screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, border_color="#FFFFFF", border_size=2, current_day=None, icon_size=50):
     $ girl = girl
@@ -1343,14 +1343,14 @@ screen cherry_window_column(girl=None, position="center", xoffset=0, yoffset=0, 
                         ysize icon_size
                         yalign 0.0
                         # PregnaVITA
-                        if girl.prenatal_boost >= 1:
+                        if vt_prenatal_status(girl):
                             imagebutton:
                                 focus_mask True
                                 xalign 0.5
                                 yalign 0.5
                                 idle fit_image_to_size("_mods/content/elkrose_vt/extra_images/pregboosters50.png", icon_size, icon_size)
                                 action NullAction()
-                                tooltip f"{{color={menu_text_color_valid}}}Has {girl.prenatal_boost} PregnaVITA{{/color}}"
+                                tooltip f"{{color={menu_text_color_valid}}}{vt_prenatal_status(girl)}{{/color}}"
 
 screen condom_cherry(position="center", xoffset=0, yoffset=0):
     # Determine positioning values directly

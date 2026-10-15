@@ -1,5 +1,15 @@
 Virginal Tracker Mod
 
+1.1.4
+
+- Corrected FertiBOOST duration tracking and cleanup of identifiable legacy gift buffs.
+- Preserved stored PregnaVITA supply when pregnancy begins.
+- Clarified remaining prenatal stock versus doses taken across the affected displays,
+  keeping indicators visible after the final stocked dose.
+- Corrected the accepted prenatal grade bargain to grant vitamin supply.
+- Fixed Mother VT daily/weekly processing running twice, affecting medication timers,
+  prenatal dosing, pregnancy progression and postpartum recovery.
+
 1.1.3
 
 - Fixed condom checks bypassing existing toy, clothing, erection and edging requirements.

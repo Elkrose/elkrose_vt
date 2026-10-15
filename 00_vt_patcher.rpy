@@ -135,6 +135,14 @@ style vt_rel_notify_text:
     slow_cps 0
 
 init python:
+    def vt_prenatal_status(girl):
+        # Presentation only; supply waits for weekly dosing, doses retain their acceleration.
+        stock = getattr(girl, "prenatal_boost", 0) or 0
+        doses = getattr(girl, "prenatal_doses", 0) or 0
+        if stock > 0 or doses > 0:
+            return "PregnaVITA ({} in stock; {} taken)".format(stock, doses)
+        return ""
+
     
     def vt_cum_notify(message, duration=3.0):
         """Custom VT notification with styled popup"""
@@ -1551,6 +1559,7 @@ init -3 python:
         # Simplified fertility check for NPCs
         if renpy.random.randint(1, 100) < 15:  # 15% chance for NPC impregnation
             target_girl.pregnant = True
+            target_girl.prenatal_doses = 0  # new pregnancy; preserve stored supply
             try:
                 target_girl.preg_start_day = time_manager.total_days
             except:
@@ -1872,6 +1881,7 @@ init -4 python:
 
         # Create patched daily_update
         def vt_mother_daily_update(self):
+            vt_reconcile_fertiboost_buff(self)
             original_mother_daily_update(self)
 
             #reset stats
@@ -1929,7 +1939,7 @@ init -4 python:
                             # SET FATHER TYPE - CRITICAL ADDITION
                             self.preg_father = "player"  # This pregnancy is from the player
                             self.prenatal_doses = 0  # fresh pregnancy: no meds yet
-                            self.prenatal_boost = 0  # no pill supply yet
+                            # Keep PregnaVITA stock accepted before conception.
                             
                             vt_preg_notify(f"{self.first_name} might be pregnant!", duration=3)
 
@@ -2221,6 +2231,26 @@ init -14 python:
                 self.mod_data = md
             return md.setdefault("elkrose_vt", {})
 
+        def vt_reconcile_fertiboost_buff(girl):
+            # Legacy Gift buffs added seven to the same counter VT counts down. Remove only
+            # that identifiable contribution and its future expiry subtraction. Consuming the
+            # impact itself is the migration marker: repeated init/load/reload is a no-op.
+            # An already-expired legacy buff can leave a negative counter (notably after
+            # inherited Mother ticks). No remaining duration can be recovered from that.
+            if girl.fertility_boost < 0:
+                girl.fertility_boost = 0
+            buffs = getattr(girl, "temporary_stat_changes", {})
+            buff = buffs.get("Gift: FertiBOOST")
+            if buff is None or buff.get("impacts", {}).get("fertility_boost") != 7:
+                return
+            impacts = dict(buff["impacts"])
+            del impacts["fertility_boost"]
+            girl.fertility_boost = max(0, girl.fertility_boost - 7)
+            if impacts:
+                buff["impacts"] = impacts
+            else:
+                del buffs["Gift: FertiBOOST"]
+
         def vt_ensure_girl_attrs(self):
             is_mother = is_mother_character(self)
             bucket = vt_girl_bucket(self)
@@ -2233,6 +2263,8 @@ init -14 python:
                 if _k in self.__dict__:
                     bucket.setdefault(_k, self.__dict__[_k])
                     del self.__dict__[_k]
+
+            vt_reconcile_fertiboost_buff(self)
 
             # ===== RELATIONSHIP TRACKING SYSTEM (sidecar) =====
             if "player_relationship" not in bucket:
@@ -2844,7 +2876,12 @@ init -14 python:
 
         # Create patched daily_update
         def vt_daily_update(self):
+            vt_reconcile_fertiboost_buff(self)
             original_daily_update(self)
+            # Mother.daily_update calls this through super(); its wrapper owns Mother VT ticks.
+            # Keep base Girl work here, then let the base Mother method finish before VT work.
+            if isinstance(self, Mother):
+                return
 
             #reset stats
             self.had_sex_today = False
@@ -2904,7 +2941,7 @@ init -14 python:
                             # SET FATHER TYPE - CRITICAL ADDITION
                             self.preg_father = "player"  # This pregnancy is from the player
                             self.prenatal_doses = 0  # fresh pregnancy: no meds yet
-                            self.prenatal_boost = 0  # no pill supply yet
+                            # Keep PregnaVITA stock accepted before conception.
                             
                             vt_preg_notify(f"{self.first_name} might be pregnant!", duration=3)
 
@@ -3119,6 +3156,9 @@ init -14 python:
         original_weekly_update = Girl.weekly_update
         def vt_weekly_update(self):
             original_weekly_update(self)
+            # Mother weekly VT dosing belongs to vt_mother_weekly_update after base super().
+            if isinstance(self, Mother):
+                return
             if self.pregnant:
                 try:
                     _cd = time_manager.total_days
@@ -4549,6 +4589,7 @@ init -3 python:
                     if check_probability(reduced_fertility):
                         # SUCCESS - PREGNANCY HAPPENING
                         target_girl.pregnant = True
+                        target_girl.prenatal_doses = 0  # new pregnancy; preserve stored supply
                         target_girl.knows_pregnant = False
                         target_girl.preg_progress_days = 1
                         target_girl.preg_announce = False
@@ -4713,6 +4754,7 @@ init -3 python:
                         if check_probability(eff_fert):
                             # SUCCESS - PREGNANCY HAPPENING
                             target_girl.pregnant = True
+                            target_girl.prenatal_doses = 0  # new pregnancy; preserve stored supply
                             target_girl.knows_pregnant = False
                             target_girl.preg_progress_days = 1
                             target_girl.preg_announce = False

@@ -44,8 +44,7 @@ init -3 python:
                 icon="_mods/content/elkrose_vt/extra_images/fertilitypills.png",
                 price=100,
                 lewdness=5,
-                accept_temporary_stat_changes={"fertility_boost": 7},
-                accept_buff_duration=7,
+                # VT owns the additive seven-day countdown; no expiring generic stat buff.
                 description="FertiBOOST! A 7-day fertility supplement that provides a reliable conception advantage.\nTake when pursuing pregnancy for optimal results.\n{color=#CCCCCC}Fertility:{/color} {color=#00FF00}++{/color}"
             )
             # Given via the "Give Medicine" submenu (vt_give_medicine, 05_vt_gift_flow_repoint.rpy)
@@ -409,13 +408,6 @@ init -3 python:
                 # on the girl). Non-VT gifts fall through to the original behavior unchanged.
                 is_vt_pill = self.id in ("fertility_pill", "prenatal_vitamins", "planb_pill", "emergency_pill")
 
-                if is_vt_pill:
-                    if apply_impacts:
-                        self.apply_gift_impacts(girl, accepted_gift=True)
-                else:
-                    original_give_gift(self, girl, apply_impacts)
-
-                # Now handle our special VT items
                 if self.id == "fertility_pill":
                     # If she AND the player both know she's pregnant, FertiBOOST is pointless and
                     # isn't offered (excluded in vt_get_items_and_quantity). Guard here too so a
@@ -423,6 +415,20 @@ init -3 python:
                     if girl.pregnant and getattr(girl, "knows_pregnant", False) and getattr(girl, "player_knows_pregnant", False):
                         vt_preg_notify(f"{girl.first_name} laughs softly - you both know she's already expecting.", duration=3.0)
                         return
+
+                if is_vt_pill:
+                    if self.id == "fertility_pill":
+                        vt_reconcile_fertiboost_buff(girl)
+                    if apply_impacts:
+                        self.apply_gift_impacts(girl, accepted_gift=True)
+                        # A saved in-flight Gift can still carry the old temporary impact.
+                        if self.id == "fertility_pill":
+                            vt_reconcile_fertiboost_buff(girl)
+                else:
+                    original_give_gift(self, girl, apply_impacts)
+
+                # Now handle our special VT items
+                if self.id == "fertility_pill":
                     # Boost only matters before conception; an already-pregnant girl still "takes"
                     # it (and the reaction reflects her secret/obliviousness) but gains nothing.
                     if not girl.pregnant:
