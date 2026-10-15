@@ -147,19 +147,18 @@ init python:
         return cycle_day, status
 
     def vt_ct_supplements(girl):
-        """Active fertility/pregnancy items she is on, as display text. Read-only.
+        """Fertility duration, prenatal stock and doses taken, as display text. Read-only.
 
         FertiBOOST (fertility_boost) is a day-countdown boost; PregnaVITA is shown by doses she
-        has actually taken (prenatal_doses), not the pill supply on hand (prenatal_boost).
+        has actually taken (prenatal_doses) and pill supply on hand (prenatal_boost).
         """
         out = []
         fb = getattr(girl, "fertility_boost", 0) or 0
         if fb > 0:
             out.append("FertiBOOST ({}d)".format(fb))
-        pb = getattr(girl, "prenatal_boost", 0) or 0
-        doses = getattr(girl, "prenatal_doses", 0) or 0
-        if pb > 0 or doses > 0:
-            out.append("PregnaVITA ({} taken)".format(doses))
+        prenatal = vt_prenatal_status(girl)
+        if prenatal:
+            out.append(prenatal)
         return ", ".join(out) if out else "None"
 
 
@@ -395,7 +394,7 @@ screen vt_ct_detail(girl, player=None):
                         _fert = 0.0
                 use vt_ct_field(label="Conception chance", value="{:.1f}%".format(_fert), tooltip="Her actual chance of conceiving right now, combining her base fertility with her current cycle day.")
 
-            use vt_ct_field(label="Supplements", value=vt_ct_supplements(girl), tooltip="Fertility/pregnancy items she is on. FertiBOOST temporarily raises her fertility (days left shown); PregnaVITA speeds an active pregnancy (doses taken shown).")
+            use vt_ct_field(label="Supplements", value=vt_ct_supplements(girl), tooltip="FertiBOOST shows days left. PregnaVITA shows stock waiting for weekly dosing and doses already taken; only doses taken accelerate pregnancy.")
 
             # ---- Condom Desires ----
             text "Condom Desires" size font_size_header color menu_text_color font header_font

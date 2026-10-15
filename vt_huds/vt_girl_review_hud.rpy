@@ -210,7 +210,7 @@ init 1:
                         null height 10 # Spacer
 
                         # Items Active
-                        text "Items Active:" size 20
+                        text "Supplements:" size 20
                         hbox:
                             spacing 20
                             $ thereareitems = False
@@ -225,12 +225,12 @@ init 1:
                                     action NullAction()
                                     tooltip f"{{color={menu_text_color_valid}}} FertiBOOST Active! Good for {girl.fertility_boost} more {days_rem_text}! {{/color}}"
                             #PregnaVITA
-                            if girl.prenatal_boost >= 1:
+                            if vt_prenatal_status(girl):
                                 $ thereareitems = True
                                 imagebutton:
                                     idle "_mods/content/elkrose_vt/extra_images/pregboosters50.png"
                                     action NullAction()
-                                    tooltip f"{{color={menu_text_color_valid}}} PregnaVITA Active! {{/color}}"
+                                    tooltip f"{{color={menu_text_color_valid}}}{vt_prenatal_status(girl)}{{/color}}"
                             if not thereareitems:
                                 text "nothing" size 20
 
