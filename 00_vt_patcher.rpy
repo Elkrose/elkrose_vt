@@ -3780,9 +3780,11 @@ init -3 python:
                 target_girl.oral_cum += 1
                 dialogtext = f"You groan, burying your raw cock to the hilt in {target_girl.first_name}'s throat. It clenches around you as you erupt, pumping a massive, hot load directly into her eager, willing belly."
             elif player.condom_broke: # The condom broke earlier, this is a bareback creampie
-                target_girl.aware_oral_condom = True
                 player.condom_cum = 0
-                dialogtext = f"{target_girl.first_name}'s eyes go wide in shock as your bare cock erupts, flooding her mouth with the sudden, hot taste of your cum!"
+                if target_girl.aware_oral_condom:
+                    dialogtext = f"{target_girl.first_name}'s eyes go wide in shock as your bare cock erupts, flooding her mouth with the sudden, hot taste of your cum!"
+                else:
+                    dialogtext = f"{target_girl.first_name} moans around your bare cock, still lost in the moment as it erupts, swallowing every hot drop without a second thought."
             else: # Condom held
                 target_girl.aware_oral_condom = False
                 player.condom_cum += 1
@@ -3795,9 +3797,11 @@ init -3 python:
                 target_girl.aware_oral_condom = False
                 dialogtext = f"You groan, aiming your bare cock as thick ropes of cum splash across {target_girl.first_name}'s eager face."
             elif player.condom_broke: # The condom broke earlier, this is a bareback facial
-                target_girl.aware_oral_condom = True
                 player.condom_cum = 0
-                dialogtext = f"The condom shatters! Your hot, raw cum splatters across {target_girl.first_name}'s shocked face."
+                if target_girl.aware_oral_condom:
+                    dialogtext = f"The condom shatters! Your hot, raw cum splatters across {target_girl.first_name}'s shocked face."
+                else:
+                    dialogtext = f"You groan, splashing thick ropes of cum across {target_girl.first_name}'s face -- she just moans, none the wiser that the condom didn't hold."
             else: # Condom held
                 target_girl.aware_oral_condom = False
                 player.condom_cum += 1
@@ -4079,12 +4083,10 @@ init -3 python:
                     # Girl becomes aware of broken condom
                     target_girl.aware_thigh_condom = True
                     vt_preg_notify(f"{target_girl.first_name} gasps as she feels your hot, raw cock sliding against her, her own juices dripping onto the shaft!", duration=4.0)
-                    renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
                 else:
                     # Girl remains unaware
                     target_girl.aware_thigh_condom = False
-                    vt_preg_notify("{target_girl.first_name} is lost in ecstasy, her wet pussy lips kissing your cock, unaware the condom is gone.", duration=4.0)
-                    renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+                    vt_preg_notify(f"{target_girl.first_name} is lost in ecstasy, her wet pussy lips kissing your cock, unaware the condom is gone.", duration=4.0)
             else:
                 target_girl.aware_thigh_condom = False
 
@@ -4115,9 +4117,11 @@ init -3 python:
                 target_girl.aware_thigh_condom = False
                 dialogtext = f"With a loud groan, your bare cock erupts, coating {target_girl.first_name}'s inner thighs and pussy with thick, hot ropes of your cum."
             elif player.condom_broke: # The condom broke earlier, this is a bareback cumshot
-                target_girl.aware_thigh_condom = True
                 player.condom_cum = 0
-                dialogtext = f"Your bare cock erupts uncontrollably, painting {target_girl.first_name}'s inner thighs and her eager pussy with thick streams of cum!"
+                if target_girl.aware_thigh_condom:
+                    dialogtext = f"{target_girl.first_name} gasps as your bare cock erupts, painting her inner thighs and her eager pussy with thick streams of cum -- she felt every hot drop of it, condom-free."
+                else:
+                    dialogtext = f"Your bare cock erupts uncontrollably, painting {target_girl.first_name}'s inner thighs and her eager pussy with thick streams of cum -- she's still too lost in the afterglow to notice the condom never held."
             else: # Condom held
                 player.condom_cum += 1
                 target_girl.aware_thigh_condom = False
@@ -4672,8 +4676,10 @@ init -3 python:
             pregnancy_risk = True
         elif player.condom_broke: # The condom broke earlier, this is a bareback creampie
             player.condom_cum = 0
-            target_girl.aware_vaginal_condom = True
-            dialogtext = f"The tearing latex sends a jolt through you both! Your bare, hot cock is now sheathed in {target_girl.first_name}'s unbelievably wet pussy. You feel her walls grip you, milking your shaft as you erupt uncontrollably, flooding her unprotected womb with every drop of your potent seed!"
+            if target_girl.aware_vaginal_condom:
+                dialogtext = f"The tearing latex sends a jolt through you both! Your bare, hot cock is now sheathed in {target_girl.first_name}'s unbelievably wet pussy. You feel her walls grip you, milking your shaft as you erupt uncontrollably, flooding her unprotected womb with every drop of your potent seed!"
+            else:
+                dialogtext = f"{target_girl.first_name} moans, utterly lost in the pleasure as your bare cock erupts deep inside her, flooding her unprotected womb -- she's still none the wiser that the condom is gone."
             pregnancy_risk = True
         else: # Condom held
             player.condom_cum += 1
@@ -5080,10 +5086,12 @@ init -3 python:
             dialogtext = f"You groan, your raw cock throbbing wildly inside {target_girl.first_name}'s clenching ass. Her tight anus kisses your cockhead with every pulse as you erupt, flooding her with your hot cum. Her wet pussy drips onto the sheets, the raw, intense pleasure of claiming her most forbidden hole almost overwhelming you both."
             #renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
         elif player.condom_broke: # The condom broke earlier, this is a bareback creampie
-            target_girl.aware_anal_condom = True
             player.condom_cum = 0
             target_girl.anal_cum += 1
-            dialogtext = f"A primal roar escapes you as your bare cock, finally free, erupts deep inside {target_girl.first_name}'s ass. You're marking her from the inside, claiming her tightest hole with a flood of your raw, potent cum. Her warm cheeks are pressed against you, her own orgasm triggered by the overwhelming heat and fullness of your load flooding her."
+            if target_girl.aware_anal_condom:
+                dialogtext = f"A primal roar escapes you as your bare cock, finally free, erupts deep inside {target_girl.first_name}'s ass. She clenches around you in shock, feeling every hot drop of your raw, potent cum flood her tightest hole."
+            else:
+                dialogtext = f"A primal roar escapes you as your bare cock erupts deep inside {target_girl.first_name}'s ass, flooding her with cum. Her warm cheeks press against you, her own orgasm triggered by the overwhelming heat -- she never even noticed the condom was gone."
             #renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
         else: # Condom held
             target_girl.aware_anal_condom = False
