@@ -1,5 +1,14 @@
 Virginal Tracker Mod
 
+1.1.3
+
+- Fixed condom checks bypassing existing toy, clothing, erection and edging requirements.
+  VT now composes its protection conditions after clothing integrations update those requirements.
+- Fixed finishers incorrectly treating an unnoticed condom break as noticed. Oral, thigh, vaginal
+  and anal finishers preserve the established awareness state and existing protection/concession rules.
+- Fixed thigh-break narration using uninitialized text and an unnoticed-break popup displaying
+  a literal character-name placeholder.
+
 1.1.2
 
 - Fixed a bug where a girl or mother who carried a pregnancy all the way to term would appear to
