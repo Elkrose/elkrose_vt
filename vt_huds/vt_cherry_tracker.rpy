@@ -14,9 +14,13 @@
 #     its icon grid from database_computer_buttons every time it opens, adding/removing
 #     the entry at init and on toggle is enough -- the icon appears/disappears live.
 #
-# The whole screen is READ-ONLY: every field is read via getattr(...) defaults and
-# read-only helpers, so opening the tracker never mutates a girl or creates a
-# sidecar key.
+# The screen is otherwise READ-ONLY: every field is read via getattr(...) defaults and
+# read-only helpers, so opening the tracker never mutates a girl or creates a sidecar key --
+# EXCEPT for one deliberate, opt-in exception: a girl flagged as needing baby_desire migration
+# (baby_desire_migration_version < 1, i.e. her score predates that flag) gets a "preview, then
+# accept/cancel" mini-tool in her detail pane. Previewing never touches her data (the candidate
+# value lives only in a screen-local cache); only clicking Accept commits it. See
+# vt_ct_needs_migration / vt_ct_migration_roll / vt_ct_migration_accept / vt_ct_migration_cancel.
 
 default persistent.vt_cherry_tracker_enabled = False
 
@@ -114,6 +118,32 @@ init python:
     def vt_ct_baby_desire(girl):
         return max(0, min(100, getattr(girl, "baby_desire", 0) or 0))
 
+    def vt_ct_needs_migration(girl):
+        """True for a girl whose baby_desire was set by a since-revised formula (pre-dates the
+        baby_desire_migration_version flag) and hasn't yet been corrected via the manual tool
+        below. Read-only check -- does not itself touch her data."""
+        return vt_girl_bucket(girl).get("baby_desire_migration_version", 0) < 1
+
+    def vt_ct_migration_roll(cache, girl):
+        """Preview-only: compute a projected established-formula baby_desire and stash it in the
+        screen-local cache. Does not touch the girl until vt_ct_migration_accept is used."""
+        cache[girl.id] = get_baby_desire(girl, fresh=False)
+
+    def vt_ct_migration_cancel(cache, girl):
+        cache.pop(girl.id, None)
+
+    def vt_ct_migration_accept(cache, girl):
+        """Commit a previewed (or freshly-rolled, if never previewed) baby_desire value and mark
+        her migrated so she won't be flagged again."""
+        value = cache.pop(girl.id, None)
+        if value is None:
+            return False  # accept only a score the player actually previewed
+        bucket = vt_girl_bucket(girl)
+        bucket["baby_desire"] = int(max(0, min(100, value)))
+        bucket["baby_desire_xp"] = 0
+        bucket["baby_desire_migration_version"] = 1
+        renpy.notify("{}'s baby desire updated to {}.".format(girl.first_name, bucket["baby_desire"]))
+
     def vt_ct_due_in(girl):
         """Days until due, or None if unknown. Read-only."""
         end = getattr(girl, "preg_end_day", 0) or 0
@@ -181,6 +211,7 @@ label vt_toggle_cherry_tracker:
 
 screen vt_cherry_tracker_menu():
     default vt_ct_sel = None
+    default vt_ct_bd_preview = {}
 
     $ _player = getattr(store, "player", None)
     $ _students = vt_ct_students()
@@ -290,7 +321,7 @@ screen vt_cherry_tracker_menu():
                     if _sel is None:
                         text "No girls available." size font_size_header color menu_text_color_muted xalign 0.5 yalign 0.5
                     else:
-                        use vt_ct_detail(girl=_sel, player=_player)
+                        use vt_ct_detail(girl=_sel, player=_player, preview_cache=vt_ct_bd_preview)
 
 
 screen vt_ct_list_row(girl, selected=False):
@@ -315,7 +346,7 @@ screen vt_ct_list_row(girl, selected=False):
                 add fit_image_to_size("_mods/content/elkrose_vt/extra_images/feeding_bottle.png", 24, 24) xalign 1.0 yalign 0.5
 
 
-screen vt_ct_detail(girl, player=None):
+screen vt_ct_detail(girl, player=None, preview_cache=None):
     viewport:
         xfill True
         yfill True
@@ -404,6 +435,26 @@ screen vt_ct_detail(girl, player=None):
             use vt_ct_field(label="Oral", value=("Wants a condom" if getattr(girl, "wants_oral_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during oral sex.")
             use vt_ct_field(label="Body", value=("Wants a condom" if getattr(girl, "wants_body_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during body / other sex acts.")
 
+            # ---- Baby Desire Migration (only shown for a girl flagged as not-yet-migrated) ----
+            if preview_cache is not None and vt_ct_needs_migration(girl):
+                text "Baby Desire Update Available" size font_size_header color menu_text_color font header_font
+                text "Her baby desire score predates the current formula and may not reflect her current stats. Preview a new score before deciding whether to update her." size font_size_small color menu_text_color_muted
+
+                use vt_ct_field(label="Current", value=str(vt_ct_baby_desire(girl)), tooltip="Her baby desire score right now -- unchanged unless you accept a preview below.")
+
+                $ _bd_preview = preview_cache.get(girl.id)
+                if _bd_preview is None:
+                    textbutton "Preview updated score":
+                        action Function(vt_ct_migration_roll, preview_cache, girl)
+                        xalign 0.0
+                else:
+                    use vt_ct_field(label="Projected", value=str(_bd_preview), tooltip="What her score would become if you accept -- computed from her current stats, not her legacy value.")
+                    hbox:
+                        spacing 10
+                        textbutton "Re-roll" action Function(vt_ct_migration_roll, preview_cache, girl)
+                        textbutton "Accept" action Function(vt_ct_migration_accept, preview_cache, girl)
+                        textbutton "Cancel" action Function(vt_ct_migration_cancel, preview_cache, girl)
+
             # ---- Attitude toward the player (items listed A-Z) ----
             text "Attitude" size font_size_header color menu_text_color font header_font
 
@@ -413,7 +464,7 @@ screen vt_ct_detail(girl, player=None):
 
             $ _bd = vt_ct_baby_desire(girl)
             $ _bd_band = vt_baby_desire_band(girl)
-            use vt_ct_bar(label="Baby desire", amount=_bd, band=VT_CT_DESIRE_LABELS.get(_bd_band, _bd_band), tooltip="How much she wants to have your baby, from No interest to Utterly obsessed.")
+            use vt_ct_bar(label="Baby desire", amount=_bd, band=VT_CT_DESIRE_LABELS.get(_bd_band, _bd_band), tooltip="How much she wants to become pregnant, from No interest to Utterly obsessed.")
 
             $ _reg = vt_explicitness_register(girl)
             use vt_ct_bar(label="Explicitness", amount=VT_CT_REGISTER_RANK.get(_reg, 2) * 20, band=VT_CT_REGISTER_LABELS.get(_reg, _reg), tooltip="How explicit her sexual wording gets, driven by her corruption, from Demure to Crude.")

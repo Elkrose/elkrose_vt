@@ -35,7 +35,7 @@ init -3 python:
                 display_name="Cum Slut",
                 rarity=0.7,  # More common than devotee traits
                 color="#FF69B4",  # Pink
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.05},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.05,
                     "boobs_sensitivity": 0.05,
@@ -107,7 +107,7 @@ init -3 python:
                 display_name="Cum Devotee",
                 rarity=0.3,
                 color="#FF69B4",  # Vibrant pink
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.08},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.05,
                     "boobs_sensitivity": 0.05,
@@ -174,7 +174,7 @@ init -3 python:
                 display_name="Cum Dumpster",
                 rarity=0.6,  # More common than devotee traits
                 color="#FF1493",  # Deep pink
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.08},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.05,
                     "ass_sensitivity": 0.05,
@@ -219,7 +219,7 @@ init -3 python:
                 display_name="Cum Dumpster Devotee",
                 rarity=0.3,
                 color="#FF1493",  # Deep pink
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.12},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.05,
                     "ass_sensitivity": 0.05,
@@ -324,7 +324,7 @@ init -3 python:
                 display_name="Oral Cum Fixation",
                 rarity=0.5,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -373,7 +373,7 @@ init -3 python:
                 display_name="Conflicted Oral Cum Slut",
                 rarity=0.45,
                 color="#9370DB",  # Medium purple
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.1,
                     "fear": 5,
@@ -413,7 +413,7 @@ init -3 python:
                 display_name="Oral Cum Slut",
                 rarity=0.35,
                 color="#FF69B4",  # Pink
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.1,
                     "shoot_acceptance": 0.05,
@@ -463,7 +463,7 @@ init -3 python:
                 display_name="Oral Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.05},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.25,
                     "shoot_acceptance": 0.15,
@@ -513,7 +513,7 @@ init -3 python:
                 display_name="Oral Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.07},
                 base_stat_modifiers={
                     "mouth_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -563,7 +563,7 @@ init -3 python:
                 display_name="Vaginal Cum Fixation",
                 rarity=0.5,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.05},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -600,7 +600,7 @@ init -3 python:
                 display_name="Conflicted Vaginal Cum Dumpster",
                 rarity=0.45,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.07},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.1,
                     "fear": 5,
@@ -635,7 +635,7 @@ init -3 python:
                 display_name="Vaginal Cum Dumpster",
                 rarity=0.35,
                 color="#FF1493",  # Deep pink
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.1},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -673,7 +673,7 @@ init -3 python:
                 display_name="Vaginal Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.15},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.15,
                     "shoot_acceptance": 0.15,
@@ -713,7 +713,7 @@ init -3 python:
                 display_name="Vaginal Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.2},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -752,7 +752,7 @@ init -3 python:
                 display_name="Anal Slut",
                 rarity=0.5,  # More common than devotee traits
                 color="#FF69B4",  # Pink
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": -0.06},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.05,
                     "shoot_acceptance": 0.05,
@@ -807,7 +807,7 @@ init -3 python:
                 display_name="Anal Cum Fixation",
                 rarity=0.5,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": -0.03},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -844,7 +844,7 @@ init -3 python:
                 display_name="Conflicted Anal Cum Dumpster",
                 rarity=0.45,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": -0.04},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.1,
                     "fear": 5,
@@ -879,7 +879,7 @@ init -3 python:
                 display_name="Anal Cum Dumpster",
                 rarity=0.35,
                 color="#FF1493",  # Deep pink
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": -0.06},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -917,7 +917,7 @@ init -3 python:
                 display_name="Anal Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": -0.1},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.15,
                     "shoot_acceptance": 0.15,
@@ -957,7 +957,7 @@ init -3 python:
                 display_name="Anal Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": -0.15},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -997,7 +997,7 @@ init -3 python:
                 display_name="Boob Cum Fixation",
                 rarity=0.5,
                 color="#FF69B4",
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "boobs_sensitivity": 0.1,
                     "shoot_acceptance": 0.05,
@@ -1036,7 +1036,7 @@ init -3 python:
                 display_name="Conflicted Boob Cum Slut",
                 rarity=0.4,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "boobs_sensitivity": 0.1,
                     "fear": 5,
@@ -1071,7 +1071,7 @@ init -3 python:
                 display_name="Boob Cum Slut",
                 rarity=0.35,
                 color="#DB7093",
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "boobs_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -1111,7 +1111,7 @@ init -3 python:
                 display_name="Boob Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.05},
                 base_stat_modifiers={
                     "boobs_sensitivity": 0.25,
                     "shoot_acceptance": 0.15,
@@ -1151,7 +1151,7 @@ init -3 python:
                 display_name="Boob Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.07},
                 base_stat_modifiers={
                     "boobs_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -1191,7 +1191,7 @@ init -3 python:
                 display_name="Thigh Cum Fixation",
                 rarity=0.5,
                 color="#FF69B4",
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.01},
                 base_stat_modifiers={
                     "legs_sensitivity": 0.1,
                     "shoot_acceptance": 0.05,
@@ -1230,7 +1230,7 @@ init -3 python:
                 display_name="Conflicted Thigh Cum Slut",
                 rarity=0.45,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "legs_sensitivity": 0.1,
                     "fear": 5,
@@ -1265,7 +1265,7 @@ init -3 python:
                 display_name="Thigh Cum Slut",
                 rarity=0.35,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "legs_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -1305,7 +1305,7 @@ init -3 python:
                 display_name="Thigh Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "legs_sensitivity": 0.25,
                     "shoot_acceptance": 0.15,
@@ -1345,7 +1345,7 @@ init -3 python:
                 display_name="Thigh Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.04},
                 base_stat_modifiers={
                     "legs_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -1385,7 +1385,7 @@ init -3 python:
                 display_name="Ass Cum Fixation",
                 rarity=0.5,
                 color="#FF69B4",
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.01},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.1,
                     "shoot_acceptance": 0.05,
@@ -1424,7 +1424,7 @@ init -3 python:
                 display_name="Conflicted Ass Cum Slut",
                 rarity=0.45,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.1,
                     "fear": 5,
@@ -1459,7 +1459,7 @@ init -3 python:
                 display_name="Ass Cum Slut",
                 rarity=0.35,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.02},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -1499,7 +1499,7 @@ init -3 python:
                 display_name="Ass Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.03},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.25,
                     "shoot_acceptance": 0.15,
@@ -1539,7 +1539,7 @@ init -3 python:
                 display_name="Ass Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.04},
                 base_stat_modifiers={
                     "ass_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
@@ -1579,7 +1579,7 @@ init -3 python:
                 display_name="Pussy Cum Fixation",
                 rarity=0.5,
                 color="#FF69B4",
-                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025},
+                stat_growth_multipliers={"corruption": 0.05, "arousal": 0.025, "baby_desire": 0.05},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.1,
                     "shoot_acceptance": 0.05,
@@ -1618,7 +1618,7 @@ init -3 python:
                 display_name="Conflicted Pussy Cum Slut",
                 rarity=0.45,
                 color="#9370DB",
-                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05},
+                stat_growth_multipliers={"corruption": 0.05, "fear": 0.05, "baby_desire": 0.07},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.1,
                     "fear": 5,
@@ -1653,7 +1653,7 @@ init -3 python:
                 display_name="Pussy Cum Slut",
                 rarity=0.35,
                 color="#DB7093",  # Pale violet red
-                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05},
+                stat_growth_multipliers={"corruption": 0.075, "arousal": 0.05, "baby_desire": 0.1},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.15,
                     "shoot_acceptance": 0.1,
@@ -1693,7 +1693,7 @@ init -3 python:
                 display_name="Pussy Cum Addict",
                 rarity=0.25,
                 color="#FF00FF",
-                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075},
+                stat_growth_multipliers={"corruption": 0.1, "arousal": 0.075, "baby_desire": 0.15},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.25,
                     "shoot_acceptance": 0.15,
@@ -1733,7 +1733,7 @@ init -3 python:
                 display_name="Pussy Cum Devotee",
                 rarity=0.15,
                 color="#FF00FF",  # Magenta
-                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1},
+                stat_growth_multipliers={"corruption": 0.15, "arousal": 0.1, "baby_desire": 0.2},
                 base_stat_modifiers={
                     "pussy_sensitivity": 0.3,
                     "shoot_acceptance": 0.2,
