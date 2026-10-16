@@ -376,6 +376,17 @@ init -1 python:
                     _vt_a.vt_condom_slot = _vt_slot
                     _vt_a.label = "vt_condom_attempt_gate"
 
+        # Preserve the outer protection negotiation; only replace its pristine continuation.
+        # Callable separately so repeated registration/reload cannot nest the gates.
+        def vt_route_direct_creampie_actions():
+            for _cat, _acts in database_sex_options.items():
+                for _act in _acts:
+                    if (getattr(_act, "action_entry_name", None) == "creampie_pussy"
+                            and getattr(_act, "label", None) == "vt_condom_attempt_gate"
+                            and getattr(_act, "vt_real_label", None) == "sex_creampie_pussy"):
+                        _act.vt_real_label = "vt_direct_creampie_pussy"
+
+        vt_route_direct_creampie_actions()
         renpy.log("VT MOD: Successfully checked and patched necessary sex actions")
     else:
         renpy.log("VT MOD ERROR: database_sex_options not found! Could not patch sex actions")

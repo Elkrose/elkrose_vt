@@ -1,5 +1,22 @@
 Virginal Tracker Mod
 
+1.1.5
+
+- Fixed ordinary oral actions skipping condom-break, awareness and later effect processing (#14).
+  Loading a save during oral narration no longer repeats the action, history or effects.
+- Fixed the direct vaginal finisher bypassing the pullout decision (#25), preserving protection
+  negotiation, action requirements and costs.
+- Expanded pullout outcomes with force attempts and accidental failure, varied dialogue and
+  encounter endings that follow the selected outcome.
+- Corrected finisher narration, first-penetration tracking and encounter-only permission wording.
+  Forced outcomes no longer receive the generic corruption reward or subtract prior corruption XP.
+- Undecided protection preferences now use current stats, activity-specific traits and a stable
+  personal temperament. Explicit decisions, legacy saved preferences and independent activities remain preserved.
+- Separated new-character and existing-save baby-desire seeding, with trait-based growth.
+  Existing scores are not automatically rerolled; Cherry Tracker offers an optional
+  preview/re-roll/accept/cancel update for legacy scores.
+- Clarified that baby desire measures general desire for pregnancy.
+
 1.1.4
 
 - Corrected FertiBOOST duration tracking and cleanup of identifiable legacy gift buffs.

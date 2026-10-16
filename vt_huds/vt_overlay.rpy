@@ -20,28 +20,44 @@ default vt_last_act_by_girl = {}
 # version = the girl's vt_accepts_vaginal_creampie flag.
 default vt_creampie_session = set()
 
+# Shared by the base label callback and standalone VT booth encounters.
+init python:
+    def vt_reset_sex_session():
+        """Clear encounter-only VT state; permanent preferences and decisions stay intact."""
+        try:
+            vt_reset_gobare_session()
+        except Exception:
+            pass
+        # Fresh encounter -> no "previous act" yet (used by the penetration->oral reaction).
+        try:
+            store.vt_prev_act_by_girl.clear()
+            store.vt_last_act_by_girl.clear()
+        except Exception:
+            store.vt_prev_act_by_girl = {}
+            store.vt_last_act_by_girl = {}
+        # Fresh encounter -> this-session "finish inside" concessions revert.
+        try:
+            store.vt_creampie_session.clear()
+        except Exception:
+            store.vt_creampie_session = set()
+        # Fresh encounter -> pullout-failure wear counter resets (03_vt_pullout_coercion.rpy).
+        store.vt_pullout_fail_count = 0
+        store.vt_pullout_result = None
+        store.vt_force_creampie_active = False
+        store.vt_force_finisher_compensation = False
+        store.vt_pullout_external_active = False
+        store.vt_forced_girl = None
+        store.vt_force_outcome_this_session = None
+        store.vt_forced_girl_was_virgin = False
+        store.vt_orig_se_end_label = None
+        store.vt_orig_se_use_generic_ending = None
+
 # Chained label_callback (runs late to wrap base/other-mod callbacks). Underscore name = not saved.
 init 100 python:
     def _vt_label_callback(name, abnormal):
         store.vt_active_label = name
-        # New sex session -> clear per-session go-bare state (concessions revert, attempts reset).
         if name == "start_sex_interaction":
-            try:
-                vt_reset_gobare_session()
-            except Exception:
-                pass
-            # Fresh encounter -> no "previous act" yet (used by the penetration->oral reaction).
-            try:
-                store.vt_prev_act_by_girl.clear()
-                store.vt_last_act_by_girl.clear()
-            except Exception:
-                store.vt_prev_act_by_girl = {}
-                store.vt_last_act_by_girl = {}
-            # Fresh encounter -> this-session "finish inside" concessions revert.
-            try:
-                store.vt_creampie_session.clear()
-            except Exception:
-                store.vt_creampie_session = set()
+            vt_reset_sex_session()
         _prev = getattr(store, "_vt_prev_label_callback", None)
         if _prev is not None:
             _prev(name, abnormal)
