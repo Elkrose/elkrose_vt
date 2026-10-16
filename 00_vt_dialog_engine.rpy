@@ -13,6 +13,7 @@
 default vt_dialog_trace = False
 
 init -1 python:
+    import re
 
     # The registry: beat id -> list of response entries. Data files register into this.
     # An entry is a dict:
@@ -23,6 +24,54 @@ init -1 python:
     #   }
     # A scalar `when` value must match exactly; an iterable (list/tuple/set) matches by membership.
     VT_RESPONSES = {}
+
+    # VT WORD LEXICON: a second, lower-level registry alongside VT_RESPONSES. Instead of picking a
+    # whole pre-written line, a beat (or a hand-written line) can ask for a single word/phrase for a
+    # concept -- "penis", "have sex", "huge" -- and get back whichever fits her CURRENT stats, so
+    # vocabulary composes instead of needing every combination hand-written as a full sentence.
+    #
+    # slot id -> list of entries. An entry is a dict:
+    #   {"when": {...}, "words": ["word1", "word2", ...]}   # same `when` grammar as VT_RESPONSES
+    # Selection mirrors vt_say exactly: filter by _vt_match, keep highest specificity, then
+    # renpy.random.choice among both tied entries AND that entry's own word list.
+    VT_LEXICON = {}
+
+    def vt_register_words(slot, entries):
+        """Append lexicon entries for a slot (e.g. "noun_penis"). Data files call this at init."""
+        VT_LEXICON.setdefault(slot, []).extend(entries)
+
+    def vt_word(girl, slot, player=None, default=""):
+        """Resolve one word/phrase for `slot` from her current stats (see VT_LEXICON above).
+
+        Same facts dict as vt_say (_vt_context), including "register" -- so a girl's improvised
+        vocabulary always agrees with her canned response lines about how corrupted she sounds.
+        Returns `default` if no entry matches (loud in developer mode, mirroring vt_say).
+        """
+        entries = VT_LEXICON.get(slot, ())
+        facts = _vt_context(girl, player)
+        cands = [e for e in entries if _vt_match(facts, e.get("when", {}))]
+        if not cands:
+            if config.developer:
+                print("VT vt_word NO MATCH slot=%s girl=%s facts=%r" % (slot, getattr(girl, "name", girl), facts))
+            return default
+        best_spec = max(len(e.get("when", {})) for e in cands)
+        cands = [e for e in cands if len(e.get("when", {})) == best_spec]
+        entry = renpy.random.choice(cands)
+        words = entry.get("words", [])
+        return renpy.random.choice(words) if words else default
+
+    # Matches %slot_name% tokens inside a vt_say-picked line (see the substitution step in vt_say
+    # below). Deliberately NOT {curly braces} (Ren'Py's own style-tag delimiter, e.g. {b}/{color=..})
+    # or [square brackets] (Ren'Py's live text substitution, already used for [girl]/[player]
+    # tokens elsewhere in this table) -- substitution happens entirely in Python here, before the
+    # resulting string is ever handed to Ren'Py, so %...% just keeps it visually unambiguous.
+    _VT_WORD_TOKEN = re.compile(r"%([a-zA-Z_][a-zA-Z0-9_]*)%")
+
+    def _vt_resolve_words(girl, line, player=None):
+        """Replace every %slot% token in `line` with vt_word(girl, slot, player)."""
+        if not line or "%" not in line:
+            return line
+        return _VT_WORD_TOKEN.sub(lambda m: vt_word(girl, m.group(1), player), line)
 
     # PLAYTEST TRACE: when True, every vt_say pick is logged to log.txt (girl, beat, register,
     # matched `when`, and the line returned) for post-playtest review. Underscore prefix means
@@ -107,6 +156,11 @@ init -1 python:
             "corruption":           getattr(girl, "corruption", 0) or 0,
             "intellect":            getattr(girl, "intellect", 0) or 0,
             "naturism":             getattr(girl, "naturism", 0) or 0,
+            # Her corruption-trait explicitness bucket (demure/shy/neutral/direct/explicit/crude),
+            # reused as-is from vt_voice's own register system (00_vt_patcher.rpy) so the word
+            # lexicon (VT_LEXICON / vt_word, below) always agrees with her canned response lines
+            # about how corrupted she currently sounds -- never re-derived independently.
+            "register":             vt_explicitness_register(girl),
         }
 
     def _vt_match(facts, when):
@@ -158,7 +212,7 @@ init -1 python:
         best_spec = max(len(e.get("when", {})) for e in cands)
         cands = [e for e in cands if len(e.get("when", {})) == best_spec]
         entry = renpy.random.choice(cands)
-        line = vt_voice(girl, entry.get("lines", {}), default)
+        line = vt_voice(girl, entry.get("lines", {}), default, player)
 
         if _VT_TRACE or store.vt_dialog_trace:
             # Full decision-state dump so the picked path can be validated independently:

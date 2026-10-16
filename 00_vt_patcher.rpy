@@ -236,17 +236,20 @@ init python:
         "demure":   ["demure", "shy", "neutral"],
     }
 
-    def vt_voice(girl, options, default=""):
+    def vt_voice(girl, options, default="", player=None):
         """Pick a register-appropriate randomized line. `options` maps register -> a line or list of
         variants; resolves the girl's register, walks _VT_REGISTER_FALLBACK toward 'neutral', then
-        random-picks a variant (rollback-safe). Returns `default` if nothing matches."""
+        random-picks a variant (rollback-safe). Returns `default` if nothing matches.
+
+        Also resolves any %slot% word-lexicon tokens in the picked line (_vt_resolve_words,
+        00_vt_dialog_engine.rpy) -- a no-op fast path for the many callers with no tokens, so every
+        existing vt_voice call site gets lexicon support for free, not just vt_say-based beats."""
         reg = vt_explicitness_register(girl)
         for key in _VT_REGISTER_FALLBACK.get(reg, ["neutral"]):
             if key in options:
                 v = options[key]
-                if isinstance(v, (list, tuple)):
-                    return renpy.random.choice(v) if v else default
-                return v
+                line = (renpy.random.choice(v) if v else default) if isinstance(v, (list, tuple)) else v
+                return _vt_resolve_words(girl, line, player)
         return default
 
     # Penetration -> oral ("ATM") reaction lines, spoken by her; register picks the tone. "dirty" = raw for
@@ -837,87 +840,40 @@ init python:
         # Cap at 100
         return min(level, 100)
 
-    def get_baby_desire(girl):
-        """Calculates baby desire (0-100) based on traits and corruption"""
-        
-        # Safety check for trait system
-        if not hasattr(girl, 'has_trait'):
-            return 20
-            
-        # Base desire inversely related to corruption
-        base_desire = 100 - min(girl.corruption, 100)
-        
-        # Conservative girls have higher baby desire
-        if girl.has_trait("conservative"):
-            base_desire += 20
-        
-        # Reserved girls have moderately high baby desire
-        elif girl.has_trait("reserved"):
-            base_desire += 10
-        
-        # Slutty/whore girls have lower baby desire
-        if girl.has_trait("ultimate_whore"):
-            base_desire -= 45
-        elif girl.has_trait("whore"):
-            base_desire -= 35
-        elif girl.has_trait("slut"):
-            base_desire -= 25
-        
-        # Cum dumpster girls might have higher baby desire (contradictory psychology)
-        if girl.has_trait("cum_dumpster"):
-            base_desire += 15
-        
-        # Handle conflicted traits with reduced impact
-        conflicted_bonus = 0
-        if girl.has_trait("conflicted_cum_dumpster"):
-            conflicted_bonus += 7.5
-        if girl.has_trait("conflicted_pussy_cum_slut"):
-            conflicted_bonus += 12.5
-        if conflicted_bonus > 0:
-            base_desire += conflicted_bonus
-        
-        # ADD ALL SPECIFIC FETISH IMPACTS - with proper tiered values
-        # Pussy cum exposure (strongest pregnancy connection)
-        if girl.has_trait("pussy_cum_addict"):
-            base_desire += 25  # Ultimate fixation
-        elif girl.has_trait("pussy_cum_slut"):
-            base_desire += 15  # Moderate interest
-        
-        # Vaginal creampie (direct pregnancy connection)
-        if girl.has_trait("vaginal_addict"):
-            base_desire += 20  # Ultimate fixation
-        elif girl.has_trait("cum_dumpster_devotee"):
-            base_desire += 12  # Devotee level
-        elif girl.has_trait("cum_dumpster"):
-            base_desire += 8   # Base level
-        
-        # External cumshot types (weaker pregnancy connection)
-        if girl.has_trait("boob_cum_addict"):
-            base_desire += 5
-        elif girl.has_trait("boob_cum_slut"):
-            base_desire += 3
-            
-        if girl.has_trait("thigh_cum_addict"):
-            base_desire += 3
-        elif girl.has_trait("thigh_cum_slut"):
-            base_desire += 1
-            
-        if girl.has_trait("ass_cum_addict"):
-            base_desire += 2
-        elif girl.has_trait("ass_cum_slut"):
-            base_desire += 1
-            
-        if girl.has_trait("oral_addict"):
-            base_desire += 1  # Minimal connection
-            
-        # Anal has NEGATIVE connection to pregnancy desire
-        if girl.has_trait("anal_addict"):
-            base_desire -= 10
-        elif girl.has_trait("anal_slut"):
-            base_desire -= 5
-        
-        # Cap at 100 and floor at 0
-        return max(0, min(base_desire, 100))
+    def get_baby_desire(girl, fresh=True):
+        """Seeds baby_desire once, at girl creation (fresh=True) or mid-save/legacy backfill
+        (fresh=False) -- see vt_add_missing_attributes and vt_huds/vt_cherry_tracker.rpy's manual
+        migration tool. Two deliberately different formulas, not one blended one:
+
+        fresh=True: a personality roll for a brand-new girl whose stats are still tiny (0-10ish)
+        ranged. Naturism raises the floor (more comfortable with the body's natural cycles -> more
+        open to it), corruption lowers the ceiling (more corrupted/hedonistic -> less
+        family-focused). No trait checks -- traits can't realistically exist yet at true creation
+        time (corruption-tier traits are rarity=0, only ever earned later via the daily
+        stat-threshold check; fetish traits need tracked action counts a fresh girl can't have).
+        Ongoing trait-driven drift instead lives in stat_growth_multipliers on the traits
+        themselves (see the runtime patch below and 01_vt_mod_traits.rpy), so it applies
+        prospectively once actually earned through play.
+
+        fresh=False: an already-developed girl (mid-save backfill of a girl who predates the mod,
+        or a manual legacy-value migration triggered from the Cherry Tracker). Her stats span
+        their full 0-100 range, so corruption and affection are weighed against each other as a
+        signed delta -- a girl who adores the player outweighs one who's simply corrupted, rather
+        than corruption alone crushing the ceiling and erasing naturism/affection's influence
+        entirely (the flaw the single-formula version had).
+        """
+        is_mother = is_mother_character(girl)
+        if fresh:
+            ceiling = max(0, (55 if is_mother else 40) - girl.corruption * 2)
+            floor = min(girl.naturism + (20 if is_mother else 0), ceiling)
+            return int(renpy.random.randint(int(floor), int(ceiling)))
+        else:
+            midpoint = (60 if is_mother else 50) + girl.naturism * 0.2 \
+                       - (girl.corruption - girl.affection) * 0.8 + girl.kids_with_player * 15
+            floor = max(0, min(100, midpoint - 10))
+            ceiling = max(0, min(100, midpoint + 10))
+            floor = min(floor, ceiling)  # defensive, arbitrary modded configs
+            return int(renpy.random.randint(int(floor), int(ceiling)))
 
     def determine_initial_virginity(girl):
         """
@@ -1108,94 +1064,115 @@ init python:
         renpy.log(f"  - Oral: {'Virgin' if statuses['first_time_oral'] else 'Non-virgin'}")
         renpy.log(f"  - Anal: {'Virgin' if statuses['first_time_anal'] else 'Non-virgin'}")
 
-    def wants_condom(girl, sex_type="vaginal"):
-        """Determines if girl wants condom based on traits and corruption level"""
-        
-        # Safety check for trait system
-        if not hasattr(girl, 'has_trait'):
-            return girl.corruption < 60
-        
-        # Base probability starts at 50% (neutral)
-        base_probability = 50
-        
-        # Conservative/reserved girls strongly want condoms
-        if girl.has_trait("conservative"):
-            base_probability += 40
-        elif girl.has_trait("reserved"):
-            base_probability += 25
-        
-        # Slutty girls strongly don't want condoms
-        if girl.has_trait("ultimate_whore"):
-            base_probability -= 50
-        elif girl.has_trait("whore"):
-            base_probability -= 35
-        elif girl.has_trait("slut"):
-            base_probability -= 20
-        
-        # Adjust based on specific fetish types
-        if sex_type == "vaginal":
-            # Vaginal creampie has highest pregnancy risk
-            if girl.has_trait("cum_dumpster_devotee") or girl.has_trait("vaginal_addict"):
-                base_probability -= 45
-            elif girl.has_trait("cum_dumpster"):
-                base_probability -= 30
-            elif girl.has_trait("conflicted_cum_dumpster"):
-                base_probability -= 15  # Conflicted - sometimes wants, sometimes doesn't
-                
-        elif sex_type == "oral":
-            # Oral has lower pregnancy risk but still relevant
-            if girl.has_trait("oral_addict") or girl.has_trait("oral_cum_addict"):
-                base_probability -= 35
-            elif girl.has_trait("oral_fixation") or girl.has_trait("cum_slut"):
-                base_probability -= 20
-            elif girl.has_trait("conflicted_oral_cum_fixation"):
-                base_probability -= 10
-                
-        elif sex_type == "anal":
-            # Anal has no pregnancy risk but some girls still want protection
-            if girl.has_trait("anal_addict") or girl.has_trait("anal_cum_addict"):
-                base_probability -= 25
-            elif girl.has_trait("anal_slut"):
-                base_probability -= 15
-            elif girl.has_trait("conflicted_anal_slut"):
-                base_probability -= 7
-                
-        elif sex_type == "body":
-            # Boob sex has very low pregnancy risk
-            if girl.has_trait("boob_cum_addict"):
-                base_probability -= 20
-            elif girl.has_trait("boob_cum_slut"):
-                base_probability -= 10
-            elif girl.has_trait("conflicted_boob_cum_fixation"):
-                base_probability -= 5
-                
-            # Thigh sex has minimal pregnancy risk
-            if girl.has_trait("thigh_cum_addict"):
-                base_probability -= 15
-            elif girl.has_trait("thigh_cum_slut"):
-                base_probability -= 7
+    # Per-act weights for get_condom_acceptance's stat sum, ordered by the same pregnancy-risk
+    # severity the old one-time roll used (vaginal most condom-favoring, body least): corruption/
+    # affection/naturism raise bareback acceptance, fear lowers it.
+    VT_CONDOM_ACCEPTANCE_WEIGHTS = {
+        "vaginal": {"corruption": 0.45, "affection": 0.15, "naturism": 0.15, "fear": -0.35},
+        "oral":    {"corruption": 0.50, "affection": 0.20, "naturism": 0.15, "fear": -0.25},
+        "anal":    {"corruption": 0.55, "affection": 0.20, "naturism": 0.20, "fear": -0.20},
+        "body":    {"corruption": 0.60, "affection": 0.20, "naturism": 0.25, "fear": -0.15},
+    }
 
-            # External ass cumshot has no pregnancy risk
+    def get_condom_trait_bonus(girl, act):
+        """Additive bareback-acceptance bonus from her traits -- carries forward the exact
+        per-trait magnitudes the old one-time wants_condom() roll used (same scale, same
+        direction, same granularity), just repurposed from a one-shot probability offset into a
+        live acceptance-score bonus so it keeps contributing every time this is read, not just once."""
+        if not hasattr(girl, 'has_trait'):
+            return 0
+
+        bonus = 0
+
+        # Conservative/reserved girls strongly resist bareback (negative bonus).
+        if girl.has_trait("conservative"):
+            bonus -= 40
+        elif girl.has_trait("reserved"):
+            bonus -= 25
+
+        # Slutty girls strongly favor it.
+        if girl.has_trait("ultimate_whore"):
+            bonus += 50
+        elif girl.has_trait("whore"):
+            bonus += 35
+        elif girl.has_trait("slut"):
+            bonus += 20
+
+        # Per-act fetish tiers.
+        if act == "vaginal":
+            if girl.has_trait("cum_dumpster_devotee") or girl.has_trait("vaginal_addict"):
+                bonus += 45
+            elif girl.has_trait("cum_dumpster"):
+                bonus += 30
+            elif girl.has_trait("conflicted_cum_dumpster"):
+                bonus += 15  # Conflicted -- sometimes wants a condom, sometimes doesn't
+
+        elif act == "oral":
+            if girl.has_trait("oral_addict") or girl.has_trait("oral_cum_addict"):
+                bonus += 35
+            elif girl.has_trait("oral_fixation") or girl.has_trait("cum_slut"):
+                bonus += 20
+            elif girl.has_trait("conflicted_oral_cum_fixation"):
+                bonus += 10
+
+        elif act == "anal":
+            if girl.has_trait("anal_addict") or girl.has_trait("anal_cum_addict"):
+                bonus += 25
+            elif girl.has_trait("anal_slut"):
+                bonus += 15
+            elif girl.has_trait("conflicted_anal_slut"):
+                bonus += 7
+
+        elif act == "body":
+            if girl.has_trait("boob_cum_addict"):
+                bonus += 20
+            elif girl.has_trait("boob_cum_slut"):
+                bonus += 10
+            elif girl.has_trait("conflicted_boob_cum_fixation"):
+                bonus += 5
+
+            if girl.has_trait("thigh_cum_addict"):
+                bonus += 15
+            elif girl.has_trait("thigh_cum_slut"):
+                bonus += 7
+
             if girl.has_trait("ass_cum_addict"):
-                base_probability -= 10
+                bonus += 10
             elif girl.has_trait("ass_cum_slut"):
-                base_probability -= 5
-                
-            # External pussy cumshot has some pregnancy risk
+                bonus += 5
+
             if girl.has_trait("pussy_cum_addict"):
-                base_probability -= 25
+                bonus += 25
             elif girl.has_trait("pussy_cum_slut"):
-                base_probability -= 15
+                bonus += 15
             elif girl.has_trait("conflicted_pussy_cum_slut"):
-                base_probability -= 7
-        
-        # Add corruption modifier (more corrupted = less likely to want condoms)
-        corruption_modifier = (100 - girl.corruption) / 2  # 0-50 range
-        final_probability = max(5, min(95, base_probability + corruption_modifier))
-        
-        # Return True if random roll is below probability (higher probability = more likely to want condoms)
-        return renpy.random.randint(1, 100) <= final_probability
-        
+                bonus += 7
+
+        return bonus
+
+    def get_condom_acceptance(girl, act):
+        """0-100ish 'how much does she accept going bare for this act right now' -- a live,
+        deterministic weighted sum of her CURRENT corruption/affection/naturism/fear (same
+        accept_influences shape the base game's own acceptance formula uses, see
+        VT-Girl-Stats-And-Traits-Reference.md SS5) plus the trait-bonus layer above. No RNG here --
+        matches the base game's own _get_action_success_by_requirements, which is also a pure
+        deterministic score that callers roll/threshold against separately (see below)."""
+        weights = VT_CONDOM_ACCEPTANCE_WEIGHTS[act]
+        score = (girl.corruption * weights["corruption"] + girl.affection * weights["affection"]
+                 + girl.naturism * weights["naturism"] + girl.fear * weights["fear"])
+        score += get_condom_trait_bonus(girl, act)
+        return max(0, min(100, score))
+
+    def wants_condom_live(girl, act):
+        """Does she currently want a condom for this act -- stable within a single sitting, and
+        drifts only when her stats actually change, not on every ask (a fresh roll each time she's
+        asked would make her answer differently to the same question twice in one conversation).
+        Her fixed personal vt_condom_temperament (seeded once at bucket creation, never re-rolled)
+        is the threshold her live bareback-acceptance score has to clear -- this is also what gives
+        two girls with identical stats a genuine per-girl difference, the same personality variance
+        the old one-time dice roll gave for free."""
+        return girl.vt_condom_temperament >= get_condom_acceptance(girl, act)
+
 
     # TRACK RETRY ATTEMPTS TO PREVENT RECURSION
     _vt_retry_count = 0
@@ -1249,6 +1226,35 @@ init -34 python:
         print("VT MOD: Patched GirlConfig with fertility attributes")
 
 init -3 python:
+    # Ongoing baby_desire drift for the base game's own corruption-tier traits (conservative/
+    # reserved/slut/whore/ultimate_whore, defined in game/scripts/databases/trait_database_ren.py).
+    # These can never be edited directly (elkrose_vt never touches game/scripts/ files), so this
+    # mutates the already-created Trait objects' own stat_growth_multipliers dicts at runtime --
+    # the same technique 01_vt_mod_items.rpy already uses on database_sex_options. Values mirror
+    # the relative weight the old one-time seed bonuses gave these traits (conservative was the
+    # largest positive, ultimate_whore the largest negative), just expressed as an ongoing growth
+    # rate instead of a flat seed-time offset.
+    _vt_baby_desire_trait_drift = {
+        "conservative": 0.15,
+        "reserved": 0.08,
+        "slut": -0.10,
+        "whore": -0.15,
+        "ultimate_whore": -0.20,
+    }
+    if "database_traits" in globals():
+        for _vt_trait_name, _vt_drift in _vt_baby_desire_trait_drift.items():
+            _vt_trait_obj = database_traits.get(_vt_trait_name)
+            if _vt_trait_obj is not None and "baby_desire" not in _vt_trait_obj.stat_growth_multipliers:
+                _vt_trait_obj.stat_growth_multipliers["baby_desire"] = _vt_drift
+
+    def vt_backfill_baby_desire_traits(girl):
+        # Saved Trait instances can predate the database's new growth key. Add only the missing
+        # baby_desire modifier, preserving all other fields and authored/custom saved overrides.
+        for trait in girl.get_all_traits():
+            current = database_traits.get(trait.name)
+            if current is not None and "baby_desire" in current.stat_growth_multipliers:
+                trait.stat_growth_multipliers.setdefault("baby_desire", current.stat_growth_multipliers["baby_desire"])
+
     # Add condom tracking to Player class
     try:
         Player = renpy.store.Player
@@ -1279,6 +1285,11 @@ init -3 python:
             "condom_broke": False,
             "condom_cum": 0,        # times unloaded in the CURRENT condom
             "condom_dirty": False,  # whether the current condom has cum
+            # Not condom-related -- reuses this same player sidecar bucket/property/migration
+            # machinery generically. Tracks forced-coercion outcomes (03_vt_pullout_coercion.rpy);
+            # accumulates across the playthrough, no upper clamp (modify_stat's own floor-at-0
+            # via apply_impacts is all it needs).
+            "vt_notoriety": 0,
         }
 
         def vt_player_bucket(p):
@@ -1697,7 +1708,7 @@ init -4 python:
             # Populate the sidecar bucket with every VT attribute (mother-aware). The old
             # inline per-attribute init here was dead: each key is now a Girl property whose
             # getter never raises, so those `if not hasattr` guards were always False.
-            vt_ensure_girl_attrs(self)
+            vt_ensure_girl_attrs(self, fresh=True)
 
             #original_mother_init(self, mother_config, daughter)
 
@@ -2251,7 +2262,7 @@ init -14 python:
             else:
                 del buffs["Gift: FertiBOOST"]
 
-        def vt_ensure_girl_attrs(self):
+        def vt_ensure_girl_attrs(self, fresh=False):
             is_mother = is_mother_character(self)
             bucket = vt_girl_bucket(self)
 
@@ -2264,7 +2275,17 @@ init -14 python:
                     bucket.setdefault(_k, self.__dict__[_k])
                     del self.__dict__[_k]
 
+            # Custom preference properties are deliberately outside generic registration.
+            # Migrate by membership: False and None are decisions/data, not missing values.
+            # Existing sidecar values win; strip stale loose copies before default seeding.
+            for _act in ("vaginal", "anal", "oral", "body"):
+                _key = "wants_%s_condom" % _act
+                if _key in self.__dict__:
+                    bucket.setdefault(_key, self.__dict__[_key])
+                    del self.__dict__[_key]
+
             vt_reconcile_fertiboost_buff(self)
+            vt_backfill_baby_desire_traits(self)
 
             # ===== RELATIONSHIP TRACKING SYSTEM (sidecar) =====
             if "player_relationship" not in bucket:
@@ -2329,15 +2350,18 @@ init -14 python:
             if "anal_cum_fetish" not in bucket:
                 bucket["anal_cum_fetish"] = get_cum_fetish_level(self, "anal")
             if "baby_desire" not in bucket:
-                bucket["baby_desire"] = get_baby_desire(self)  # Start with baseline baby desire
+                bucket["baby_desire"] = get_baby_desire(self, fresh=fresh)  # Start with baseline baby desire
+                # Seeded just now under the current formula, from her real current stats (fresh or
+                # backfilled) -- there is nothing here to migrate later.
+                bucket["baby_desire_migration_version"] = 1
             if "baby_desire_xp" not in bucket:
                 bucket["baby_desire_xp"] = 0  # XP companion so baby_desire levels like a base stat
-            # Heal saves from before baby_desire was XP-backed: the old apply_impacts write-path
-            # could push the level past 100. Re-seed from traits+corruption so the now-XP-backed
-            # stat starts from a sane level instead of a stuck max.
-            if bucket["baby_desire"] > 100:
-                bucket["baby_desire"] = get_baby_desire(self)
-                bucket["baby_desire_xp"] = 0
+            # Legacy safety clamp only -- NOT a formula recompute. A girl who already had
+            # baby_desire set by an older version of this code (before baby_desire_migration_version
+            # existed) keeps her value and stays flagged as needing migration; correcting her is a
+            # manual, previewable action in the Cherry Tracker (vt_huds/vt_cherry_tracker.rpy), not
+            # something this function does automatically on every save load.
+            bucket["baby_desire"] = max(0, min(100, bucket["baby_desire"]))
 
             if "hymen" not in bucket:
                 bucket["hymen"] = False if is_mother else True
@@ -2421,14 +2445,23 @@ init -14 python:
                 bucket["player_knows_oral_condom"] = False
             if "player_knows_body_condom" not in bucket:
                 bucket["player_knows_body_condom"] = False
+            # wants_*_condom start at None ("never explicitly decided" -> the property getter
+            # live-computes from her current stats via wants_condom_live). A concrete True/False
+            # here means an explicit narrative decision (a persuasion pitch, a refusal, a go-bare
+            # coercion win) and is returned as-is, permanently -- see the property block below.
+            # A girl from a save made before this change already has a concrete value seeded by
+            # the old one-time wants_condom() roll, so this guard leaves her untouched; only a
+            # girl with no key yet (brand new, or backfilled for the first time) gets None.
             if "wants_vaginal_condom" not in bucket:
-                bucket["wants_vaginal_condom"] = wants_condom(self, "vaginal")
+                bucket["wants_vaginal_condom"] = None
             if "wants_anal_condom" not in bucket:
-                bucket["wants_anal_condom"] = wants_condom(self, "anal")
+                bucket["wants_anal_condom"] = None
             if "wants_oral_condom" not in bucket:
-                bucket["wants_oral_condom"] = wants_condom(self, "oral")
+                bucket["wants_oral_condom"] = None
             if "wants_body_condom" not in bucket:
-                bucket["wants_body_condom"] = wants_condom(self, "body")
+                bucket["wants_body_condom"] = None
+            if "vt_condom_temperament" not in bucket:
+                bucket["vt_condom_temperament"] = renpy.random.randint(0, 100)
             # Permanent "you may finish inside me" concession (climax pull-out coercion, 03_vt_pullout_
             # coercion.rpy). Starts False; flipped by an eager in-sex push or the small-talk finish-inside
             # pitch. Read/written via vt_girl_bucket so no property accessor is needed.
@@ -2631,7 +2664,7 @@ init -14 python:
 
             vt_apply_init_boost_and_virginity(self)
 
-            vt_ensure_girl_attrs(self)
+            vt_ensure_girl_attrs(self, fresh=True)
 
             #original_girl_init(self, *args, **kwargs)
 
@@ -3220,6 +3253,7 @@ init -14 python:
             # batch 4: fetishes
             "oral_cum_fetish", "vaginal_cum_fetish", "anal_cum_fetish", "boob_cum_fetish",
             "thigh_cum_fetish", "ass_cum_fetish", "pussy_cum_fetish", "impreg_fetish", "baby_desire", "baby_desire_xp",
+            "baby_desire_migration_version",
             # batch 5: sex history
             "oral_cum", "vaginal_cum", "anal_cum",
             "oral_sex_count", "last_oral_sex", "vaginal_sex_count", "last_vaginal_sex",
@@ -3233,7 +3267,9 @@ init -14 python:
             "aware_vaginal_condom", "aware_oral_condom", "aware_anal_condom", "aware_boob_condom",
             "aware_thigh_condom", "aware_ass_cumshot_condom", "aware_pussy_cumshot_condom",
             "player_knows_vaginal_condom", "player_knows_anal_condom", "player_knows_oral_condom", "player_knows_body_condom",
-            "wants_vaginal_condom", "wants_anal_condom", "wants_oral_condom", "wants_body_condom",
+            # wants_vaginal/anal/oral/body_condom are NOT here -- they get a custom property
+            # (None -> live-computed) right after this loop runs, see below.
+            "vt_condom_temperament",
             # batch 7: misc flags / follow-ups
             "had_sex_today", "having_oral_sex", "having_vaginal_sex",
             "has_met_before", "has_discussed_pregnancy_before", "has_discussed_birth_control_before", "has_discussed_condoms_before",
@@ -3279,6 +3315,7 @@ init -14 python:
             # batch 4: fetishes
             "oral_cum_fetish": 0, "vaginal_cum_fetish": 0, "anal_cum_fetish": 0, "boob_cum_fetish": 0,
             "thigh_cum_fetish": 0, "ass_cum_fetish": 0, "pussy_cum_fetish": 0, "impreg_fetish": 0, "baby_desire": 0, "baby_desire_xp": 0,
+            "baby_desire_migration_version": 0,
             # batch 5: sex history
             "oral_cum": 0, "vaginal_cum": 0, "anal_cum": 0,
             "oral_sex_count": 0, "last_oral_sex": -1, "vaginal_sex_count": 0, "last_vaginal_sex": -1,
@@ -3293,7 +3330,7 @@ init -14 python:
             "aware_vaginal_condom": False, "aware_oral_condom": False, "aware_anal_condom": False, "aware_boob_condom": False,
             "aware_thigh_condom": False, "aware_ass_cumshot_condom": False, "aware_pussy_cumshot_condom": False,
             "player_knows_vaginal_condom": False, "player_knows_anal_condom": False, "player_knows_oral_condom": False, "player_knows_body_condom": False,
-            "wants_vaginal_condom": False, "wants_anal_condom": False, "wants_oral_condom": False, "wants_body_condom": False,
+            "vt_condom_temperament": 50,
             # batch 7: misc flags / follow-ups
             "had_sex_today": False, "having_oral_sex": False, "having_vaginal_sex": False,
             "has_met_before": False, "has_discussed_pregnancy_before": False, "has_discussed_birth_control_before": False, "has_discussed_condoms_before": False,
@@ -3321,6 +3358,27 @@ init -14 python:
 
         for _gk in VT_GIRL_SIDECAR_KEYS:
             setattr(Girl, _gk, _vt_make_girl_property(_gk))
+
+        # wants_*_condom: custom property (not the generic factory above). Bucket value None means
+        # "never explicitly decided" -> live-computed from her current stats; a concrete True/False
+        # means an explicit narrative decision (a persuasion pitch, a refusal, a go-bare coercion
+        # win) and is returned permanently, exactly like before this rework. The setter is
+        # unchanged/generic, so every existing `girl.wants_X_condom = True/False` write across the
+        # mod's small-talk and coercion scenes keeps working with no changes -- it's already
+        # writing a concrete bool, which now simply sets the override instead of clobbering a
+        # frozen one-time roll.
+        def _vt_make_condom_property(act):
+            _key = "wants_%s_condom" % act
+            def _getter(self):
+                stored = vt_girl_bucket(self).get(_key)
+                return stored if stored is not None else wants_condom_live(self, act)
+            def _setter(self, value):
+                vt_girl_bucket(self)[_key] = value
+            return property(_getter, _setter)
+
+        for _act in ("vaginal", "anal", "oral", "body"):
+            setattr(Girl, "wants_%s_condom" % _act, _vt_make_condom_property(_act))
+
         #Girl.vt_relationship_change = vt_relationship_change
         #Girl.vt_seed_relationship_path = vt_seed_relationship_path
 
@@ -3598,7 +3656,13 @@ init -3 python:
         
         # Get relevant fetish level
         fetish_level = 0
-        fetish_attr = f"{creampie_type}_cum_fetish"
+        # Action categories and canonical properties use different singular/plural names.
+        fetish_attr = {
+            "oral": "oral_cum_fetish", "vaginal": "vaginal_cum_fetish",
+            "anal": "anal_cum_fetish", "boobs": "boob_cum_fetish",
+            "thighs": "thigh_cum_fetish", "ass_cumshot": "ass_cum_fetish",
+            "pussy_cumshot": "pussy_cum_fetish",
+        }[creampie_type]
         if hasattr(target_girl, fetish_attr):
             fetish_level = getattr(target_girl, fetish_attr)
         
@@ -3607,7 +3671,12 @@ init -3 python:
         
         # Awareness modifier - unaware of broken condom increases chance
         unaware_modifier = 0
-        awareness_attr = f"aware_{creampie_type}_condom"
+        awareness_attr = {
+            "oral": "aware_oral_condom", "vaginal": "aware_vaginal_condom",
+            "anal": "aware_anal_condom", "boobs": "aware_boob_condom",
+            "thighs": "aware_thigh_condom", "ass_cumshot": "aware_ass_cumshot_condom",
+            "pussy_cumshot": "aware_pussy_cumshot_condom",
+        }[creampie_type]
         if hasattr(target_girl, awareness_attr) and not getattr(target_girl, awareness_attr):
             unaware_modifier = 20
         
@@ -3728,20 +3797,20 @@ init -3 python:
             _atm_dirty = bool(_atm_prev["raw"]) and not condom_used
             _atm_line = vt_atm_line(target_girl, _atm_prev["act"], _atm_dirty)
             if _atm_line:
-                renpy.call("vt_atm_reaction", line=_atm_line)
+                vt_queue_oral_narration("atm", _atm_line)
 
         # --- START: ACTION NOTIFICATION LOGIC ---
         # Notify for the start of the act, if it's not a creampie/facial action.
         if action_name in ["blowjob", "sleep_blowjob", "use_mouth"]:
-            if not condom_used:
+            if not condom_used or player.condom_broke:
                 dialogtext = f"{target_girl.first_name} eagerly wraps her lips around your bare cock, and sucks you."
-                renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+                vt_queue_oral_narration("dialog", dialogtext)
             else:
-                dialogtext = f"{target_girl.first_name} eagerly suck you off, her tongue teasing your tip through the latex of the condom."
-                renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+                dialogtext = f"{target_girl.first_name} eagerly sucks you off, her tongue teasing your tip through the latex of the condom."
+                vt_queue_oral_narration("dialog", dialogtext)
         # --- END: ACTION NOTIFICATION LOGIC ---
         # --- START: CONDOM BREAKAGE LOGIC (HAPPENS FIRST, BEFORE ANYTHING ELSE) ---
-        # This block runs first to set the state of the condom before the action is described.
+        # Mechanics complete before the impact wrapper emits reaction/start/break narration.
         if condom_used and not player.condom_broke:
             premium_condom = player.condom_active == "premium"
             cheap_condom = player.condom_active == "cheap"
@@ -3768,7 +3837,7 @@ init -3 python:
             # Handle breakage consequences IMMEDIATELY after it occurs
             if break_occurred:
                 # Player's immediate notification
-                vt_firsttime_notify("You feel a sudden tear! And the sudden bliss of her warm moist mouth on your cock!", duration=3.0)
+                vt_queue_oral_narration("firsttime", "You feel a sudden tear! And the sudden bliss of her warm moist mouth on your cock!", duration=3.0)
                 # Determine if girl is aware of breakage
                 awareness_chance = 70  # Base chance to notice breakage
                 # Modify chance based on girl's traits
@@ -3780,12 +3849,12 @@ init -3 python:
                 if renpy.random.randint(1, 100) <= awareness_chance:
                     # Girl becomes aware of broken condom
                     target_girl.aware_oral_condom = True
-                    vt_fetish_notify(f"{target_girl.first_name} gasps around your cock as the distinct taste of your precum hits her tongue, the barrier between you suddenly vanished!", duration=5.0)
+                    vt_queue_oral_narration("fetish", f"{target_girl.first_name} gasps around your cock as the distinct taste of your precum hits her tongue, the barrier between you suddenly vanished!", duration=5.0)
                     renpy.log(f"VT MOD: {target_girl.first_name} became aware of broken oral condom")
                 else:
                     # Girl remains unaware
                     target_girl.aware_oral_condom = False
-                    vt_fetish_notify(f"{target_girl.first_name} moans softly, swirling her tongue around your now-exposed cock, loving the new, intense flavor.", duration=4.0)
+                    vt_queue_oral_narration("fetish", f"{target_girl.first_name} moans softly, swirling her tongue around your now-exposed cock, loving the new, intense flavor.", duration=4.0)
                     renpy.log(f"VT MOD: {target_girl.first_name} remained unaware of broken oral condom")
             else:
                 target_girl.aware_oral_condom = False
@@ -3859,7 +3928,7 @@ init -3 python:
         renpy.log(f"VT MOD: Oral sex processing complete for {target_girl.first_name}")
         
         # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+        vt_queue_oral_narration("dialog", dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
         
@@ -4611,7 +4680,9 @@ init -3 python:
                 renpy.log(f"VT MOD ERROR: External cumshot pregnancy calculation failed - {str(e)}")        
         renpy.log(f"VT MOD: Pussy cumshot processing complete for {target_girl.first_name}")
 
-        renpy.call("vt_raw_dialog", dialogtext=dialogtext)
+        if getattr(store, "vt_pullout_external_active", False):
+            dialogtext = renpy.random.choice(VT_PULLOUT_EXTERNAL_DESCRIPTION)
+        vt_queue_finisher_narration("vt_raw_dialog", dialogtext)
 
         #renpy.restart_interaction()
 
@@ -4713,7 +4784,7 @@ init -3 python:
         player.condom_dirty = True
         if not condom_used:
             target_girl.aware_vaginal_condom = False
-            dialogtext = f"You drive your raw, throbbing cock deep into {target_girl.first_name}'s dripping wet pussy. Her soft vulva kiss your shaft with every thrust, her tight hole sucking you as you slide back and forth. You groan as her pussy clenches, milking you for all you're worth, and explode, flooding her warm, eager womb with thick, potent ropes of your cum."
+            dialogtext = f"You drive your raw, throbbing cock deep into {target_girl.first_name}'s dripping wet pussy. Her soft vulva kisses your shaft with every thrust, her tight hole sucking you as you slide back and forth. You groan as her pussy clenches, milking you for all you're worth, and explode, flooding her warm, eager womb with thick, potent ropes of your cum."
             pregnancy_risk = True
         elif player.condom_broke: # The condom broke earlier, this is a bareback creampie
             player.condom_cum = 0
@@ -4728,16 +4799,36 @@ init -3 python:
             dialogtext = f"{target_girl.first_name}'s dripping pussy grips you tightly, her juices flowing down your cock as you bury yourself to the hilt. You throb powerfully inside her, groaning as you pump the condom full of your cum, the thin latex the only thing separating you from her fertile depths."
             pregnancy_risk = False
         # --- END: CUMSHOT NOTIFICATION LOGIC ---
+        # First time sex -- vt_catch_vaginal_sex (fuck_pussy) already handles this, but a creampie
+        # can be the very first penetrating action of a session (sex_creampie_pussy's own
+        # requirements have no dependency on a prior fuck_pussy action or on girl.hymen), so this
+        # hook needs the same handling or a virgin's hymen/first_time_pussy state never flips when
+        # her first penetration happens to end directly in a creampie.
+        if target_girl.vaginal_sex_count <= 0:
+            target_girl.vaginal_sex_count = 1
+            target_girl.last_vaginal_sex = vt_current_day
+        if target_girl.first_time_pussy and target_girl.hymen:
+            target_girl.hymen = False
+            target_girl.first_time_pussy = False
+            if not getattr(store, "vt_force_creampie_active", False):
+                vt_firsttime_notify(f"{target_girl.first_name} is no longer a virgin!!", duration=5.0)
+        elif target_girl.first_time_pussy:
+            target_girl.first_time_pussy = False
+            if not getattr(store, "vt_force_creampie_active", False):
+                vt_firsttime_notify(f"{target_girl.first_name}'s first time sex with you!", duration=5.0)
         # --- START: PREGNANCY RISK LOGIC ---
         # This block now uses the pregnancy_risk flag set above.
         if pregnancy_risk:
             target_girl.vaginal_cum = getattr(target_girl, 'vaginal_cum', 0) + 1
-            
-            # Handle fetish progression using centralized function
-            vt_handle_cum_fetishes(action_name, target_girl, fetish_category = "vaginal")
-            
-            # Handle baby desire increase using centralized function
-            vt_handle_baby_desire(action_name, target_girl, "vaginal")
+
+            # Handle fetish progression using centralized function -- skipped for a forced creampie
+            # (see 03_vt_pullout_coercion.rpy's vt_force_creampie_active): she isn't conceding, so
+            # this shouldn't grow her fetish/baby_desire the same way a willing creampie does.
+            if not getattr(store, "vt_force_creampie_active", False):
+                vt_handle_cum_fetishes(action_name, target_girl, fetish_category = "vaginal")
+
+                # Handle baby desire increase using centralized function
+                vt_handle_baby_desire(action_name, target_girl, "vaginal")
             
             # Immediate pregnancy check
             if not target_girl.pregnant and not target_girl.just_had_baby:
@@ -4773,7 +4864,10 @@ init -3 python:
                             target_girl.preg_end_day = vt_current_day + 250 + renpy.random.randint(0, 10)
                             
                             renpy.log(f"VT MOD: {target_girl.full_name} got pregnant! (Chance: {eff_fert:.1f}%)")
-                            vt_preg_notify(f"Your raw cock throbs deep inside her. {target_girl.first_name}'s pussy grips you, milking your shaft as you pump a massive load directly into her fertile womb.", duration=5.0)
+                            if getattr(store, "vt_force_creampie_active", False):
+                                vt_preg_notify(f"Your release remains inside {target_girl.first_name}, leaving a risk of pregnancy.", duration=5.0)
+                            else:
+                                vt_preg_notify(f"Your raw cock throbs deep inside her. {target_girl.first_name}'s pussy grips you, milking your shaft as you pump a massive load directly into her fertile womb.", duration=5.0)
                         else:
                             renpy.log(f"VT MOD: Pregnancy failed - fertility check ({eff_fert:.1f}%)")
                     else:
@@ -4782,12 +4876,15 @@ init -3 python:
                 except Exception as e:
                     renpy.log(f"VT MOD ERROR: Pregnancy calculation failed - {str(e)}")
         # --- END: PREGNANCY RISK LOGIC ---
-        
-        # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+
+        # --- FINAL STEP: Call the dialogue label -- skipped for a forced creampie; this text reads
+        # as her enjoying it ("milking you for all you're worth"), which would contradict the mod's
+        # own forced-outcome line already shown for this beat (03_vt_pullout_coercion.rpy).
+        if not getattr(store, "vt_force_creampie_active", False):
+            vt_queue_finisher_narration("vt_fetish_dialog", dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
-        
+
         #renpy.restart_interaction()
 
     database_apply_action_impacts_hooks.append(vt_catch_vaginal_creampie)
