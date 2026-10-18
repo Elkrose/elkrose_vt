@@ -1,4 +1,4 @@
-# Vaginal finishers retain their actual effects/hooks before transferring to narration.
+# Vaginal buildup and finishers complete their effects/hooks before narration.
 # Composes with the existing oral continuation when installed; no oral prerequisite.
 default vt_finisher_narration = None
 default vt_force_finisher_compensation = False
@@ -22,7 +22,7 @@ init 999 python:
         _vt_original_finisher_impacts = apply_action_impacts
 
         def vt_apply_finisher_impacts(action_name, *args, **kwargs):
-            if action_name not in VT_FINISHER_ACTIONS:
+            if action_name not in VT_FINISHER_ACTIONS + ("fuck_pussy", "sleep_fuck_pussy"):
                 return _vt_original_finisher_impacts(action_name, *args, **kwargs)
             previous = store.vt_finisher_narration
             narration = []
@@ -48,8 +48,11 @@ init 999 python:
                 if original_entry is not None:
                     database_action_impacts[action_name] = original_entry
                 store.vt_finisher_narration = previous
-            # Every hook has returned; transfer only after restoring the prior queue.
-            if narration:
+            # VT scenes select their media before speaking. Legacy callers still use
+            # the continuation here. In both cases all hooks and queue restoration finish first.
+            if store.vt_owned_finish_options is not None:
+                store.vt_owned_finish_options["narration"] = narration
+            elif narration:
                 renpy.call("vt_finisher_action_continuation", narration=narration)
             return result
 
@@ -57,6 +60,8 @@ init 999 python:
         apply_action_impacts = vt_apply_finisher_impacts
 
 label vt_finisher_action_continuation(narration):
+    # Preserve the completed action/callbacks when loading during a queued line.
+    $ renpy.retain_after_load()
     while narration:
         $ _vt_finisher_label, _vt_finisher_text = narration.pop(0)
         $ renpy.call(_vt_finisher_label, dialogtext=_vt_finisher_text)

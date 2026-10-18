@@ -1,5 +1,14 @@
 Virginal Tracker Mod
 
+1.1.6
+
+- Added VT-owned vaginal buildup and vaginal/withdrawal finishing sequences, removing
+  duplicate penetration and base-finisher narration.
+- Finisher mechanics and reactions now consistently follow resolved protection, exposure
+  and condom-break awareness.
+- Added more varied, natural narration and character responses reflecting personality,
+  comfort, familiarity, role and the situation.
+
 1.1.5
 
 - Fixed ordinary oral actions skipping condom-break, awareness and later effect processing (#14).

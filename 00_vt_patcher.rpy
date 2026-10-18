@@ -4353,6 +4353,12 @@ init -3 python:
                 target_girl.aware_vaginal_condom = False
         # --- END: CONDOM BREAKAGE LOGIC ---
         
+        # Base tracking has already recorded this action; the tracker resets per encounter.
+        _vt_vaginal_actions = ("fuck_pussy", "sleep_fuck_pussy", "creampie_pussy", "sleep_creampie_pussy")
+        _vt_first_in_session = sum(target_girl.session_action_tracker.get(name, 0) for name in _vt_vaginal_actions) <= 1
+        _vt_first_with_player = target_girl.first_time_pussy
+        _vt_virgin = target_girl.hymen
+
         # --- LOGIC: Prepare dialogue and determine which label to call ---
         dialogtext = ""
         call_label = None
@@ -4502,9 +4508,15 @@ init -3 python:
         if not condom_used or player.condom_broke:
             vt_handle_cum_fetishes(action_name, target_girl, fetish_category="vaginal")
 
+        if girl_awake:
+            call_label = "vt_broken_condom_dialog" if condom_used and player.condom_broke else "vt_condom_dialog" if condom_used else "vt_raw_dialog"
+            dialogtext = vt_vaginal_buildup_text(target_girl, condom_used, condom_used and player.condom_broke,
+                                               target_girl.aware_vaginal_condom, _vt_first_in_session,
+                                               _vt_first_with_player, _vt_virgin)
+
         # --- FINAL STEP: Call the dialogue label ---
         if call_label and dialogtext:
-            renpy.call(call_label, dialogtext=dialogtext)
+            vt_queue_finisher_narration(call_label, dialogtext)
 
         renpy.log(f"VT MOD: Vaginal sex tracked for {target_girl.full_name}")
         #renpy.restart_interaction()
@@ -4588,7 +4600,7 @@ init -3 python:
             # Handle breakage consequences IMMEDIATELY after it occurs
             if break_occurred:
                 # Player's immediate notification
-                vt_firsttime_notify("As you stroke yourself hard, you feel the condom tear right as you are about to cum!", duration=3.0)
+                vt_firsttime_notify("The condom tears as you finish.", duration=3.0)
                 
                 # Determine if girl is aware of breakage
                 awareness_chance = 65  # Higher than other areas due to direct contact
@@ -4600,12 +4612,12 @@ init -3 python:
                 if renpy.random.randint(1, 100) <= awareness_chance:
                     # Girl becomes aware of broken condom
                     target_girl.aware_pussy_cumshot_condom = True
-                    vt_fetish_notify(f"{target_girl.first_name}'s eyes go wide as the raw heat of your cock kisses her soaked vulva, the sudden sensation making her realize the condom is gone!", duration=5.0)
+                    vt_fetish_notify(f"{target_girl.first_name} notices that the condom has broken.", duration=5.0)
                     renpy.log(f"VT MOD: {target_girl.first_name} became aware of broken pussy cumshot condom")
                 else:
                     # Girl remains unaware
                     target_girl.aware_pussy_cumshot_condom = False
-                    vt_fetish_notify(f"{target_girl.first_name} is lost in ecstasy, moaning as your bare cock slides against her dripping pussy, completely unaware the condom has failed.", duration=3.0)
+                    vt_fetish_notify(f"The condom has broken, but {target_girl.first_name} has not noticed.", duration=3.0)
                     renpy.log(f"VT MOD: {target_girl.first_name} remained unaware of broken pussy cumshot condom")
             else:
                 target_girl.aware_pussy_cumshot_condom = False
@@ -4680,9 +4692,10 @@ init -3 python:
                 renpy.log(f"VT MOD ERROR: External cumshot pregnancy calculation failed - {str(e)}")        
         renpy.log(f"VT MOD: Pussy cumshot processing complete for {target_girl.first_name}")
 
-        if getattr(store, "vt_pullout_external_active", False):
-            dialogtext = renpy.random.choice(VT_PULLOUT_EXTERNAL_DESCRIPTION)
-        vt_queue_finisher_narration("vt_raw_dialog", dialogtext)
+        if not vt_resolved_finish_narration(target_girl, False, condom_used, pregnancy_risk):
+            if getattr(store, "vt_pullout_external_active", False):
+                dialogtext = renpy.random.choice(VT_PULLOUT_EXTERNAL_DESCRIPTION)
+            vt_queue_finisher_narration("vt_raw_dialog", dialogtext)
 
         #renpy.restart_interaction()
 
@@ -4761,7 +4774,7 @@ init -3 python:
             # Handle breakage consequences IMMEDIATELY after it occurs
             if break_occurred:
                 # Player's immediate notification
-                vt_firsttime_notify("A sudden tear! The frustrating latex is gone, and you feel her hot, dripping vulva kiss your raw, throbbing cock as it sinks deep into her wet heat!", duration=3.0)                
+                vt_firsttime_notify("The condom tears during the finish.", duration=3.0)
                 # Determine if girl is aware of breakage
                 awareness_chance = 60  # Slightly lower than oral for vaginal
                 
@@ -4772,11 +4785,11 @@ init -3 python:
                 if renpy.random.randint(1, 100) <= awareness_chance:
                     # Girl becomes aware of broken condom
                     target_girl.aware_vaginal_condom = True
-                    vt_fetish_notify(f"{target_girl.first_name} cries out in shock and pure ecstasy as the barrier vanishes! She feels every inch of your hot, bare cock stretching her, her pussy instantly beginning to milk your shaft for your seed.", duration=5.0)
+                    vt_fetish_notify(f"{target_girl.first_name} notices that the condom has broken.", duration=5.0)
                 else:
                     # Girl remains unaware
                     target_girl.aware_vaginal_condom = False
-                    vt_fetish_notify(f"{target_girl.first_name} moans like a whore, her pussy walls gripping you tighter than ever. She's too lost in the overwhelming pleasure to realize she's now taking your raw, bare cock with every thrust.", duration=5.0)
+                    vt_fetish_notify(f"The condom has broken, but {target_girl.first_name} has not noticed.", duration=5.0)
             else:
                 target_girl.aware_vaginal_condom = False
         # --- END: CONDOM BREAKAGE LOGIC ---
@@ -4880,8 +4893,9 @@ init -3 python:
         # --- FINAL STEP: Call the dialogue label -- skipped for a forced creampie; this text reads
         # as her enjoying it ("milking you for all you're worth"), which would contradict the mod's
         # own forced-outcome line already shown for this beat (03_vt_pullout_coercion.rpy).
-        if not getattr(store, "vt_force_creampie_active", False):
-            vt_queue_finisher_narration("vt_fetish_dialog", dialogtext)
+        if not vt_resolved_finish_narration(target_girl, True, condom_used, pregnancy_risk):
+            if not getattr(store, "vt_force_creampie_active", False):
+                vt_queue_finisher_narration("vt_fetish_dialog", dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
 
