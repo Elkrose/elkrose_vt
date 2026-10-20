@@ -65,9 +65,9 @@ init python:
 
     # Her interjection when you go to finish inside.
     VT_PULLOUT_INTERJECT = {
-        "crude":    ["Wait -- pull out! I'm not on the pill, don't you dare %verb_climax% in me!", "Pull out, I mean it! I'm not on birth control, don't you fucking %verb_climax% in me!", "Whoa, hold up -- pull out! I'm not covered, don't you dare finish in me!"],
-        "explicit": ["Nngh -- pull out! I'm not on anything, you can't finish inside!", "Ah -- wait, pull out! I'm not protected, please don't cum inside!", "Mmh -- not inside, pull out! I'm not on anything, I mean it!"],
-        "direct":   ["Wait -- pull out. I'm not on birth control, don't %verb_climax% in me.", "Hold on -- pull out. I'm not protected right now, don't finish inside me.", "Wait, stop -- I'm not on birth control. Pull out before you finish."],
+        "crude":    ["Wait -- pull out! I'm not on the pill, don't you dare cum in me!", "Pull out, I mean it! I'm not on birth control, don't you fucking cum in me!", "Whoa, hold up -- pull out! I'm not covered, don't you dare cum in me!"],
+        "explicit": ["Nngh -- pull out! I'm not on anything, you can't cum inside!", "Ah -- wait, pull out! I'm not protected, please don't cum inside!", "Mmh -- not inside, pull out! I'm not on anything, I mean it!"],
+        "direct":   ["Wait -- pull out. I'm not on birth control, don't cum in me.", "Hold on -- pull out. I'm not protected right now, don't cum inside me.", "Wait, stop -- I'm not on birth control. Pull out before you cum."],
         "neutral":  ["W-wait, pull out! I'm not on anything right now!", "Wait, please pull out! I'm not on birth control!", "Hold on -- I'm not protected, please pull out!"],
         "shy":      ["N-no, pull out! P-please, I'm not on the pill...!", "W-wait, please... I'm not on the pill, pull out!", "Um, wait -- I'm not protected... please pull out...!"],
         "demure":   ["Wait -- you mustn't finish inside. I'm not protected...!", "Please, you must withdraw. I am not protected right now.", "Wait, I beg you -- I am not on birth control. Please pull out."],
@@ -75,25 +75,25 @@ init python:
 
     # Player's push lines.
     VT_PULLOUT_PUSH = [
-        "I'm too close to stop... let me finish inside you, just this once.",
-        "I want to %verb_climax% in you so bad... let me fill you up.",
-        "Just this once, let me stay inside when I finish -- please.",
+        "I'm too close to stop... let me cum inside you, just this once.",
+        "I want to cum in you so bad... let me fill you up.",
+        "Just this once, let me stay inside when I cum -- please.",
     ]
 
     # Her answer, keyed by outcome then register.
     VT_PULLOUT_LINES = {
         "yes_perm": {
-            "crude":    ["Fuck it -- do it. Fill me up, and keep %verb_climax_ing% in me from now on.", "Screw it, just %verb_climax% in me already -- and don't pull out again.", "Do it -- fill me up. I don't want you pulling out ever again."],
-            "explicit": ["God... yes, finish inside me. Don't pull out -- not now, not ever.", "Yes -- finish inside me, every time from now on. I mean it.", "Ohh, don't stop -- %verb_climax_ing% inside me is all I want now."],
-            "direct":   ["...Okay. Finish inside. And keep doing it -- I want it.", "Fine -- finish inside. From now on, don't pull out.", "Okay, I want this. Finish inside me, and keep doing it."],
-            "neutral":  ["...Do it -- %verb_climax% inside me. I don't want you to pull out anymore.", "Alright -- go ahead and finish inside. I want that from now on.", "Okay. Don't pull out anymore -- finish inside me."],
+            "crude":    ["Fuck it -- do it. Fill me up, and keep cumming in me from now on.", "Screw it, just cum in me already -- and don't pull out again.", "Do it -- fill me up. I don't want you pulling out ever again."],
+            "explicit": ["God... yes, cum inside me. Don't pull out -- not now, not ever.", "Yes -- cum inside me, every time from now on. I mean it.", "Ohh, don't stop -- all I want now is for you to cum inside me."],
+            "direct":   ["...Okay. Cum inside. And keep doing it -- I want it.", "Fine -- cum inside. From now on, don't pull out.", "Okay, I want this. Cum inside me, and keep doing it."],
+            "neutral":  ["...Do it -- finish inside me. I don't want you to pull out anymore.", "Alright -- go ahead and finish inside. I want that from now on.", "Okay. Don't pull out anymore -- finish inside me."],
             "shy":      ["I... o-okay. Finish inside... I want to feel it. Every time.", "O-okay... I want you to finish inside, every time now...", "I... I want that. Please, finish inside me from now on."],
             "demure":   ["...Very well. Finish inside me. Don't hold back -- not anymore.", "Very well -- finish inside me. I no longer wish for you to withdraw.", "...I want this. Please finish inside me, from now on."],
         },
         "yes_session": {
-            "crude":    ["...Fuck it -- %verb_climax% in me for the rest of this encounter. But next time, you pull out.", "Ugh, fine -- while we're together this time. After that, back to pulling out.", "Alright, for this encounter. Do it. But don't get used to it."],
-            "explicit": ["Ohh -- okay, for this encounter. Finish inside... but don't expect it next time.", "Mmh -- alright, while we're together this time. Finish inside me, but that's it.", "Okay... for this encounter, %verb_climax% in me. Back to pulling out next time."],
-            "direct":   ["...Fine, for this encounter -- %verb_climax% in me -- but we go back to pulling out next time.", "Okay -- while we're together this time. Finish inside, then next time we're back to pulling out.", "Alright, for this encounter only. You can finish inside, but don't expect it next time."],
+            "crude":    ["...Fuck it -- cum in me for the rest of this encounter. But next time, you pull out.", "Ugh, fine -- while we're together this time. After that, back to pulling out.", "Alright, for this encounter. Do it. But don't get used to it."],
+            "explicit": ["Ohh -- okay, for this encounter. Cum inside... but don't expect it next time.", "Mmh -- alright, while we're together this time. Cum inside me, but that's it.", "Okay... for this encounter, cum in me. Back to pulling out next time."],
+            "direct":   ["...Fine, for this encounter -- cum in me -- but we go back to pulling out next time.", "Okay -- while we're together this time. Cum inside, then next time we're back to pulling out.", "Alright, for this encounter only. You can cum inside, but don't expect it next time."],
             "neutral":  ["...Okay, for this encounter. Finish inside. But pull out next time.", "While we're together this time, then -- finish inside. Pull out again next time.", "Okay, I'll allow it for this encounter. Finish inside, but don't assume I'll agree next time."],
             "shy":      ["I-I... for this encounter, okay? O-only while we're together this time...", "J-just while we're together this time... I guess it's okay... b-but next time, pull out...", "O-okay, for this encounter. But please pull out again next time..."],
             "demure":   ["For this encounter, then. Finish inside -- but do not presume it next time.", "While we are together this time, you may finish inside. Do not expect it next time.", "Very well, for this encounter. Do not make a habit of it, however."],
@@ -104,7 +104,7 @@ init python:
             "direct":   ["No. Pull out. I'm not risking it.", "No. I need you to pull out, right now.", "No -- I won't risk it. Pull out."],
             "neutral":  ["No -- pull out! Please!", "No, please -- you need to pull out!", "No -- I mean it, pull out now!"],
             "shy":      ["N-no, please pull out! I-I can't...!", "N-no, I can't risk it... please pull out...!", "P-please, no... pull out, now...!"],
-            "demure":   ["No -- withdraw. I will not be finished inside.", "No. I must insist that you withdraw.", "No -- please, you must pull out. I cannot risk it."],
+            "demure":   ["No -- withdraw. I will not allow you to finish inside me.", "No. I must insist that you withdraw.", "No -- please, you must pull out. I cannot risk it."],
         },
     }
 
@@ -121,9 +121,9 @@ init python:
     # Her reaction to a forced-creampie escalation, keyed by outcome then register.
     VT_FORCE_LINES = {
         "force_success": {
-            "crude":    ["You -- you actually just came in me. I told you not to, and you did it anyway.", "You did it anyway. I told you no, and you came in me regardless.", "You actually just did that. I said no, and you finished in me anyway."],
-            "explicit": ["Oh god, you didn't pull out... you came inside me even though I said no...", "You came inside me... after I said no. I can't believe you did that.", "God, I can feel it -- you finished inside me, even after I told you not to."],
-            "direct":   ["You didn't stop. I told you not to, and you finished inside me anyway.", "You went ahead and finished inside me. I told you not to.", "I said no, and you did it anyway. I can't believe that."],
+            "crude":    ["You -- you actually just came in me. I told you not to, and you did it anyway.", "You did it anyway. I told you no, and you came in me regardless.", "You actually just did that. I said no, and you came in me anyway."],
+            "explicit": ["Oh god, you didn't pull out... you came inside me even though I said no...", "You came inside me... after I said no. I can't believe you did that.", "God, I can feel it -- you came inside me, even after I told you not to."],
+            "direct":   ["You didn't stop. I told you not to, and you came inside me anyway.", "You went ahead and came inside me. I told you not to.", "I said no, and you did it anyway. I can't believe that."],
             "neutral":  ["You... you didn't pull out. I told you not to. Why didn't you listen?", "You didn't listen. I told you no, and you finished inside me anyway.", "I can't believe you just did that. I said not to, and you did it."],
             "shy":      ["Y-you didn't stop... I told you not to... I can feel it... why didn't you listen to me?", "Y-you really did it... I told you not to... why...?", "I-I can feel it... you didn't listen, even after I said no..."],
             "demure":   ["You finished inside me despite my explicit refusal. I... I do not know what to say.", "I asked you not to, and yet you finished inside me regardless.", "You disregarded what I said entirely. I am at a loss for words."],
@@ -164,9 +164,9 @@ init python:
 
     # force_success, she did NOT orgasm this session -- pure anger/violation, no ambiguity.
     VT_FORCED_ENDING_ANGRY = {
-        "crude":    ["You still went and came in me earlier without giving a shit what I said. That's not something I'm just going to get over.", "I'm still pissed about earlier. You came in me after I told you not to, and that's not okay.", "You really just ignored me earlier and finished inside anyway. I haven't forgotten that."],
-        "explicit": ["I keep thinking about earlier... you finished inside me even after I told you not to. That wasn't your choice to make.", "I'm still upset about earlier. You finished inside me, and I told you not to.", "What happened earlier is still bothering me. You didn't listen when I said no."],
-        "direct":   ["I haven't forgotten what happened earlier. You finished inside me despite my refusal, and that isn't something I'll just let go.", "I'm still angry about earlier. You finished inside me despite my refusal.", "What you did earlier hasn't left my mind. You ignored what I said."],
+        "crude":    ["You came in me earlier without giving a shit what I said. That's not something I'm just going to get over.", "I'm still pissed about earlier. You came in me after I told you not to, and that's not okay.", "You really just ignored me earlier and came inside anyway. I haven't forgotten that."],
+        "explicit": ["I keep thinking about earlier... you came inside me even after I told you not to. That wasn't your choice to make.", "I'm still upset about earlier. You came inside me, and I told you not to.", "What happened earlier is still bothering me. You didn't listen when I said no."],
+        "direct":   ["I haven't forgotten what happened earlier. You came inside me despite my refusal, and that isn't something I'll just let go.", "I'm still angry about earlier. You came inside me despite my refusal.", "What you did earlier hasn't left my mind. You ignored what I said."],
         "neutral":  ["I'm still thinking about earlier... you didn't listen when I said no, and you finished inside me anyway.", "I keep thinking about earlier. You didn't stop when I told you no.", "I'm still upset about what happened earlier. You didn't listen to me."],
         "shy":      ["I... I can't stop thinking about earlier. You didn't stop, even after I said no... that really hurt.", "I-I keep thinking about earlier... you didn't stop... it really scared me...", "I'm still... upset about earlier. You didn't listen when I said no..."],
         "demure":   ["I have not forgotten what transpired earlier. You disregarded my refusal entirely, and that is not something I take lightly.", "What occurred earlier remains with me. You did not heed my refusal.", "I continue to reflect on earlier events. My objection was entirely disregarded."],
@@ -177,9 +177,9 @@ init python:
     # This is the fallback bucket for a girl who doesn't clear any of the three tone-bucket
     # thresholds below (_vt_forced_conflicted_lines) -- kept as the plain baseline framing.
     VT_FORCED_ENDING_CONFLICTED = {
-        "crude":    ["Fuck... my body came anyway, I won't lie about that. But that doesn't mean I wanted you to finish inside me. I told you not to.", "Yeah, I came too, whatever. Doesn't mean I wanted you finishing inside me after I said no.", "My body got off, fine. That's not the same as me wanting you to cum in me."],
-        "explicit": ["God, I did end up cumming... but don't mistake that for wanting what you did. You came inside me after I said no.", "I did cum, I'll admit it. But that's not the same as wanting what you did.", "My body responded, yes. That doesn't mean I was okay with you finishing inside."],
-        "direct":   ["My body responded, I'll admit that. But that isn't the same as consent -- you finished inside me after I refused.", "I did orgasm, yes. That doesn't change that you finished inside me without my consent.", "My body reacted, that's true. It still wasn't consent."],
+        "crude":    ["Fuck... I came anyway, I won't lie about that. But that doesn't mean I wanted you to cum inside me. I told you not to.", "Yeah, I came too, whatever. Doesn't mean I wanted you cumming inside me after I said no.", "My body got off, fine. That's not the same as me wanting you to cum in me."],
+        "explicit": ["God, I did end up cumming... but don't mistake that for wanting what you did. You came inside me after I said no.", "I did cum, I'll admit it. But that's not the same as wanting what you did.", "My body responded, yes. That doesn't mean I was okay with you cumming inside."],
+        "direct":   ["My body responded, I'll admit that. But that isn't the same as consent -- you came inside me after I refused.", "I did cum, yes. That doesn't change that you came inside me without my consent.", "My body reacted, that's true. It still wasn't consent."],
         "neutral":  ["I know I came too, at some point... but that doesn't make what you did okay. You didn't listen when I said no.", "I came too, I know. But that's not the same as being okay with what happened.", "My body responded, but that doesn't excuse what you did."],
         "shy":      ["I-I couldn't help how my body reacted... but that doesn't mean any of this was okay. You didn't stop when I told you to.", "I-I did end up... finishing too... but that doesn't make it okay...", "M-my body reacted, but I still didn't want that to happen..."],
         "demure":   ["I will not deny that my body responded. That does not excuse what you did -- you finished inside me despite my explicit refusal.", "I concede that my body reacted. That does not equate to my consent.", "That I climaxed changes nothing about the fact that I refused."],
@@ -189,7 +189,7 @@ init python:
     # enough (see _vt_forced_conflicted_lines) that she articulates the arousal/consent distinction
     # explicitly and analytically, regardless of how upset she otherwise is.
     VT_FORCED_ENDING_CONFLICTED_ANALYTICAL = {
-        "crude":    ["My body getting off doesn't mean shit -- arousal and consent aren't the same thing, and you should already know that.", "My body reacting means jack shit about whether I consented -- you already know the difference.", "Getting off and saying yes are two different things. You crossed a line regardless."],
+        "crude":    ["My body getting off doesn't mean shit -- arousal and consent aren't the same thing, and you should already know that.", "My body's reaction doesn't tell you shit about whether I consented -- you already know the difference.", "Getting off and saying yes are two different things. You crossed a line regardless."],
         "explicit": ["Just because my body responded doesn't mean I consented to any of it. Those are two completely different things, and you crossed a line regardless.", "Arousal isn't consent. My body responding doesn't erase that I said no.", "You know full well arousal and permission aren't the same thing. That still applies here."],
         "direct":   ["My body's reaction and my consent aren't the same thing. One happening doesn't excuse the other being ignored.", "Physical arousal and consent are separate concepts. You ignored the one that mattered.", "My body's reaction doesn't retroactively grant permission you never had."],
         "neutral":  ["I know my body reacted, but that's a physical response, not permission. You still did something I explicitly said no to.", "A physical response isn't the same as agreement. You still crossed a line I set.", "I understand my body reacted. That's not the same as me consenting."],
@@ -212,8 +212,8 @@ init python:
     # registers as surprising to her anymore -- matter-of-fact/resigned; the anger is purely about
     # the act itself, not personal betrayal.
     VT_FORCED_ENDING_CONFLICTED_DEFIANT = {
-        "crude":    ["Yeah, my body came, big surprise -- it does that. Doesn't mean you get a pass for ignoring me.", "Of course my body came, it always does now. Doesn't mean you get to just ignore me.", "Yeah, I got off. Big deal. You still don't get a pass for that."],
-        "explicit": ["My body's going to respond to this stuff at this point, that's just how it works now. Doesn't mean what you did was fine.", "My body responding is old news by now. Doesn't mean what you did was fine.", "I stopped being surprised my body reacts a while ago. Still doesn't excuse this."],
+        "crude":    ["Yeah, I came. Big surprise. Doesn't mean you get a pass for ignoring me.", "Of course I came; I always do now. Doesn't mean you get to just ignore me.", "Yeah, I got off. Big deal. You still don't get a pass for that."],
+        "explicit": ["My body's going to respond to this stuff at this point, that's just how it works now. Doesn't mean what you did was fine.", "My body responding is old news by now. Doesn't mean what you did was fine.", "I stopped being surprised by my body's reactions a while ago. Still doesn't excuse this."],
         "direct":   ["My body reacting isn't news to me anymore. It still doesn't make what you did acceptable.", "My body reacting is expected at this point. It doesn't excuse ignoring my refusal.", "That's just how my body works now. It changes nothing about what you did."],
         "neutral":  ["I'm not surprised my body reacted -- that's just how it goes for me now. It still doesn't excuse what you did.", "I'm used to my body reacting by now. It still doesn't make this okay.", "That's just how things go for me these days. Still doesn't excuse what happened."],
         "shy":      ["I-I'm not even that surprised my body reacted... it just does that now. But that doesn't make it okay.", "I-I guess I'm used to it by now... but it still wasn't okay...", "It just... happens now. That doesn't mean what you did was fine..."],
@@ -250,7 +250,7 @@ init python:
     # having been her first time.
     VT_FORCED_ENDING_VIRGIN_ADDENDUM = {
         "crude":    ["And to top it off, that was supposed to be my first time. Guess I don't get a do-over on that.", "And that was my first time too. Guess that's just gone now, huh.", "On top of everything, that was supposed to be my first time. Not like this."],
-        "explicit": ["I keep coming back to the fact that that was my first time. I always thought it would be so different from that.", "And on top of it all, that was my first time. Not how I ever pictured it.", "I can't stop thinking that was also my first time, taken like that."],
+        "explicit": ["I keep coming back to the fact that that was my first time. I always thought it would be so different from that.", "And on top of it all, that was my first time. Not how I ever pictured it.", "I can't stop thinking about how my first time was taken from me."],
         "direct":   ["I also can't stop thinking that that was my first time. It was supposed to be my choice, not yours.", "And that was also my first time. It should have been my decision.", "On top of everything else, that was supposed to be my first time."],
         "neutral":  ["And that was supposed to be my first time. I always imagined it would go so differently than that.", "And that was also my first time. I imagined it very differently.", "That was supposed to be my first time too. Not like this."],
         "shy":      ["I-I keep thinking about how that was my first time... it wasn't supposed to happen like that...", "A-and that was my first time too... it wasn't supposed to be like this...", "I keep thinking that was also my first time... not this way..."],
@@ -269,8 +269,8 @@ init python:
 
     # Her line when you pull out (respect choice).
     VT_PULLOUT_RESPECT = {
-        "crude":    ["Good -- yeah, all over me. Thanks for not risking it.", "Yeah, that's it -- good call not risking it. Thanks.", "Mm, appreciate you pulling out. Smart move."],
-        "explicit": ["Mmm -- yes, pull out, cover me. Thank you for being careful.", "Ahh -- thank you for pulling out. That felt so good, even without finishing inside.", "God, thank you for being careful. Pulling out was the right call."],
+        "crude":    ["Good. Thanks for pulling out like I asked.", "Yeah, you pulled out like I asked. Thanks.", "Mm, appreciate you pulling out. Smart move."],
+        "explicit": ["Mmm -- yes, pull out, cover me. Thank you for being careful.", "Thank you for pulling out when I asked.", "God, thank you for being careful. Pulling out was the right call."],
         "direct":   ["Thank you. Pulling out -- that's the right call.", "Good call, pulling out. I appreciate that.", "Thanks for pulling out. That was the responsible thing to do."],
         "neutral":  ["Thank you for pulling out. I feel safer with you.", "Thanks for pulling out. That means a lot to me.", "I appreciate you pulling out. It makes me trust you more."],
         "shy":      ["Th-thank you for pulling out... I was scared for a second.", "Th-thanks for being careful... I really appreciate it...", "I-I'm glad you pulled out... thank you..."],
@@ -281,9 +281,9 @@ init python:
     # off her register, same as everything else here -- there's no separate "player register"
     # concept anywhere in this mod). Previously bare literals with zero variety at all.
     VT_PULLOUT_MENU_PUSH_CAPTION = {
-        "crude":    ["Push her to let you finish inside", "Talk her into letting you finish inside", "Try to convince her to take it"],
-        "explicit": ["Push her to let you finish inside", "Try to convince her to let you cum inside", "Coax her into letting you finish inside"],
-        "direct":   ["Push her to let you finish inside", "Try to convince her to let you finish inside", "Ask her to let you finish inside anyway"],
+        "crude":    ["Push her to let you cum inside", "Talk her into letting you cum inside", "Try to convince her to take it"],
+        "explicit": ["Push her to let you cum inside", "Try to convince her to let you cum inside", "Coax her into letting you cum inside"],
+        "direct":   ["Push her to let you cum inside", "Try to convince her to let you cum inside", "Ask her to let you cum inside anyway"],
         "neutral":  ["Push her to let you finish inside", "Try to convince her to let you finish inside", "Ask if you can finish inside anyway"],
         "shy":      ["Push her to let you finish inside", "Gently try to convince her", "Softly ask if you can finish inside"],
         "demure":   ["Push her to let you finish inside", "Attempt to persuade her otherwise", "Politely ask to finish inside anyway"],
@@ -534,8 +534,8 @@ label vt_direct_creampie_pussy:
 label vt_pullout_climax_gate(action_name=None, additional_subtags=None, skip_descriptions=False, skip_responses=False):
     python:
         _pg_girl = selected_girl
-        _pg_real = "generic_action_creampie_pussy"     # cum inside
-        _pg_pullout = "generic_action_cumshot_pussy"   # pull out (external)
+        _pg_real = "vt_vaginal_finisher"     # cum inside
+        _pg_pullout = "vt_withdrawal_finisher"   # pull out (external)
 
     # Not a pull-out girl -> finish inside as chosen.
     if not vt_wants_pullout(_pg_girl):
