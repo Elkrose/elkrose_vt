@@ -552,24 +552,27 @@ init python:
 
     def check_pregnancy_followups():
         current_day = time_manager.total_days
-        all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
+        all_girls = renpy.store.academy.get_all_possible_girls_and_mothers(include_pending=True)
         for girl in all_girls:
             if hasattr(girl, "pregnancy_followup") and girl.pregnancy_followup == current_day:
                 girl.trigger_pregnancy_followup()
+                girl.pregnancy_followup = 0  # this due date is consumed once
 
     def check_birth_control_followups():
         current_day = time_manager.total_days
-        all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
+        all_girls = renpy.store.academy.get_all_possible_girls_and_mothers(include_pending=True)
         for girl in all_girls:
             if hasattr(girl, "birth_control_followup") and girl.birth_control_followup == current_day:
                 girl.trigger_birth_control_followup()
+                girl.birth_control_followup = 0  # this due date is consumed once
 
     def check_condoms_followups():
         current_day = time_manager.total_days
-        all_girls = renpy.store.academy.girl_manager.get_all_possible_girls(include_pending=True)
+        all_girls = renpy.store.academy.get_all_possible_girls_and_mothers(include_pending=True)
         for girl in all_girls:
             if hasattr(girl, "condoms_followup") and girl.condoms_followup == current_day:
                 girl.trigger_condoms_followup()
+                girl.condoms_followup = 0  # this due date is consumed once
 
     def check_corruption_followups():
         current_day = time_manager.total_days
@@ -1564,7 +1567,7 @@ init -3 python:
 
     def trigger_npc_pregnancy(target_girl):
         """Handles pregnancy from NPC interactions"""
-        if target_girl.pregnant or target_girl.just_had_baby:
+        if target_girl.pregnant or target_girl.just_had_baby or target_girl.planb_pills > 0:
             return False
         
         # Simplified fertility check for NPCs
@@ -1904,10 +1907,6 @@ init -4 python:
             if self.fertility_boost > 0:
                 self.fertility_boost -= 1
 
-            # SafeDOCK countdown
-            if self.planb_pills > 0:
-                self.planb_pills -= 1
-
             # Anal and Oral, all cum is gone by next day
             # technically doesn't really matter, as its more of a temp visual for the day.
             if self.oral_cum > 0:
@@ -1925,7 +1924,7 @@ init -4 python:
                     self.hymen = False
 
                 # Pregnancy check - only check if not already pregnant and not in postpartum period
-                if not self.pregnant and not self.just_had_baby and self.vaginal_cum >= 0:
+                if not self.pregnant and not self.just_had_baby and self.planb_pills <= 0 and self.vaginal_cum >= 0:
                     # Birth control failed to prevent the pregnancy
                     if renpy.random.randint(1, 100) > self.birthcontrol_efficiency():
                         # There's a chance she's pregnant based on effective fertility
@@ -1956,6 +1955,11 @@ init -4 python:
 
                 #remove cum after preg check.
                 self.vaginal_cum -= 1
+
+            # The final protected day includes the residual-semen conception check above.
+            # Expiry applies to subsequent immediate actions, never to an existing pregnancy.
+            if self.planb_pills > 0:
+                self.planb_pills -= 1
 
             # Pregnancy progression
             if self.pregnant:
@@ -2925,10 +2929,6 @@ init -14 python:
             if self.fertility_boost > 0:
                 self.fertility_boost -= 1
 
-            # SafeDOCK countdown
-            if self.planb_pills > 0:
-                self.planb_pills -= 1
-
             # Anal and Oral, all cum is gone by next day
             # technically doesn't really matter, as its more of a temp visual for the day.
             if self.oral_cum > 0:
@@ -2946,7 +2946,7 @@ init -14 python:
                     self.hymen = False
 
                 # Pregnancy check - only check if not already pregnant and not in postpartum period
-                if not self.pregnant and not self.just_had_baby and self.vaginal_cum >= 0:
+                if not self.pregnant and not self.just_had_baby and self.planb_pills <= 0 and self.vaginal_cum >= 0:
                     #still use up a unit for the check (this is for cum still in the womb)
                     
                     # Birth control failed to prevent the pregnancy
@@ -2981,6 +2981,11 @@ init -14 python:
                 #remove cum after preg check.
                 self.vaginal_cum -= 1
 
+
+            # The final protected day includes the residual-semen conception check above.
+            # Expiry applies to subsequent immediate actions, never to an existing pregnancy.
+            if self.planb_pills > 0:
+                self.planb_pills -= 1
 
             # Pregnancy progression
             if self.pregnant:
@@ -3890,6 +3895,7 @@ init -3 python:
                 dialogtext = f"You groan, burying your raw cock to the hilt in {target_girl.first_name}'s throat. It clenches around you as you erupt, pumping a massive, hot load directly into her eager, willing belly."
             elif player.condom_broke: # The condom broke earlier, this is a bareback creampie
                 player.condom_cum = 0
+                target_girl.oral_cum += 1
                 if target_girl.aware_oral_condom:
                     dialogtext = f"{target_girl.first_name}'s eyes go wide in shock as your bare cock erupts, flooding her mouth with the sudden, hot taste of your cum!"
                 else:
@@ -4090,7 +4096,10 @@ init -3 python:
         renpy.log(f"VT MOD: Boob sex processing complete for {target_girl.first_name}")
         
         # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+        if store.vt_oral_narration is not None:
+            vt_queue_oral_narration("dialog", dialogtext)
+        else:
+            renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
             
@@ -4242,7 +4251,7 @@ init -3 python:
             vt_handle_cum_fetishes(action_name, target_girl, fetish_category="thighs")
         
         # Very small chance of pregnancy from thigh sex (if creampie occurred)
-        if action_name in ["cumshot_thighs", "sleep_cumshot_thighs"] and renpy.random.randint(1, 100) <= 2:
+        if action_name in ["cumshot_thighs", "sleep_cumshot_thighs"] and (not condom_used or player.condom_broke) and renpy.random.randint(1, 100) <= 2:
             target_girl.vaginal_cum = getattr(target_girl, 'vaginal_cum', 0) + 1
             #renpy.log(f"VT MOD: Added minimal cum unit (thigh cumshot with pregnancy risk). Total: {target_girl.vaginal_cum}")
         
@@ -4253,7 +4262,10 @@ init -3 python:
         renpy.log(f"VT MOD: Thigh sex processing complete for {target_girl.first_name}")
         
         # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+        if store.vt_oral_narration is not None:
+            vt_queue_oral_narration("dialog", dialogtext)
+        else:
+            renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
         
@@ -4653,7 +4665,7 @@ init -3 python:
             vt_handle_baby_desire(action_name, target_girl, "pussy_cumshot")
         
         # Immediate pregnancy check (for external cumshot with pregnancy risk)
-        if pregnancy_risk and not target_girl.pregnant and not target_girl.just_had_baby:
+        if pregnancy_risk and not target_girl.pregnant and not target_girl.just_had_baby and target_girl.planb_pills <= 0:
             try:
                 # Get fertility and birth control values
                 bc_eff = target_girl.birthcontrol_efficiency()
@@ -4844,7 +4856,7 @@ init -3 python:
                 vt_handle_baby_desire(action_name, target_girl, "vaginal")
             
             # Immediate pregnancy check
-            if not target_girl.pregnant and not target_girl.just_had_baby:
+            if not target_girl.pregnant and not target_girl.just_had_baby and target_girl.planb_pills <= 0:
                 try:
                     # Get fertility and birth control values
                     bc_eff = target_girl.birthcontrol_efficiency()
@@ -4880,7 +4892,7 @@ init -3 python:
                             if getattr(store, "vt_force_creampie_active", False):
                                 vt_preg_notify(f"Your release remains inside {target_girl.first_name}, leaving a risk of pregnancy.", duration=5.0)
                             else:
-                                vt_preg_notify(f"Your raw cock throbs deep inside her. {target_girl.first_name}'s pussy grips you, milking your shaft as you pump a massive load directly into her fertile womb.", duration=5.0)
+                                vt_preg_notify(f"Your release remains inside {target_girl.first_name}, uncontained by a condom.", duration=5.0)
                         else:
                             renpy.log(f"VT MOD: Pregnancy failed - fertility check ({eff_fert:.1f}%)")
                     else:
@@ -5140,7 +5152,10 @@ init -3 python:
         
         renpy.log(f"VT MOD: Ass cumshot processing complete for {target_girl.first_name}")
         # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+        if store.vt_oral_narration is not None:
+            vt_queue_oral_narration("dialog", dialogtext)
+        else:
+            renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
         # if call_label and dialogtext:
             # renpy.call(call_label, dialogtext=dialogtext)
 
@@ -5262,7 +5277,10 @@ init -3 python:
         renpy.log(f"VT MOD: Anal creampie processing complete for {target_girl.first_name}")
 
         # --- FINAL STEP: Call the dialogue label ---
-        renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
+        if store.vt_oral_narration is not None:
+            vt_queue_oral_narration("dialog", dialogtext)
+        else:
+            renpy.call("vt_fetish_dialog", dialogtext=dialogtext)
 
         #renpy.restart_interaction()
 

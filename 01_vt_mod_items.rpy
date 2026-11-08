@@ -186,8 +186,8 @@ init -1 python:
                     
                     # *** CHECK: Only patch if our requirement is not already present ***
                     if condom_requirement not in action.requirements:
-                        new_requirements = add_requirements(action.requirements, condom_requirement)
-                        new_desc = update_requirement_description(action, "Condom in use (working or unaware of break)")
+                        new_requirements = add_requirements(action.requirements, condom_requirement) if action.action_entry_name == "creampie_mouth" else action.requirements
+                        new_desc = action.requirement_description
                         
                         database_sex_options["face"][i] = SexAction(
                             name=action.name,
@@ -206,7 +206,7 @@ init -1 python:
                     # Cumshot on boobs: Allowed if:
                     # - Girl doesn't want condom, OR
                     # - Condom is being used (intact OR broken but unaware)
-                    condom_requirement = "(not girl.wants_body_condom) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_boob_condom))"
+                    condom_requirement = "(not vt_body_contact_condom(girl)) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_boob_condom))"
                     
                     # *** CHECK: Only patch if our requirement is not already present ***
                     if condom_requirement not in action.requirements:
@@ -227,12 +227,12 @@ init -1 python:
                     # Cumshot on boobs: Allowed if:
                     # - Girl doesn't want condom, OR
                     # - Condom is being used (intact OR broken but unaware)
-                    condom_requirement = "(not girl.wants_body_condom) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_boob_condom))"
+                    condom_requirement = "(not vt_body_contact_condom(girl)) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_boob_condom))"
                     
                     # *** CHECK: Only patch if our requirement is not already present ***
                     if condom_requirement not in action.requirements:
-                        new_requirements = add_requirements(action.requirements, condom_requirement)
-                        new_desc = update_requirement_description(action, "Condom in use (working or unaware of break)")
+                        new_requirements = action.requirements
+                        new_desc = action.requirement_description
                         
                         database_sex_options["boobs"][i] = SexAction(
                             name=action.name,
@@ -274,8 +274,8 @@ init -1 python:
                     
                     # *** CHECK: Only patch if our requirement is not already present ***
                     if condom_requirement not in action.requirements:
-                        new_requirements = add_requirements(action.requirements, condom_requirement)
-                        new_desc = update_requirement_description(action, "Condom in use (working or unaware of break)")
+                        new_requirements = action.requirements if action.action_entry_name == "cumshot_pussy" else add_requirements(action.requirements, condom_requirement)
+                        new_desc = action.requirement_description if action.action_entry_name == "cumshot_pussy" else update_requirement_description(action, "Condom in use (working or unaware of break)")
                         
                         database_sex_options["pussy"][i] = SexAction(
                             name=action.name,
@@ -333,16 +333,16 @@ init -1 python:
         # Process legs category
         if "legs" in database_sex_options:
             for i, action in enumerate(database_sex_options["legs"]):
-                if action.action_entry_name == "cumshot_thighs":
+                if action.action_entry_name in ("fuck_thighs", "cumshot_thighs"):
                     # Cumshot on thighs: Allowed if:
                     # - Girl doesn't want condom, OR
                     # - Condom is being used (intact OR broken but unaware)
-                    condom_requirement = "(not girl.wants_body_condom) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_thigh_condom))"
+                    condom_requirement = "(not vt_body_contact_condom(girl)) or (player.condom_active == 'raw') or ('body' in getattr(girl, 'vt_bare_session', ())) or (player.condom_active != 'raw' and (not player.condom_broke or not girl.aware_thigh_condom))"
                     
                     # *** CHECK: Only patch if our requirement is not already present ***
                     if condom_requirement not in action.requirements:
-                        new_requirements = add_requirements(action.requirements, condom_requirement)
-                        new_desc = update_requirement_description(action, "Condom in use (working or unaware of break)")
+                        new_requirements = add_requirements(action.requirements, condom_requirement) if action.action_entry_name == "fuck_thighs" else action.requirements
+                        new_desc = action.requirement_description
                         
                         database_sex_options["legs"][i] = SexAction(
                             name=action.name,
@@ -362,9 +362,9 @@ init -1 python:
         # stash the true label as vt_real_label so the gate can call through. Only touch acts we actually
         # condom-patched (their requirements carry 'vt_bare_session'); idempotent via the label guard.
         vt_condom_slot_by_entry = {
-            "blowjob": "oral", "use_mouth": "oral", "facial": "oral", "creampie_mouth": "oral",
-            "fuck_boobs": "body", "cumshot_boobs": "body", "cumshot_thighs": "body",
-            "fuck_pussy": "vaginal", "cumshot_pussy": "vaginal", "creampie_pussy": "vaginal",
+            "blowjob": "oral", "use_mouth": "oral", "creampie_mouth": "oral",
+            "fuck_boobs": "body", "fuck_thighs": "body",
+            "fuck_pussy": "vaginal", "creampie_pussy": "vaginal",
             "fuck_ass": "anal", "creampie_ass": "anal",
         }
         for _vt_cat, _vt_acts in database_sex_options.items():
@@ -664,6 +664,10 @@ init -3 python:
 # verbatim port of the old menu branches.
 init python:
     def vt_equip_cheap_condom():
+        # Inventory counts spare units; an already worn condom survives an empty stock.
+        if player.condom_cheap_count <= 0:
+            queue_notification("Out of BasicShield condoms!", duration=3.0)
+            return
         player.condom_cheap_count -= 1
         player.condom_active = "cheap"
         player.condom_cum = 0
@@ -672,12 +676,13 @@ init python:
         queue_notification("Equipped BasicShield condom", duration=2.0)
         renpy.log(f"VT MOD: Consumed 1 cheap condom. Remaining: {player.condom_cheap_count}")
 
-        # If we ran out of condoms, automatically switch to raw
-        if player.condom_cheap_count <= 0 and player.condom_active == "cheap":
-            player.condom_active = "raw"
-            queue_notification("Out of BasicShield condoms!", duration=3.0)
+
 
     def vt_equip_premium_condom():
+        # Inventory counts spare units; an already worn condom survives an empty stock.
+        if player.condom_premium_count <= 0:
+            queue_notification("Out of UltraProtect condoms!", duration=3.0)
+            return
         player.condom_premium_count -= 1
         player.condom_active = "premium"
         player.condom_cum = 0
@@ -686,10 +691,7 @@ init python:
         queue_notification("Equipped UltraProtect condom", duration=2.0)
         renpy.log(f"VT MOD: Consumed 1 premium condom. Remaining: {player.condom_premium_count}")
 
-        # If we ran out of condoms, automatically switch to raw
-        if player.condom_premium_count <= 0 and player.condom_active == "premium":
-            player.condom_active = "raw"
-            queue_notification("Out of UltraProtect condoms!", duration=3.0)
+
 
     def vt_go_bareback():
         player.condom_active = "raw"

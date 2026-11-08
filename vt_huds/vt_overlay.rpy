@@ -28,6 +28,9 @@ init python:
             vt_reset_gobare_session()
         except Exception:
             pass
+        store.vt_finish_session = {}
+        store.vt_finish_closing_contexts = {}
+        store.vt_booth_buildup_context = None
         # Fresh encounter -> no "previous act" yet (used by the penetration->oral reaction).
         try:
             store.vt_prev_act_by_girl.clear()
@@ -120,6 +123,9 @@ screen vt_cherry_overlay():
             use condom_cherry(position="top") id "vt_so_condom"
             for _vt_so_i, _vt_so_girl in enumerate(_vt_so_girls):
                 use cherry_window_row(girl=_vt_so_girl, position="sex_outro", xoffset=-(_vt_so_n-1)*950//2+_vt_so_i*950, yoffset=150, border_color="#664444", border_size=2, icon_size=36) id "vt_so_cherry_{}".format(_vt_so_i)
+
+    elif getattr(store, "vt_booth_overlay_girl", None) is not None:
+        use vt_booth_arousal_overlay(girl=store.vt_booth_overlay_girl) id "vt_booth_arousal"
 
     elif renpy.get_screen("girl_review_menu", layer="master"):
         if _vt_girl:
