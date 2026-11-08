@@ -100,15 +100,15 @@ init python:
 
     # Narrator reveal when a first raw attempt turns out she never wanted a condom for that act.
     VT_GOBARE_ACCEPT_NOTE = {
-        "oral":    "{name} doesn't reach for a condom -- she's happy to take you bare in her mouth.",
-        "body":    "{name} doesn't ask you to wrap up -- she's fine feeling you bare against her skin.",
-        "anal":    "{name} doesn't ask for a condom -- she's fine taking you bare in her ass.",
-        "vaginal": "{name} doesn't reach for a condom -- she's fine feeling you bare inside her.",
+        "oral":    "{name} doesn't require a condom for oral sex.",
+        "body":    "{name} doesn't require a condom for body contact.",
+        "anal":    "{name} doesn't require a condom for anal sex.",
+        "vaginal": "{name} doesn't require a condom for vaginal sex.",
     }
 
     def vt_condom_accept_note(girl, act):
         name = getattr(girl, "first_name", "She")
-        return VT_GOBARE_ACCEPT_NOTE.get(act, "{name} is fine going bare.").format(name=name)
+        return VT_GOBARE_ACCEPT_NOTE.get(act, "{name} has no condom requirement for this activity.").format(name=name)
 
     def _vt_gobare_intent(act):
         # Only go_bare_vaginal has its own willingness weights; oral/anal/body share "go_bare".
@@ -116,7 +116,7 @@ init python:
 
     def vt_condom_now(girl, act):
         """True if she wants a condom for `act` right now (a this-session concession only counts mid-interaction)."""
-        if not getattr(girl, "wants_" + act + "_condom", False):
+        if not (vt_body_contact_condom(girl) if act == "body" else getattr(girl, "wants_" + act + "_condom", False)):
             return False
         if getattr(store, "is_during_sex_interaction", False) and act in getattr(girl, "vt_bare_session", ()):
             return False
@@ -250,7 +250,7 @@ label vt_condom_attempt_gate:
         return
 
     python:
-        _cg_wants = bool(getattr(_cg_girl, "wants_" + _cg_slot + "_condom", False))
+        _cg_wants = bool(vt_body_contact_condom(_cg_girl) if _cg_slot == "body" else getattr(_cg_girl, "wants_" + _cg_slot + "_condom", False))
         _cg_known = bool(getattr(_cg_girl, "player_knows_" + _cg_slot + "_condom", False))
 
     if not _cg_wants:

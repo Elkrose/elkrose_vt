@@ -433,7 +433,7 @@ screen vt_ct_detail(girl, player=None, preview_cache=None):
             use vt_ct_field(label="Vaginal", value=("Wants a condom" if getattr(girl, "wants_vaginal_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during vaginal sex.")
             use vt_ct_field(label="Anal", value=("Wants a condom" if getattr(girl, "wants_anal_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during anal sex.")
             use vt_ct_field(label="Oral", value=("Wants a condom" if getattr(girl, "wants_oral_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during oral sex.")
-            use vt_ct_field(label="Body", value=("Wants a condom" if getattr(girl, "wants_body_condom", False) else "Prefers raw"), tooltip="Whether she wants a condom used during body / other sex acts.")
+            use vt_ct_field(label="Body contact", value=("Condom required" if vt_body_contact_condom(girl) else "Bare contact allowed"), tooltip="Protection for body contact. Permission to finish on her is agreed separately for each destination.")
 
             # ---- Baby Desire Migration (only shown for a girl flagged as not-yet-migrated) ----
             if preview_cache is not None and vt_ct_needs_migration(girl):

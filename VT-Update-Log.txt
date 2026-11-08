@@ -1,5 +1,29 @@
 Virginal Tracker Mod
 
+1.1.7
+
+- Separated body-contact protection from destination-specific finishing permissions (#25),
+  preserving existing saved preferences and agreements.
+- Added shared finish requests and a finish-away option, with encounter-only answers remembered
+  for each character and destination across saving/loading and cleared when the encounter ends.
+- Added VT-owned oral, anal and external finishing sequences. Finisher reactions and shared
+  closing dialogue follow the agreed destination, actual exposure and condom-break awareness.
+- Added the bar booth with flirting, escalating activities and first-time handling, plus bathroom
+  quickie and invitation-home options using arousal-aware acceptance and the existing home flow.
+- Added coffee-shop booth activities, cafe-specific flirting and an arousal-aware bathroom
+  invitation. Normal bathroom returns resume the same booth visit and its existing limits.
+- Improved booth retries, protection negotiation, refusal/departure handling and visit cleanup.
+  Respecting a boundary grants its reward once per act per visit while allowing later requests.
+- Polished booth and finisher narration, character responses, speaker tags and transitions;
+  removed repeated setup narration while preserving action effects and saved preferences.
+- Fixed SafeDOCK protection for immediate and residual conception checks, including the final
+  protected day, without interrupting existing pregnancies.
+- Fixed equipping the final spare condom and preserved worn protection when stock is empty.
+- Removed duplicate primary vaginal action effects and repeated insertion narration from the
+  library encounter, preserving its climax, timing and follow-up flow.
+- Included Mothers in supported pregnancy, birth-control and condom follow-up collection,
+  consuming each due date once while preserving the existing scheduling rules.
+
 1.1.6
 
 - Added VT-owned vaginal buildup and vaginal/withdrawal finishing sequences, removing

@@ -1,4 +1,5 @@
-# Oral impact narration is action-scoped, primitive data only. The wrapper clears it
+# Shared impact narration is action-scoped, primitive data only. Legacy oral names
+# remain valid for saved callers; ordinary body contact uses the same continuation. The wrapper clears it
 # before control transfer; the explicit label returns to the original generic action.
 default vt_oral_narration = None
 
@@ -6,6 +7,7 @@ init -3 python:
     VT_ORAL_NARRATION_ACTIONS = (
         "blowjob", "sleep_blowjob", "use_mouth", "creampie_mouth",
         "sleep_creampie_mouth", "facial", "sleep_facial",
+        "fuck_boobs", "fuck_thighs",
     )
 
     def vt_queue_oral_narration(kind, text, duration=None):
@@ -20,7 +22,7 @@ init 999 python:
         _vt_original_action_impacts = apply_action_impacts
 
         def vt_apply_action_impacts(action_name, *args, **kwargs):
-            if action_name not in VT_ORAL_NARRATION_ACTIONS:
+            if action_name not in VT_ORAL_NARRATION_ACTIONS or store.vt_oral_narration is not None:
                 return _vt_original_action_impacts(action_name, *args, **kwargs)
             previous = store.vt_oral_narration
             narration = []
@@ -30,6 +32,8 @@ init 999 python:
             finally:
                 store.vt_oral_narration = previous
             # All effects and callbacks have returned. No Python work follows transfer.
+            if action_name == "blowjob" and vt_booth_buildup_matches(selected_girl, action_name):
+                narration = vt_booth_oral_buildup_narration(narration)
             if narration:
                 renpy.call("vt_oral_action_continuation", narration=narration)
             return result

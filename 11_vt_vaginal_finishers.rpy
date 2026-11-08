@@ -4,151 +4,164 @@ default vt_owned_finish_options = None
 
 init -3 python:
     VT_FINISH_CONTAINED = [
-        "The last tension leaves you, and you go still. The condom has held, keeping your release contained.",
-        "A moment passes before your breathing evens out; your release stays in the intact condom.",
+        "You drive in deep and cum hard, the condom catching every pulse. It holds, and you go still inside her, breathing hard.",
+        "Your rhythm breaks as you cum into the condom. It holds, and for a moment neither of you moves.",
+    ]
+    # External containment never borrows insertion/inside-her narration.
+    VT_FINISH_EXTERNAL_CONTAINED = [
+        "You cum hard into the condom. It holds, and you pull back carefully to keep it that way.",
+        "Your release fills the tip of the condom, and it holds. You ease back, breathing hard.",
     ]
     VT_FINISH_INTERNAL = [
-        "Your rhythm falters into stillness as you finish inside her, with no condom between you.",
-        "The motion falters on a sharp breath. You finish inside her without a condom.",
+        "You thrust deep against her cervix in time with your thick white ropes filling her womb, pulse after pulse until you're spent.",
+        "Your rhythm stutters as you cum, filling her deep. You groan as you drain your balls inside her.",
     ]
     VT_FINISH_BREAK = [
-        "You fall still, but the torn condom has let your release through inside her. She knows it has failed.",
-        "The pause has a different weight: the condom hasn't held, and you have finished inside her. She knows it too.",
+        "You cum deep inside her, and only then does the torn condom show itself. She knows it failed, and she knows where it all went.",
+        "You finish inside her, but the condom hasn't held. She feels it too, and the heat drains out of the moment.",
     ]
     VT_FINISH_BREAK_UNNOTICED = [
-        "Your breath comes unevenly as the moment passes. The torn condom has let your release reach her, though she has not noticed.",
-        "The movement ebbs. She remains unaware that the condom hasn't held and your release has reached her.",
+        "You cum inside her and catch your breath. The condom has torn and let it through, though she hasn't noticed.",
+        "The moment ebbs as you finish. The torn condom hasn't kept anything from her, and she has no idea.",
     ]
     VT_FINISH_EXTERNAL = [
-        "You pull out in time, finishing against her rather than inside her. The hurried movement gives way to stillness.",
-        "A quick withdrawal interrupts the rhythm. Your release lands outside her, and the hurried moment is over.",
+        "You pull out just in time and cum over her pussy and belly, hot against her skin.",
+        "You pull out at the last second and spill across her skin.",
     ]
     VT_FINISH_EXTERNAL_CONTACT = [
-        "Your breath catches as you finish against her, leaving your release outside. The movement subsides into stillness.",
-        "The moment ends with your release against her lower body, not inside her. You go still, breathing unevenly.",
+        "You grind against her and cum, spilling over her pussy rather than inside it.",
+        "Your breath catches as you finish against her, leaving her slick with your cum on the outside.",
     ]
     VT_FINISH_EXTERNAL_CONTACT_LEAK = [
-        "As you finish against her, some of your release escapes at the condom's base. The leak is already against her as you go still.",
-        "Your breathing turns uneven as you finish. The condom has leaked at the base, leaving some of your release on her.",
+        "You cum against her, and some of it squeezes out past the base of the condom onto her skin.",
+        "As you finish against her, the condom leaks at the base, leaving a smear of your cum on her.",
     ]
     VT_FINISH_EXTERNAL_LEAK = [
-        "You pull clear, but the condom hasn't kept everything contained: some of your release escapes at the base onto her.",
-        "The rhythm breaks as you withdraw. You finish outside her, but a leak at the condom's base leaves some of your release against her.",
+        "You pull out and finish, but the condom leaks at the base and some of it ends up on her.",
+        "You withdraw as you cum. The condom doesn't hold it all, and some leaks out across her.",
     ]
     VT_FINISH_REPLIES = {
         "contained": {
-            "demure": ["That is a relief. Let us not hurry the moment.", "I should like a little quiet just now.", "Please be careful. I'd like everything to stay where it belongs."],
-            "shy": ["Oh. That's a relief.", "I'm not in a hurry for anything else, okay?", "Careful with the condom. I'd rather not have a mess."],
-            "neutral": ["That's a relief.", "All right. I'm choosing what happens next, though.", "Careful now. Let's keep everything in the condom."],
-            "direct": ["Good. No surprises, please.", "I'm in no hurry for a repeat.", "Keep the mess in the condom, okay?"],
-            "explicit": ["Well, that's a relief.", "Easy. I'm not ready to jump straight into something else.", "Careful with that condom. No spilling it now."],
-            "crude": ["Well, that's a damn relief.", "I'm in no hurry for another round.", "Keep that mess in the condom, all right?"],
+            "demure": ["Oh my. That was rather more than I expected.", "I'm glad the condom held. Let me catch my breath.", "Please be careful taking that off."],
+            "shy": ["Th-that was a lot... I'm glad it held.", "C-careful with the condom, okay?", "I... need a second. That was intense."],
+            "neutral": ["Wow. Okay. Good thing that held.", "Careful pulling out, okay?", "That was intense. Give me a second."],
+            "direct": ["Good. It held.", "Careful pulling out. Keep that condom on until you're clear.", "That was good. Give me a sec."],
+            "explicit": ["Mmm, I felt you throbbing in there. Good thing it held.", "God, that was good. Careful pulling out.", "That was hot. Pull out slow so it doesn't spill."],
+            "crude": ["Fuck, I felt you pumping in there. Good thing it held.", "Damn, that was good. Pull out slow, don't spill it.", "Shit, that was hot. Keep that thing on till you're clear."],
         },
         "break": {
-            "demure": ["The condom has torn. I would like us to take that seriously.", "That is a broken condom. We need to decide what to do.", "Please, no guessing. Let us work out what happened."],
-            "shy": ["It's torn. What are we going to do?", "The condom broke... I need a straight answer about this.", "Please don't brush off that tear."],
-            "neutral": ["The condom broke. What do we do now?", "That tear matters. Let's think this through.", "I want to talk about the broken condom before anything else."],
-            "direct": ["It's broken. Don't brush it off.", "The condom tore. We need a plan.", "No guessing. We need to deal with that tear."],
-            "explicit": ["The condom broke. I need a straight answer here.", "It's torn. Let's take that seriously.", "That tear isn't something to shrug off."],
-            "crude": ["Shit, it's broken. What do we do now?", "The condom tore. Don't brush that off.", "That damn tear matters. We need to talk."],
+            "demure": ["The condom tore, and you finished inside me. We need to talk about this now.", "That is not what I agreed to. What do we do?", "Please don't brush this off. It broke."],
+            "shy": ["I-it broke... and you... inside me... what do we do?", "The condom tore, didn't it? I can tell.", "Please don't say it's fine. It broke."],
+            "neutral": ["It broke. You came inside me. What now?", "That condom tore. We need to figure this out.", "Don't brush this off. That was inside me."],
+            "direct": ["It broke, and you came in me. We need a plan.", "Don't shrug this off. That tore.", "That's not what we agreed. What now?"],
+            "explicit": ["Shit, it tore. You came right inside me.", "That's not how I wanted that. We need to deal with this.", "That condom's done, and so is the mood. What now?"],
+            "crude": ["Fuck, it broke. You dumped it right in me.", "Shit, that's all inside me now. What the hell do we do?", "Damn thing tore. Don't you dare shrug that off."],
         },
         "unaware": {
-            "demure": ["I would prefer a little quiet just now.", "I am feeling rather dazed.", "I would rather you asked how I am than guessed."],
-            "shy": ["Can we just be quiet for a moment?", "I'm a little dazed. That's all I know how to say.", "You can ask how I am, you know."],
-            "neutral": ["I'd like a little quiet.", "I'm a little dazed. Don't read too much into it.", "I'd rather you asked how I am than guessed."],
-            "direct": ["Quiet for a minute, okay?", "I'm a little dazed. Don't make a big thing of it.", "Ask me how I am. Don't guess."],
-            "explicit": ["I'd like a little quiet right now.", "I'm still feeling dazed.", "You can ask how I am instead of guessing."],
-            "crude": ["Quiet for a minute, all right?", "I'm a bit dazed. Don't make a damn thing of it.", "Ask me how I am. Don't guess."],
+            "demure": ["My goodness. I need a moment.", "I'm rather dazed, I'm afraid.", "I'd like you to ask how I am, rather than guess."],
+            "shy": ["I... I need a second.", "My head's spinning a little...", "C-can we just stay quiet a moment?"],
+            "neutral": ["Wow. I need a minute.", "I'm a little dazed.", "Ask me how I'm doing. Don't just guess."],
+            "direct": ["Give me a minute.", "Whew. I'm dazed.", "Ask me how I am. Don't guess."],
+            "explicit": ["Fuck... my legs are shaking.", "God. Give me a second to come down.", "I'm still buzzing. Don't move yet."],
+            "crude": ["Fuck me... give me a damn minute.", "Shit, I can't think straight.", "Hold still, I'm still coming down."],
         },
         "agreed": {
-            "demure": ["I meant what I said. We may leave it at that.", "I am glad I could make that choice.", "I needn't explain every feeling all at once."],
-            "shy": ["I did mean it. I'm just a little overwhelmed.", "I'm glad I got to choose.", "Can we leave some of this unsaid for now?"],
-            "neutral": ["I meant it. Let's leave it at that.", "I'm glad I got to choose.", "There's a lot going through my head."],
-            "direct": ["I meant it. I can speak for myself.", "That was my choice. I like being clear about it.", "I have mixed feelings. Let me have them."],
-            "explicit": ["Yes, I meant it. Don't make me give a speech about it.", "I'm glad that was my call.", "I'm still sorting out how I feel."],
-            "crude": ["I meant it. Don't make a damn ceremony out of it.", "Good. That was my call.", "I'm allowed to feel more than one damn thing."],
+            "demure": ["Goodness, that's... quite nice.", "Oh, my... let me have this moment.", "Well... I certainly didn't mind THAT..."],
+            "shy": ["I... I'm glad I let you.", "I can still feel it... it's warm.", "Oh... wow... it's so much..."],
+            "neutral": ["Yeah... that feels nice...", "I can still feel you. Give me a minute.", "I like feeling your seed inside me."],
+            "direct": ["Ahhh... that feels so good.", "I can feel your cum flooding me.", "Stay there a second. I can still feel you."],
+            "explicit": ["Mmm, I can feel your cum deep inside...", "God, I love feeling you fill me up.", "Fuck, feeling you flood me was the right call."],
+            "crude": ["Fuck yes. Mmmm, I can feel it in my womb.", "Damn, you filled me up good. Fuck, that's hot...", "Oh, fuck, yes... so much fucking cum!"],
         },
         "external": {
-            "demure": ["Well. I should like a moment to compose myself.", "I would like to clean up before anything else.", "Please give me a little room to sort myself out."],
-            "shy": ["Oh. Let me sort myself out, okay?", "I'd like to clean up first.", "Could you give me a little room?"],
-            "neutral": ["Well, that's quite a finish.", "I'd like to clean up before anything else.", "Give me a little room to sort myself out."],
-            "direct": ["Well. That's quite a finish.", "I want to clean up first.", "A little room, please."],
-            "explicit": ["Well, that's one thing to deal with.", "I'd like to clean up before deciding anything else.", "Give me some room to sort myself out."],
-            "crude": ["Well, that's a mess to deal with.", "I'd like to clean up first.", "A little room, all right?"],
+            "demure": ["Well. I should like to clean up, please.", "That is... quite a mess. A moment, please.", "Please hand me something to tidy up with."],
+            "shy": ["Oh... it's everywhere. C-can I clean up?", "Um... could you pass me something to wipe with?", "That's... a lot. Let me sort myself out."],
+            "neutral": ["Well, that's quite a mess.", "Pass me something to clean up with?", "Give me a second to sort myself out."],
+            "direct": ["That's a mess. Hand me a towel.", "Okay. Cleanup first.", "A little room, please. I need to wipe off."],
+            "explicit": ["Look at the mess you made on me.", "Mmm, that's a lot. Hand me something to wipe off with.", "You really covered me. Let me clean up."],
+            "crude": ["Fuck, look at this mess.", "Damn, you plastered me. Hand me something.", "Shit, it's all over me. Give me a sec."],
         },
+    }
+    VT_FINISH_EXTERNAL_CONTAINED_REPLIES = {
+        "demure": ["Oh my. That was rather more than I expected.", "I'm glad the condom held. Let me catch my breath.", "Please be careful taking that off."],
+        "shy": ["Th-that was a lot... I'm glad it held.", "C-careful with the condom, okay?", "I... need a second. That was intense."],
+        "neutral": ["Wow. Okay. Good thing that held.", "Careful with the condom, okay?", "That was intense. Give me a second."],
+        "direct": ["Good. It held.", "Keep that condom on until you're clear.", "That was good. Give me a sec."],
+        "explicit": ["Mmm... don't move yet. Let me enjoy that.", "That's more like it. Give me a second to catch up.", "God. Okay... I need a breath."],
+        "crude": ["Fuck... okay. Give me a second.", "Damn. That was something. Hang on.", "Shit, I need a minute after that."],
     }
     VT_FINISH_CONTEXT_REPLIES = {
         "warm_reserved": {
-            "demure": ["I do like having you here. I am simply not very good at saying so.", "Please be kind to me for a moment.", "I don't mind being a little shy with you."],
-            "shy": ["I like being here with you. I'm just not very good at saying it.", "Be kind to me for a minute, will you?", "I don't mind being shy with you."],
-            "neutral": ["I like having you here. The words are taking a little longer.", "A little kindness would go a long way right now.", "I don't mind being shy with you."],
-            "direct": ["I like being here. I'm just not ready with a speech.", "Be kind to me for a minute, okay?", "I don't mind you seeing me a little shy."],
-            "explicit": ["I like having you here. Don't make me get eloquent about it.", "Be kind to me for a moment, will you?", "I don't mind being shy around you."],
-            "crude": ["I like being here with you. I'm just lousy at saying it.", "Be kind to me for a minute, all right?", "I don't mind you seeing me shy. Don't make a damn thing of it."],
+            "demure": ['I am glad you are here, even if I seem a little flustered.', 'Being close to you matters to me. Saying so is the difficult part.', 'You have left me rather flustered.'],
+            "shy": ["I'm glad you're here. Even if I'm hiding my face.", "I like being close to you. I'm just not very good at saying it.", "Please don't tease me for being shy."],
+            "neutral": ["I'm glad you're here. There, I managed to say it.", "I like having you this close, even if I'm not saying much.", "Be kind. I'm feeling a little shy."],
+            "direct": ["I like having you here. That's what I'm trying to say.", 'You caught me off guard. In a good way.', "You can spare me the teasing. I'm feeling shy enough."],
+            "explicit": ["I wasn't expecting to feel this shy around you.", 'I like having you this close. The words can wait.', "Be nice. I'm more shy around you than I expected."],
+            "crude": ['I like having you here, all right? There, I said it.', "You've caught me off guard. In a good way.", "Don't start teasing. I'm feeling shy enough already."],
         },
         "warm_familiar": {
-            "demure": ["We need not fill every silence, you know. I rather like this one.", "I like not having to put on a performance with you.", "You do make it rather difficult to remain sensible."],
-            "shy": ["We don't have to fill the silence. I like this part too.", "I like not having to put on an act with you.", "You're rather hard to be sensible around."],
-            "neutral": ["You don't have to fill the silence. I like this part too.", "I like not having to put on an act with you.", "You're rather hard to be sensible around."],
-            "direct": ["We can leave the silence alone. I like it.", "I like that I don't have to put on a performance with you.", "You make it difficult to stay sensible."],
-            "explicit": ["Don't feel you have to fill the silence. I like this too.", "I like being myself with you.", "So much for being sensible around you."],
-            "crude": ["Leave the silence alone. I like this part too.", "I like not having to put on a damn act with you.", "So much for being sensible around you."],
+            "demure": ['Stay a little longer. Your company is rather welcome.', 'It is a comfort knowing I can be myself with you.', 'You do have a way of making me lose my train of thought.'],
+            "shy": ['Stay a little longer? I like this part with you.', "I don't feel like I have to impress you. That's nice.", "It's easy being here with you."],
+            "neutral": ['Stay a little longer. I like having you here.', 'I like that I can just be myself with you.', "We don't have to rush off, do we?"],
+            "direct": ["I'm happy right here with you.", 'I can be myself with you. That matters.', "I'm in no hurry to end this moment."],
+            "explicit": ["Don't rush off. I like having you to myself.", "I don't have to put on a show with you. I like that.", 'Stay close a little longer, will you?'],
+            "crude": ['Stay a while, will you? I like having you around.', "I can just be myself with you. Fuck, that's a relief.", "We're not in that much of a hurry. Stay with me."],
         },
         "playful": {
-            "demure": ["If you are waiting for a clever remark, you may be waiting some time.", "Do not start looking pleased with yourself. I have not composed my review.", "I seem to have misplaced my dignity. Kindly pretend not to notice."],
-            "shy": ["If you're waiting for a clever remark, you'll have to give me a minute.", "Don't start looking smug. I haven't worked out my review yet.", "I seem to have lost my composure. Could you pretend you didn't notice?"],
-            "neutral": ["If you're waiting for a clever remark, you'll have to give me a minute.", "Don't start looking smug. I haven't written your review yet.", "I seem to have misplaced my dignity. Pretend you didn't notice."],
-            "direct": ["My clever remark will have to wait.", "Don't get smug. Your review isn't finished.", "I've misplaced my dignity. You saw nothing."],
-            "explicit": ["I had a clever remark ready. Apparently it's gone now.", "Don't get smug. I haven't decided what to put in your review.", "So much for my composure. You're going to pretend you missed that."],
-            "crude": ["My clever remark has gone to hell. You'll have to wait.", "Don't get smug. The damn review isn't finished.", "There goes my dignity. You saw nothing, all right?"],
+            "demure": ['You look altogether too pleased with yourself.', 'I had a perfectly good reply a moment ago. It seems to have deserted me.', 'There goes my attempt to look composed.'],
+            "shy": ["You're looking awfully pleased with yourself.", "Don't grin at me like that. You're making me blush.", 'I had something clever to say. Now look at me...'],
+            "neutral": ["Look at that grin. You're pleased with yourself.", "Don't let this go to your head.", 'So much for playing it cool.'],
+            "direct": ['You look far too pleased with yourself.', "Don't let it go to your head.", 'I was going to say something clever. There goes that plan.'],
+            "explicit": ["Look at that grin. I know exactly what you're thinking.", "Don't get too pleased with yourself just yet.", 'I was trying to look composed. You can see how well that went.'],
+            "crude": ["Look at that damn grin. You're enjoying yourself.", "Don't let it go to your head, all right?", 'I had a smart answer ready. Where the hell did it go?'],
         },
         "reserved": {
-            "demure": ["Must we find words for everything immediately?", "I am not quite ready to meet your eyes just yet.", "Please don't make a great occasion of my embarrassment."],
-            "shy": ["We don't have to talk about everything right away, do we?", "I know I'm being quiet. I'm just embarrassed.", "Please don't make a big thing of me blushing."],
-            "neutral": ["Can we leave some things unsaid for a moment?", "I'm being quiet because I'm embarrassed, all right?", "Please don't make a big thing of it."],
-            "direct": ["Let me be quiet without turning it into a question.", "I'm embarrassed. You don't need to point it out.", "Don't make a big thing of this."],
-            "explicit": ["I can be quiet without having an answer ready.", "Yes, I'm embarrassed. Don't start teasing.", "Don't make me explain every look on my face."],
-            "crude": ["Let me be quiet without making a damn thing of it.", "I'm embarrassed, all right? Don't start.", "Don't make me explain every look on my face."],
+            "demure": ['I am not quite ready to put that into words.', 'I would like a little quiet while I collect myself.', 'I know I am blushing. Please be kind.'],
+            "shy": ["I'm not sure I can look you in the eye yet.", "I'm embarrassed. I just need a little quiet.", "Please don't point out that I'm blushing."],
+            "neutral": ["I'm still trying to find my words.", "I'm feeling a little self-conscious. Can we be quiet for a bit?", "Be kind. I know I'm blushing."],
+            "direct": ["I'm not ready to talk about it yet.", "I'm embarrassed. A little quiet would help.", 'Let me have a little space.'],
+            "explicit": ["I haven't found the words yet.", "Yes, I'm embarrassed. Just give me a little quiet.", 'A little space would help me settle.'],
+            "crude": ["I'm still finding my damn words.", "I'm embarrassed, all right? A bit of quiet would help.", 'Give me some room to collect myself.'],
         },
         "reserved_mother": {
-            "demure": ["I should like to recover a little of my composure first.", "There are occasions when a measured silence is quite sufficient.", "I would rather choose my own words than be prompted."],
-            "shy": ["I would like a little of my composure back first.", "A little silence isn't something we have to fix.", "Let me choose my own words, please."],
-            "neutral": ["I'd like some of my composure back first.", "A little silence isn't a problem we have to solve.", "I'd rather choose my own words."],
-            "direct": ["Let me get my composure back.", "We don't have to fix every silence.", "I'll choose my own words, thank you."],
-            "explicit": ["Give me a chance to recover my composure.", "Silence isn't always an invitation to ask questions.", "Let me choose how I say this."],
-            "crude": ["Let me get my composure back, all right?", "We don't need to fix every damn silence.", "I'll find my own words. Give me a chance."],
+            "demure": ['I am rather at a loss for words.', 'A little quiet would help me collect myself.', 'I seem to have misplaced my composure.'],
+            "shy": ["I'm... not quite sure what to say.", 'Could I have a little quiet to collect myself?', "I'm feeling rather self-conscious all of a sudden."],
+            "neutral": ["I'm still finding my words.", 'A little quiet would help me collect myself.', "I'm not feeling quite composed yet."],
+            "direct": ["I'm at a loss for words.", 'Let me collect myself before we talk.', "I'm feeling self-conscious. Bear with me."],
+            "explicit": ["I don't quite have the words yet.", 'A little quiet, please. I need to collect myself.', "You've caught me without my usual composure."],
+            "crude": ["I'm still finding my damn words.", 'A little quiet, all right? I need to collect myself.', 'So much for keeping my composure.'],
         },
         "uneasy": {
-            "demure": ["I need a little space, please.", "I wish I could feel less tense.", "I would rather you told me what you are thinking."],
-            "shy": ["Could I have a little space?", "I wish I didn't feel so tense.", "What are you thinking? I can't tell."],
-            "neutral": ["I need a little space, please.", "I wish I felt less tense.", "Tell me what you're thinking. I can't read you."],
-            "direct": ["Give me some space.", "I'm tense. I'm not going to pretend otherwise.", "Tell me what you're thinking instead of leaving me to guess."],
-            "explicit": ["I need some space. Don't rush me.", "I'm still tense. I'm not putting on a happy face.", "What are you thinking? I'd rather hear it from you."],
-            "crude": ["Give me some space, all right?", "I'm still fucking tense. I'm not pretending otherwise.", "Tell me what's going through your head."],
+            "demure": ['A little space would help, please.', 'I am not at ease. Please do not hurry me.', 'I would rather know what you are thinking than have to guess.'],
+            "shy": ['Could you give me a little room?', "I'm not sure what to say. Please don't press me.", "What are you thinking? I can't tell."],
+            "neutral": ['I could use some space.', "I don't feel settled yet. Please wait.", "Talk to me. I don't want to guess what you're thinking."],
+            "direct": ['Give me some room.', "I'm tense. Don't hurry me along.", "Tell me what you're thinking. I need a straight answer."],
+            "explicit": ['Back up a little. I need room.', "I'm not ready to put on a happy face.", 'Talk to me instead of leaving me to guess.'],
+            "crude": ['Give me some damn room.', "I'm tense. Don't expect me to pretend otherwise.", "Tell me what's going through your head."],
         },
         "practical": {
-            "demure": ["One decision at a time, please.", "I would rather think clearly than find something flattering to say.", "Let us not rush straight into the next thing."],
-            "shy": ["Can we take one thing at a time?", "I'd rather get my thoughts straight than find the right answer.", "We don't have to rush into anything else, do we?"],
-            "neutral": ["One thing at a time, all right?", "I'd rather think clearly than find something flattering to say.", "There's no need to rush into the next thing."],
-            "direct": ["One decision at a time.", "I'd rather be clear than flattering.", "Let's not rush the next thing."],
-            "explicit": ["One thing at a time. I like to know what I'm deciding.", "I'd rather give you a straight answer than a pretty one.", "No need to hurry into the next thing."],
-            "crude": ["One damn thing at a time.", "I'd rather be straight with you than tell you what sounds good.", "Don't rush straight into the next thing."],
+            "demure": ['I could do with a little water.', 'Anything else can wait until we have settled ourselves.', 'There is no reason to hurry straight into the next thing.'],
+            "shy": ['Could I have a sip of water?', "We don't have to rush off, do we?", "Let's not try to do everything at once."],
+            "neutral": ['I could use some water.', "Everything else can wait until we're comfortable.", 'One thing at a time.'],
+            "direct": ['I need some water after that.', "We don't need to rush straight on.", 'We can take our time.'],
+            "explicit": ['A drink of water would be good right now.', "We're in no rush. Stay here a little.", "Let's get comfortable before anything else."],
+            "crude": ['I could use some damn water.', "There's no prize for rushing off.", 'No rush. We can sort out the rest afterward.'],
         },
         "break_connected": {
-            "demure": ["The condom has torn. Please talk to me while we think this through.", "I do care for you, but that tear still matters.", "Let us deal with the broken condom together, rather than falling silent."],
-            "shy": ["It broke. Please talk to me while we work out what to do.", "I like being with you, but I can't ignore that tear.", "The condom's torn. Don't leave me worrying about it on my own."],
-            "neutral": ["The condom broke. Talk to me while we think this through.", "I like being with you, but that tear still matters.", "Let's deal with the broken condom together."],
-            "direct": ["It broke. Talk to me. We'll work out what to do.", "I care about you. I'm still taking that tear seriously.", "The condom's torn. I don't want to worry about it on my own."],
-            "explicit": ["The condom broke. Don't go quiet on me now.", "I care about you. That doesn't make the tear unimportant.", "Let's think through the broken condom together."],
-            "crude": ["Shit, it's broken. Talk to me while we work this out.", "I care about you. I'm still taking that damn tear seriously.", "The condom's torn. Don't leave me worrying about it alone."],
+            "demure": ['The condom has torn. Please stay with me while we consider what to do.', 'I care for you. I still need us to take that tear seriously.', 'Let us look at the broken condom together.'],
+            "shy": ['It broke... stay with me while we work out what to do?', "I like being with you, but I can't ignore that tear.", "Please don't leave me worrying about the condom by myself."],
+            "neutral": ['The condom broke. Stay with me while we work this out.', 'I care about you. The tear still matters.', "Let's look at the broken condom together."],
+            "direct": ['It broke. Stay here and help me think.', "I care about you. I'm taking the tear seriously.", 'We need to deal with the broken condom together.'],
+            "explicit": ["The condom broke. Don't go quiet on me now.", 'I care about you. I still need you to take the tear seriously.', 'Stay with me. We need to work out what to do about the condom.'],
+            "crude": ['Shit, it broke. Stay here while we work this out.', "I care about you. That doesn't make the damn tear disappear.", "Help me think about the condom. Don't leave me worrying alone."],
         },
         "break_uneasy": {
-            "demure": ["It has torn. Please do not tell me that is nothing.", "The condom is broken. I need you to take that seriously.", "That tear matters. I need time to think."],
-            "shy": ["It broke. Please don't tell me that's nothing.", "The condom's torn. I need you to take this seriously.", "Please don't brush off that tear. I'm worried."],
-            "neutral": ["It broke. Please don't tell me that's nothing.", "The condom's torn. Take this seriously.", "That tear matters. I need time to think."],
-            "direct": ["It's broken. Don't minimize it.", "The condom tore. Take that seriously.", "That tear matters. Let me think."],
-            "explicit": ["It broke. Don't tell me it's nothing.", "The condom's torn. I need you to take this seriously.", "That tear matters. I'm not shrugging it off."],
-            "crude": ["It's broken. Don't tell me it's nothing.", "The damn condom tore. Take it seriously.", "That tear matters. I'm not shrugging it off."],
+            "demure": ['It has torn. Please do not dismiss my concern.', 'The condom is broken. I need you to take this seriously.', 'Please give me a moment to think about that tear.'],
+            "shy": ["It broke... please don't tell me it doesn't matter.", "The condom's torn. I need you to listen to me.", "Give me a moment. I'm worried about that tear."],
+            "neutral": ["It broke. Please don't brush that off.", "The condom's torn. I need you to take this seriously.", 'Give me a moment to think. That tear matters.'],
+            "direct": ["It's broken. Don't minimize it.", 'The condom tore. Take that seriously.', 'Let me think about that tear before you say anything else.'],
+            "explicit": ["It broke. Don't tell me it's nothing.", 'I need you to listen. The condom tore.', "I'm not shrugging that tear off. Give me a minute."],
+            "crude": ["It's broken. Don't tell me it's nothing.", 'The damn condom tore. Listen to me.', "Give me a minute. I'm not brushing that tear off."],
         },
     }
 
@@ -175,26 +188,46 @@ init -3 python:
             return "reserved_mother" if isinstance(girl, Mother) else "reserved"
         return "neutral"
 
-    def vt_finish_reply_pool(girl, outcome):
+    def vt_finish_reply_join(outcome_line, personality_line):
+        # Keep the supplied outcome; avoid asking for the same pause twice.
+        if any(phrase in personality_line.lower() for phrase in
+               ("give me a second", "give me a minute", "give me a sec")):
+            for ending in (" Give me a minute.", " Give me a second.",
+                           " Give me a sec.", " Give me a second to catch up."):
+                if outcome_line.endswith(ending):
+                    outcome_line = outcome_line[:-len(ending)]
+                    break
+        return outcome_line + " " + personality_line
+
+    def vt_finish_reply_pool(girl, outcome, internal=True):
         context = vt_finish_reply_context(girl)
-        # A known failure always has an informed, concerned reply. An unnoticed
-        # failure never borrows these lines, even from an otherwise warm character.
+        base = (VT_FINISH_EXTERNAL_CONTAINED_REPLIES if outcome == "contained" and not internal
+                else VT_FINISH_REPLIES[outcome])
+        # A known failure stays informed; an unnoticed one never borrows break replies.
         if outcome == "break":
             if context == "uneasy":
                 return VT_FINISH_CONTEXT_REPLIES["break_uneasy"]
             if context in ("warm_reserved", "warm_familiar", "playful"):
                 return VT_FINISH_CONTEXT_REPLIES["break_connected"]
-            return VT_FINISH_REPLIES[outcome]
-        return VT_FINISH_CONTEXT_REPLIES.get(context, VT_FINISH_REPLIES[outcome])
+            return base if internal else VT_FINISH_CONTEXT_REPLIES["break_uneasy"]
+        if context == "uneasy" or outcome == "unaware":
+            return VT_FINISH_CONTEXT_REPLIES.get(context, base)
+        personality = VT_FINISH_CONTEXT_REPLIES.get(context)
+        if personality is None:
+            return base
+        # Pair the existing three alternatives without an extra draw or saved state.
+        return {register: [vt_finish_reply_join(line, personality[register][(index + 1) % len(personality[register])])
+                           for index, line in enumerate(lines)]
+                for register, lines in base.items()}
 
     def vt_vaginal_buildup_text(girl, condom_used, broken, aware, first_in_session, first_with_player, virgin):
         # Exactly one two-way choice, as in the reviewed mechanical delivery.
         if first_in_session:
-            pool = ["You begin, and a rhythm takes shape with the condom in place.", "A brief shift, then you start to find the pace, the condom still between you."] if condom_used else ["You begin without a condom between you, taking a moment to find the pace.", "You start without protection, and the first uncertain rhythm grows steadier."]
+            pool = ["You push into her with the condom on, and a rhythm starts to build.", "You sink into her, the condom between you, and start to find the pace."] if condom_used else ["You push into her bare, nothing between you, taking a moment to find the pace.", "You slide in without a condom, and the first uncertain strokes grow steadier."]
         else:
-            pool = ["You continue the rhythm, the condom still in place.", "The movement carries on; you find the pace again, still protected by the condom."] if condom_used else ["You continue the rhythm without a condom between you.", "The pace carries on, still without the barrier of a condom."]
+            pool = ["You keep fucking her, the condom still in place.", "You find the pace again, still wrapped in the condom."] if condom_used else ["You keep fucking her bare.", "You keep the pace going, skin to skin, no condom between you."]
         if broken:
-            pool = ["The movement continues, but the torn condom is no longer a barrier.", "The pace carries on with the damaged condom still in place; it no longer keeps you covered."]
+            pool = ["You keep going, but the torn condom isn't a barrier anymore.", "The pace carries on with the damaged condom still on you; it no longer keeps you covered."]
         text = renpy.random.choice(pool)
         if first_with_player:
             text += " This is your first time with her like this; there is no familiar pace to fall back on yet."
@@ -250,7 +283,7 @@ init -3 python:
         if internal and store.vt_force_creampie_active:
             return True
         if not pregnancy_risk:
-            descriptions = VT_FINISH_CONTAINED
+            descriptions = VT_FINISH_CONTAINED if internal else VT_FINISH_EXTERNAL_CONTAINED
             reply = "contained"
         elif broken:
             descriptions = VT_FINISH_BREAK if aware else VT_FINISH_BREAK_UNNOTICED
@@ -263,6 +296,7 @@ init -3 python:
         else:
             descriptions = (VT_FINISH_EXTERNAL_LEAK if options["withdrawal"] else VT_FINISH_EXTERNAL_CONTACT_LEAK) if condom_used else external_description
             reply = "external"
+        vt_note_finish_closing(girl, known_break=(reply == "break"))
         text = renpy.random.choice(descriptions)
         if internal and options["first_with_player"]:
             text = "This is your first time with her like this; there is no familiar pace to fall back on yet. " + text
@@ -271,7 +305,7 @@ init -3 python:
         vt_queue_finisher_narration("vt_fetish_dialog", text)
         # Withdrawal's negotiated/adverse reply is emitted by its gate, after the act.
         if not options["skip_responses"] and not store.vt_pullout_external_active:
-            vt_queue_finisher_narration("vt_finish_girl_reply", vt_voice(girl, vt_finish_reply_pool(girl, reply), "Give me a moment."))
+            vt_queue_finisher_narration("vt_finish_girl_reply", vt_voice(girl, vt_finish_reply_pool(girl, reply, internal=internal), "Give me a moment."))
         return True
 
 # Registered action objects and chooser dictionaries keep their identities/requirements/costs.
@@ -333,7 +367,7 @@ label vt_direct_vaginal_buildup:
         call vt_vaginal_buildup(additional_subtags=se_additional_webm_sub_tags, skip_descriptions=sex_skip_descriptions, skip_responses=sex_skip_responses)
     return
 
-label vt_vaginal_buildup(additional_subtags=None, skip_descriptions=False, skip_responses=False, force_cum=False, ask_to_cum=False, force_orgasm=False, can_deny_orgasm=True):
+label vt_vaginal_buildup(additional_subtags=None, skip_descriptions=False, skip_responses=False, force_cum=False, ask_to_cum=False, force_orgasm=False, can_deny_orgasm=True, select_base_description=False):
     # The hook supplies insertion/first/repeat text once; the rest mirrors the base action.
     $ apply_action_impacts("fuck_pussy")
     $ media_helper.show_video("fuck_pussy", selected_girl, additional_subtags)
@@ -355,6 +389,9 @@ label vt_vaginal_buildup(additional_subtags=None, skip_descriptions=False, skip_
     $ can_deny_orgasm = can_deny_orgasm and not force_orgasm
     if force_orgasm and not selected_girl.just_came:
         $ selected_girl.just_came = True
+    # Legacy scene callers retain the base selector/RNG draw, without a second insertion.
+    if select_base_description and not skip_descriptions:
+        $ action_description = player.get_description_for_action("fuck_pussy", selected_girl)
     if selected_girl.just_came:
         call generic_action_orgasm("fuck_pussy", additional_subtags=additional_subtags, skip_descriptions=skip_descriptions, skip_responses=skip_responses, can_deny_orgasm=can_deny_orgasm)
         if player.just_came:

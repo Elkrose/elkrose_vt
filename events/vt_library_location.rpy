@@ -136,9 +136,7 @@ label vt_between_the_stacks:
                     
                     selected_girl.character "Time is a tickin, get dickin, Professor!"
                                    
-                    $ apply_action_impacts("fuck_pussy")
-
-                    call generic_action_fuck_pussy(additional_subtags=additional_subtag, skip_descriptions=False, skip_responses=False, force_cum=True, ask_to_cum=False, force_orgasm=True)
+                    call vt_vaginal_buildup(additional_subtags=additional_subtag, skip_descriptions=False, skip_responses=False, force_cum=True, ask_to_cum=False, force_orgasm=True, select_base_description=True)
                     
                     "As you both recover from your quick study session, you almost accidentally pinch your dick while zipping up."
 

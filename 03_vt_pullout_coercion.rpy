@@ -346,6 +346,9 @@ init python:
         # Wants a condom now -> the condom gate handles it, not this.
         if vt_condom_now(girl, "vaginal"):
             return False
+        finish_preference = vt_finish_permission(girl, "creampie_pussy")
+        if finish_preference is not None:
+            return not finish_preference
         if getattr(girl, "birth_control", False):
             return False
         if getattr(girl, "pregnant", False):
@@ -535,7 +538,7 @@ label vt_pullout_climax_gate(action_name=None, additional_subtags=None, skip_des
     python:
         _pg_girl = selected_girl
         _pg_real = "vt_vaginal_finisher"     # cum inside
-        _pg_pullout = "vt_withdrawal_finisher"   # pull out (external)
+        _pg_pullout = "vt_finish_target_pussy"   # pull out (external)
 
     # Not a pull-out girl -> finish inside as chosen.
     if not vt_wants_pullout(_pg_girl):
