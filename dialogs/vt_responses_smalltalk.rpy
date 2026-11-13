@@ -2267,3 +2267,183 @@ init python:
             "crude":   ["I'm already fucking pregnant, Professor. Prevent it, risk it -- too late now, it's done."],
         }},
     ])
+
+    # The family topic resolves what the player knows before choosing from these replies.
+    VT_FAMILY_PREGNANCY_REPLIES = {
+        ("daughter", "both_by_player"): {
+            "compassionate": (
+                "It's a lot to take in... my mom and I, both carrying your children at the same time. Strange as it is, I'm glad we'll have each other to go through it with.",
+                "Seeing Mom go through this too makes me feel less alone. We're both having your children, and she's the one person I can talk to without explaining why it's complicated.",
+                "Mom's carrying your baby too. I keep getting stuck on that part. Then I remember she's probably just as overwhelmed as I am. I want to be there for her.",
+            ),
+            "sexualized": (
+                "Both of us, round with your babies at the same time? God, that's messed up... and it turns me on more than it should.",
+                "Mom and I are both having your babies. Even saying that feels like I've told you a secret we all already know. I can't stop smiling at how strange it sounds.",
+                "Mom and I, both having your children. Try saying that with a straight face, Professor. I can barely do it myself.",
+            ),
+            "dominate": (
+                "I want to ask Mom how she's holding up, Professor. She's having your baby, and so am I. I don't know what I'd say if she asked me first.",
+                "Mom and I are both having your children, Professor. I want to talk to her about it. I keep practicing the first sentence and stopping before I get to the second.",
+                "I want to be honest with you, Professor. Knowing Mom's carrying your baby too makes me want to ask for help, even if I haven't quite worked out what I'd ask for.",
+            ),
+            "transactional": (
+                "My mom and I, pregnant with your kids at the same time... I don't really know how I'm supposed to feel about that.",
+                "Mom and I are both having your kids. That's a lot to take on at once, and I need a minute before I can tell you how I feel about it.",
+                "I know Mom's carrying your baby too. I'm trying to take in what this means for me before I start guessing what it means for the three of us.",
+            ),
+        },
+        ("daughter", "both_expecting"): {
+            "compassionate": (
+                "It's strange, both of us expecting at once. At least neither of us has to go through it alone.",
+                "Mom and I are both expecting, so at least I can talk to her about the weird little things that make no sense to anyone else.",
+                "I thought I'd be asking Mom about what she remembered. Now we're both expecting, so we can compare notes as we go.",
+            ),
+            "sexualized": (
+                "My mom and I, both pregnant at the same time? That's... a lot to sit with, honestly.",
+                "Mom and I, both expecting at once. That sounds like gossip I'd laugh at if it were about anyone else. Living it is a lot more interesting.",
+                "My mom and I both pregnant? Go ahead, you can look surprised. I did, and I'm one of the people it happened to.",
+            ),
+            "dominate": (
+                "I hadn't thought about it that way, Professor. Both of us expecting at once -- it's just a coincidence, that's all.",
+                "I'm still getting used to it, Professor. With Mom and me both expecting, I think I'd rather let her decide when we talk about it together.",
+                "When you say it out loud like that, it does feel strange, Professor. Mom and I are both expecting. I'm trying to give her the same space I'd want.",
+            ),
+            "transactional": (
+                "It's weird, both of us being pregnant at the same time. It's a lot for one house.",
+                "Mom and I are both pregnant. I'm still thinking about what that changes for each of us. It might take me a while to have much to say.",
+                "We both have our own decisions to make. I'm fine talking about Mom, but I'd rather keep the details of the two pregnancies separate.",
+            ),
+        },
+        ("daughter", "relative_by_player"): {
+            "compassionate": (
+                "My mom, carrying your child... it's a lot to process. But I don't hate the idea of our families being tied together like that.",
+                "Mom's carrying your child. I worry about her sometimes, and I hope she feels she can talk to both of us when things get hard.",
+                "It'll take me a while to get used to Mom having your baby. She's still my mom, though. If she needs me, I want her to know she can ask.",
+            ),
+            "sexualized": (
+                "You got my mom pregnant? God, that's filthy... and I can't stop thinking about it.",
+                "So Mom's having your baby. I was going to play it cool when you brought it up, but that plan lasted about two seconds.",
+                "My mom, carrying your child. I had a very clever remark ready for this, Professor, and somehow all I've got left is a grin.",
+            ),
+            "dominate": (
+                "So my mother is carrying your child, Professor. I suppose that's simply how it is now.",
+                "Yes, Professor, I know Mom's carrying your child. I think I'll follow her lead on what she's comfortable talking about.",
+                "I did wonder how to bring up the fact that Mom's having your baby, Professor. I wanted to give her a chance to tell me how she feels first.",
+            ),
+            "transactional": (
+                "I still don't really know what to think about my mom carrying your baby. It's a lot to wrap my head around.",
+                "My mom's having your baby. I still have questions, but I think most of them are ones I need to ask her.",
+                "Mom's carrying your child. I'm trying to work out how that changes things in our family. Give me a little time with it.",
+            ),
+        },
+        ("daughter", "relative_expecting"): {
+            "compassionate": (
+                "I know about my mom. It's strange to think about, but I'm glad she's not going through it alone.",
+                "I'm still getting used to Mom being pregnant. I hope she knows she can call me, even if all she wants is someone to listen.",
+                "When I think about Mom expecting, mostly I want to make sure she has someone to lean on. I'd like to be that person if she wants.",
+            ),
+            "sexualized": (
+                "My mom, pregnant? That's... a weirdly hot thing to think about, honestly.",
+                "Mom's pregnant. There are about six jokes I could make, and I'd get a look for every single one of them. I'll behave. Mostly.",
+                "I didn't expect news about Mom to make me blush, but here we are. Give me a second and I'll think of something clever to say.",
+            ),
+            "dominate": (
+                "Yes, I know about my mother. It changes things around the house, but it's really none of my business, Professor.",
+                "I know Mom's expecting, Professor. I think she'll talk about it when she wants to. I'd rather leave that up to her.",
+                "I know about her pregnancy, Professor. I've thought about asking whether she needs anything. I think I'd be better at helping than talking about how I feel.",
+            ),
+            "transactional": (
+                "It's strange, knowing my mom is pregnant. I'm still getting used to the idea.",
+                "I'm still sorting out what Mom's pregnancy means for us. I don't have a tidy answer for you yet.",
+                "I know she's expecting. I don't really want to speak for Mom, especially on something this personal.",
+            ),
+        },
+        ("mother", "both_by_player"): {
+            "compassionate": (
+                "My daughter and I, both carrying your children at the same time... it's not how I imagined motherhood again, but I'm grateful we'll have each other.",
+                "I never pictured sharing this part of my life with my daughter. We're both having your children, and I hope she knows she can lean on me. I may need to lean on her too.",
+                "My daughter is carrying your child too. When she asks me what it's like, I'll have an answer from this morning for a change.",
+            ),
+            "sexualized": (
+                "Both of us round with your children at once -- mother and daughter. It's obscene... and I love every second of it.",
+                "My daughter and I are both carrying your children. I had every intention of being very serious about this, Professor. Then I caught the look on your face.",
+                "The two of us are having your children, and I still catch myself smiling at how much that sentence surprises me. I suspect I'll enjoy watching you get used to it.",
+            ),
+            "dominate": (
+                "I want to tell my daughter we'll be all right, Professor. We're both carrying your children, and right now I wish I could believe that myself.",
+                "I'm trying to stay composed, Professor. My daughter and I are both carrying your children, and there are times when I feel I ought to have an answer for her. I don't always have one.",
+                "I appreciate you asking, Professor. My daughter and I are both carrying your children, and I've been so busy thinking about her that I haven't let myself wonder what I want from all of this.",
+            ),
+            "transactional": (
+                "My daughter and I, pregnant with your children at the same time. I'm still working out how I feel about all of it.",
+                "My daughter and I are both having your children. I've started thinking about what each of us will need. My feelings are taking a little longer to catch up.",
+                "Knowing we're both carrying your children is a lot to take in. I need some time with my daughter before I know what I'm comfortable saying to anyone else.",
+            ),
+        },
+        ("mother", "both_expecting"): {
+            "compassionate": (
+                "It's strange, the two of us expecting at once. At least we can lean on each other through it.",
+                "We're both expecting. I want my daughter to know she can tell me when she's had a hard day, and I hope I can do the same with her.",
+                "My daughter and I are both pregnant, and I find myself relieved that we can talk about things neither of us would usually bring up. If we're both awake worrying, at least we'll know who to call.",
+            ),
+            "sexualized": (
+                "My daughter and I, both pregnant at the same time. That's a lot to sit with.",
+                "My daughter and I, expecting at the same time. I'd give you the respectable version of how I feel about it, Professor, but I'd have trouble keeping a straight face.",
+                "I keep catching myself grinning at the timing. Both of us pregnant at once. That would have sounded absurd even to me before it happened.",
+            ),
+            "dominate": (
+                "It's simply a coincidence, Professor -- the two of us expecting at once. Nothing more than that.",
+                "I appreciate you asking, Professor. With both of us expecting, I think it's best to give my daughter room to talk about her own pregnancy in her own time.",
+                "Yes, Professor, I know how unusual it is. My daughter and I are both expecting, and for now I'm trying to take each day as it comes.",
+            ),
+            "transactional": (
+                "It's odd, both of us pregnant under the same roof at once. It's a lot to manage.",
+                "My daughter and I are both pregnant. I'm thinking about how to be available when she needs me and still make time for my own appointments.",
+                "The two of us are expecting at the same time. I think we need a little room to decide what we want to share and what we'd rather keep to ourselves.",
+            ),
+        },
+        ("mother", "relative_by_player"): {
+            "compassionate": (
+                "My daughter, carrying your child... I won't pretend that's easy to sit with, but I don't regret our families being tied together this way.",
+                "I know my daughter's having your baby. More than anything, I want her to feel she has people around her she can count on.",
+                "My daughter is carrying your child. I'm still taking it in, but I love her, and I want her to know she's welcome to come to me even on the hard days.",
+            ),
+            "sexualized": (
+                "You got my daughter pregnant? As depraved as that is, I can't say the thought doesn't excite me.",
+                "My daughter is having your baby. I thought I had a composed answer ready, Professor. Then you asked me straight out, and I found myself smiling.",
+                "My daughter's carrying your child. You chose your words very carefully just now, Professor. I almost wish you hadn't.",
+            ),
+            "dominate": (
+                "So my daughter is carrying your child, Professor. I suppose that is simply the way of things.",
+                "Yes, Professor, I know my daughter is carrying your child. I'd like to hear from her how much she wants me to be involved before I make any assumptions.",
+                "I have some worries about my daughter having your baby, Professor. I'd rather talk them through with her first. I hope you'll understand.",
+            ),
+            "transactional": (
+                "I'm still adjusting to the idea of my daughter carrying your child. It's a lot for one family.",
+                "My daughter is carrying your child. I need to know what she wants for herself before I decide how I feel about the rest of it.",
+                "I know my daughter's having your baby. It's a conversation I want to have with her when we have time to sit down properly.",
+            ),
+        },
+        ("mother", "relative_expecting"): {
+            "compassionate": (
+                "I know about my daughter. It's not the easiest thing to sit with, but I'm glad she isn't going through it alone.",
+                "I'm glad my daughter has people she can talk to. I want her to know she can lean on me as much or as little as she needs.",
+                "I'm still getting used to the news. I keep thinking about what would have helped me back then, and I hope I can offer my daughter some of that.",
+            ),
+            "sexualized": (
+                "My daughter, pregnant? I really shouldn't find that as interesting as I do.",
+                "My daughter is pregnant. I know I'm expected to be very solemn about it, but sometimes a little humor is exactly what gets us through a conversation like this.",
+                "I still find myself smiling at how thoroughly my daughter's news caught me off guard. I thought I had a better poker face than that.",
+            ),
+            "dominate": (
+                "Yes, I'm aware of my daughter's condition. It's a family matter, Professor, nothing you need concern yourself with.",
+                "I know my daughter's expecting, Professor. I'd like to leave it to her to decide what she wants to tell people.",
+                "Yes, I'm aware, Professor. I plan to listen to my daughter first and give her time to tell me what she needs.",
+            ),
+            "transactional": (
+                "It's strange, knowing my daughter is pregnant. I'm still getting used to the idea.",
+                "My daughter is expecting. It raises a lot of practical questions, but I think she deserves time to answer those for herself.",
+                "I'm still taking in the news about my daughter. For now I'd like to keep our conversations about it in the family.",
+            ),
+        },
+    }

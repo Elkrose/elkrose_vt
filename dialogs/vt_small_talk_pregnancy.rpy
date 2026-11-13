@@ -7,8 +7,19 @@ default vt_baby_checkin_days = {}
 # Menu-`set` of pregnancy sub-menu captions already chosen this entry -- the menu hides items whose
 # caption is in it (they disappear, unlike an `if`-gate which greys under menu_include_disabled=True).
 default vt_preg_menu_seen = set()
+# Reset on entry to the pregnancy menu. Contains literal captions hidden for that entry.
+default vt_preg_main_menu_hidden = set()
 
 init python:
+    def vt_family_pregnancy_reply(girl, role, both_pregnant, relative_by_player, both_by_player):
+        if both_pregnant:
+            situation = "both_by_player" if both_by_player else "both_expecting"
+        else:
+            situation = "relative_by_player" if relative_by_player else "relative_expecting"
+        tones = VT_FAMILY_PREGNANCY_REPLIES[role, situation]
+        replies = tones.get(girl.dominant_approach, tones["transactional"])
+        return renpy.random.choice(replies)
+
     def vt_bc_pitch_hint(girl, leaning_ok, bc_need=None):
         # The greyed-tooltip text for a birth-control persuasion pitch: report the FIRST unmet gate
         # condition so the disabled option explains itself. The pitches are now ASKABLE once she's in
@@ -704,7 +715,31 @@ label vt_preg_main_menu:
     # never wrongly calls the baby yours.
     $ _preg_is_players = selected_girl.pregnant and selected_girl.player_knows_pregnant and selected_girl.knows_pregnant and selected_girl.preg_father == "player"
     $ _preg_topic_label = "About your pregnancy..." if _preg_is_players else "What are your thoughts on pregnancy?"
+    # Discuss a relative's pregnancy after she knows and the player has learned about it.
+    # The household is assumed to share the news once both knowledge gates are met.
+    $ _fam_other = None
+    if is_student and hasattr(selected_girl, "mother") and selected_girl.mother:
+        $ _fam_other = selected_girl.mother
+    elif is_base_mother and hasattr(selected_girl, "daughter") and selected_girl.daughter:
+        $ _fam_other = selected_girl.daughter
+    $ _fam_cross_aware = bool(_fam_other) and getattr(_fam_other, "pregnant", False) and getattr(_fam_other, "knows_pregnant", False) and getattr(_fam_other, "player_knows_pregnant", False)
+    # Richer content for the rarer case where BOTH of them are pregnant at once.
+    $ _fam_both_pregnant = _fam_cross_aware and selected_girl.pregnant and selected_girl.knows_pregnant and selected_girl.player_knows_pregnant
+    $ _fam_other_is_players = _fam_cross_aware and getattr(_fam_other, "preg_father", None) == "player"
+    $ _fam_both_are_players = _fam_other_is_players and _preg_is_players
+    if is_student:
+        $ _fam_topic_caption = "How do you feel about your mother expecting too?" if _fam_both_pregnant else "How do you feel about your mother expecting?"
+    elif is_base_mother:
+        $ _fam_topic_caption = "How do you feel about your daughter expecting too?" if _fam_both_pregnant else "How do you feel about your daughter expecting?"
+    else:
+        $ _fam_topic_caption = ""
+    $ vt_preg_main_menu_hidden = set()
+    if not _fam_cross_aware or not _fam_topic_caption:
+        # The menu set uses the literal caption, before substitution.
+        $ vt_preg_main_menu_hidden.add("[_fam_topic_caption]")
+
     menu:
+        set vt_preg_main_menu_hidden
         # BIRTH CONTROL OPTIONS
         "What are your thoughts on birth control methods?":
             player.character "What are your thoughts on birth control methods?"
@@ -1175,6 +1210,9 @@ label vt_preg_main_menu:
             else:
                 call vt_preg_general_beat
 
+        "[_fam_topic_caption]":
+            jump vt_preg_family_cross_aware
+
         # Back out to the small-talk topic list. make_small_talk (the base dispatcher) counts a topic as
         # used the instant it returns and charges 10 minutes, which would wrongly burn a small-talk action
         # and can trip the daily "enough small talk" cap. So instead of a plain return we use the base's
@@ -1186,6 +1224,20 @@ label vt_preg_main_menu:
     # Reached by birth control (a protection topic) and the non-pregnant general beat; the reaction
     # guards on pregnant+known so it only speaks after a pregnant girl's protection question.
     call vt_preg_protection_reaction
+    jump vt_preg_wrapup
+
+label vt_preg_family_cross_aware:
+    # The menu owns the disclosure gate. Refer to both pregnancies only when both are known.
+    player.character "[_fam_topic_caption]"
+
+    if is_student or is_base_mother:
+        python:
+            _line = vt_family_pregnancy_reply(
+                selected_girl, "daughter" if is_student else "mother",
+                _fam_both_pregnant, _fam_other_is_players, _fam_both_are_players,
+            )
+        selected_girl.character "[_line]"
+
     jump vt_preg_wrapup
 
 label vt_preg_smalltalk_reenter:

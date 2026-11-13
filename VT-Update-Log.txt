@@ -1,5 +1,12 @@
 Virginal Tracker Mod
 
+1.1.8
+
+- Added mother/daughter pregnancy small talk under Pregnancy & Protection (#22).
+  The question appears once the relative and the player know about her pregnancy.
+- Added randomized replies for both speakers, with variants for her tone, which
+  pregnancies are known, and whether the player is the father.
+
 1.1.7
 
 - Separated body-contact protection from destination-specific finishing permissions (#25),
