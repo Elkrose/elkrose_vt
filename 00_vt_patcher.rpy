@@ -1,3 +1,5 @@
+default persistent.vt_baby_desire_scale = 1.0
+
 # VT MOD 
 
 screen vt_firsttime_notification(message, duration=3.0):
@@ -315,12 +317,12 @@ init python:
     # Per-ask weights, all on 0-100 terms that sum to 1.0 so the blend stays 0-100.
     # Caution stats enter inverted ("_inv" -> 100 - stat). Weights are tunable; revisit during playtest.
     VT_WILLINGNESS_WEIGHTS = {
-        "stop_bc_breed":   {"baby_desire": .40, "corruption": .20, "fear_inv": .20, "discipline_inv": .10, "affection": .10},
+        "vaginal_finish":  {"baby_desire": .40, "corruption": .20, "fear_inv": .20, "discipline_inv": .10, "affection": .10},
         "go_bare_vaginal": {"baby_desire": .20, "corruption": .40, "fear_inv": .25, "discipline_inv": .10, "affection": .05},
         "go_bare":         {"corruption": .55, "fear_inv": .20, "naturism": .20, "affection": .05},
-        "natural_cycle":   {"corruption": .10, "discipline_inv": .20, "naturism": .60, "affection": .10},
-        "start_bc":        {"baby_desire_inv": .25, "corruption_inv": .15, "fear": .30, "discipline": .20, "intellect": .10},
         "keep_pregnancy":  {"baby_desire_inv": .40, "corruption_inv": .20, "fear": .20, "discipline": .10, "affection_inv": .10},
+        # SafeDOCK keeps the original start-BC weights and the shared player nudge.
+        "take_safedock":   {"baby_desire_inv": .25, "corruption_inv": .15, "fear": .30, "discipline": .20, "intellect": .10},
     }
     # go_bare_anal / _oral / _body share the generic "go_bare" weights.
 
@@ -349,9 +351,47 @@ init python:
             n += min(8.0, getattr(player, "control", 0) * 0.8)
         return max(-15.0, min(15.0, n))
 
+    def vt_bc_decision_details(girl, ask, player=None):
+        """Live contraception response only; no RNG, state writes or preference migration.
+        Natural-cycle persuasion is still a request to stop BC, not a separate shortcut.
+        Finish permission keeps its existing vaginal_finish formula and saved agreements."""
+        if ask not in ("start_bc", "stop_bc_breed", "natural_cycle"):
+            raise ValueError("Unknown birth-control request: " + str(ask))
+        if player is None:
+            player = getattr(renpy.store, "player", None)
+
+        def bounded(obj, key, low=0.0, high=100.0):
+            return max(low, min(high, float(getattr(obj, key, 0) or 0)))
+
+        interest = .70 * bounded(girl, "baby_desire") + .30 * bounded(girl, "affection")
+        fear = bounded(girl, "fear") / 100.0
+        discipline = bounded(girl, "discipline") / 100.0
+        control = bounded(player, "control", -10.0, 10.0) / 10.0
+        fear_base = fear ** 2
+        fear_effective = fear_base + control * fear_base * (1.0 - fear_base)
+        fear_help = 10.0 * fear_effective * (1.0 - .75 * discipline)
+        corruption_help = .05 * bounded(girl, "corruption")
+        compassion_help = 4.0 * (bounded(player, "compassion", -10.0, 10.0) / 10.0) * (
+            bounded(girl, "affection") + bounded(girl, "intellect")) / 200.0
+        reputation_help = .02 * bounded(player, "reputation")
+        player_raw = compassion_help + reputation_help
+        player_help = max(-8.0, min(8.0, player_raw))
+        support = max(-10.0, min(20.0, fear_help + corruption_help + player_help))
+        baseline = 100.0 - interest if ask == "start_bc" else interest
+        score = max(0.0, min(100.0, baseline + support))
+        # Counterfactual supports wording only; it never changes the resolved decision.
+        without_fear = max(0.0, min(100.0, baseline + max(-10.0, min(20.0, corruption_help + player_help))))
+        return {"ask": ask, "interest": interest, "baseline": baseline,
+                "fear_help": fear_help, "corruption_help": corruption_help,
+                "compassion_help": compassion_help, "reputation_help": reputation_help,
+                "player_help": player_help, "support": support,
+                "without_fear": without_fear, "score": score}
+
     def vt_willingness(girl, ask, player=None):
-        """0-100 consent score for `ask` (VT_WILLINGNESS_WEIGHTS): her stats + a capped player nudge.
-        Unknown ask -> 50 (never a hard refuse)."""
+        """0-100 response score. Contraception has its own preference/pressure model;
+        other asks retain their weighted stats and player nudge. Unknown ask -> 50."""
+        if ask in ("start_bc", "stop_bc_breed", "natural_cycle"):
+            return vt_bc_decision_details(girl, ask, player)["score"]
         weights = VT_WILLINGNESS_WEIGHTS.get(ask)
         if weights is None:
             return 50.0
@@ -469,6 +509,7 @@ init python:
         "go_bare_vaginal": ("open", 2),
         "stop_bc_breed":   ("open", 2),
         "keep_pregnancy":  ("guarded", 0),   # DryDOCK: ending an existing pregnancy, not a breeding-kink ask
+        "take_safedock":   ("guarded", 0),   # Emergency prevention, no history requirement
     }
     _VT_TIER_RANK = {"closed": 0, "guarded": 1, "open": 2}
 
@@ -3634,10 +3675,11 @@ init -3 python:
     # here to make creampies push pregnancy desire faster or slower.
     VT_BABY_DESIRE_XP_PER_POINT = 50
 
-    def vt_handle_baby_desire(action_name: str, target_girl: Girl, creampie_type: str) -> None:
+    def vt_handle_baby_desire(action_name: str, target_girl: Girl, creampie_type: str, *, vaginal_base_chance=0) -> None:
         """
         Handles baby desire increases with fetish integration
         creampie_type: 'oral', 'vaginal', 'anal', 'boobs', 'thighs', 'ass_cumshot', 'pussy_cumshot'
+        The vaginal finisher supplies its resolved base chance. Zero skips the roll.
         """
         # Exit early if not a creampie action
         if "creampie" not in action_name and "cumshot" not in action_name and action_name != "facial":
@@ -3646,7 +3688,7 @@ init -3 python:
         # Base chance to increase baby desire (varies by creampie type)
         base_chances = {
             'oral': 5,
-            'vaginal': 20,
+            'vaginal': vaginal_base_chance,
             'anal': 2,
             'boobs': 2,
             'thighs': 2,
@@ -3658,6 +3700,8 @@ init -3 python:
             return
             
         base_chance = base_chances[creampie_type]
+        if base_chance <= 0:
+            return
         
         # Get relevant fetish level
         fetish_level = 0
@@ -3674,24 +3718,15 @@ init -3 python:
         # Higher fetish level = higher chance to increase baby desire
         fetish_modifier = fetish_level * 0.1  # 0.1% increase per fetish level
         
-        # Awareness modifier - unaware of broken condom increases chance
-        unaware_modifier = 0
-        awareness_attr = {
-            "oral": "aware_oral_condom", "vaginal": "aware_vaginal_condom",
-            "anal": "aware_anal_condom", "boobs": "aware_boob_condom",
-            "thighs": "aware_thigh_condom", "ass_cumshot": "aware_ass_cumshot_condom",
-            "pussy_cumshot": "aware_pussy_cumshot_condom",
-        }[creampie_type]
-        if hasattr(target_girl, awareness_attr) and not getattr(target_girl, awareness_attr):
-            unaware_modifier = 20
-        
         # Special modifier for pussy cumshot (highest pregnancy relevance)
         pussy_modifier = 0
         if creampie_type == "pussy_cumshot":
             pussy_modifier = 10
         
         # Calculate final chance
-        final_chance = min(85, base_chance + fetish_modifier + unaware_modifier + pussy_modifier)
+        # Scale the frequency of the award, keeping the XP amount independent.
+        vt_scale = getattr(persistent, "vt_baby_desire_scale", 1.0) or 1.0
+        final_chance = min(85, (base_chance + fetish_modifier + pussy_modifier) * vt_scale)
         
         # Roll for baby desire increase
         if renpy.random.randint(1, 100) <= final_chance:
@@ -4713,6 +4748,15 @@ init -3 python:
 
     database_apply_action_impacts_hooks.append(vt_catch_cumshot_pussy)
 
+    def _vt_vaginal_desire_base_chance(girl, action_name, condom_used, exposed):
+        # Coercion, failed withdrawal and sleep actions are ineligible.
+        if action_name != "creampie_pussy" or getattr(store, "vt_force_creampie_active", False):
+            return 0
+        if condom_used and (not exposed or not girl.aware_vaginal_condom):
+            # The selected protected finish proceeded under the existing action gate.
+            return 20 if exposed else 10
+        return 40 if vt_finish_permission(girl, "creampie_pussy") is True else 0
+
     def vt_catch_vaginal_creampie(action_name: str, action_failed: bool, target_girl: Union[Girl, None], girls_who_got_impacts: list[Girl]) -> None:
         """Handles vaginal creampie actions (creampie_pussy)"""
         if action_failed or not target_girl:
@@ -4841,20 +4885,19 @@ init -3 python:
             target_girl.first_time_pussy = False
             if not getattr(store, "vt_force_creampie_active", False):
                 vt_firsttime_notify(f"{target_girl.first_name}'s first time sex with you!", duration=5.0)
-        # --- START: PREGNANCY RISK LOGIC ---
-        # This block now uses the pregnancy_risk flag set above.
         if pregnancy_risk:
             target_girl.vaginal_cum = getattr(target_girl, 'vaginal_cum', 0) + 1
 
-            # Handle fetish progression using centralized function -- skipped for a forced creampie
-            # (see 03_vt_pullout_coercion.rpy's vt_force_creampie_active): she isn't conceding, so
-            # this shouldn't grow her fetish/baby_desire the same way a willing creampie does.
+            # Preserve fetish progression for exposed finishes outside force/accident paths.
             if not getattr(store, "vt_force_creampie_active", False):
                 vt_handle_cum_fetishes(action_name, target_girl, fetish_category = "vaginal")
 
-                # Handle baby desire increase using centralized function
-                vt_handle_baby_desire(action_name, target_girl, "vaginal")
-            
+        vaginal_base_chance = _vt_vaginal_desire_base_chance(target_girl, action_name, condom_used, pregnancy_risk)
+        if vaginal_base_chance:
+            vt_handle_baby_desire(action_name, target_girl, "vaginal", vaginal_base_chance=vaginal_base_chance)
+
+        # Conception depends on exposure, including breaks she did not notice.
+        if pregnancy_risk:
             # Immediate pregnancy check
             if not target_girl.pregnant and not target_girl.just_had_baby and target_girl.planb_pills <= 0:
                 try:

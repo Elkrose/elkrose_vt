@@ -366,7 +366,7 @@ init python:
         if player is None:
             player = getattr(store, "player", None)
 
-        band = vt_willingness_band(girl, "stop_bc_breed", player)
+        band = vt_willingness_band(girl, "vaginal_finish", player)
         if band == "eager":
             if vt_set_accepts_creampie(girl, True):                # permanent
                 outcome, line_key = "yes_perm", "yes_perm"

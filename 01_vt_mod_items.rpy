@@ -455,19 +455,9 @@ init -3 python:
                     vt_preg_notify(vt_pill_reaction(girl, "prenatal_vitamins"), duration=3.5)
 
                 if self.id in ("planb_pill", "emergency_pill"):
-                    # Consent gate (04_vt_dock_coercion.rpy): she may refuse outright (not open to
-                    # the player managing her reproduction yet) or need talking into it (wants the
-                    # outcome the pill would prevent). Legal to renpy.call a label from here --
-                    # give_gift runs as a $-python statement inside the active label
-                    # give_girl_gift (label_give_girl_gift.rpy), same technique
-                    # 03_vt_pullout_coercion.rpy uses. vt_dock_gift_applied (set by the label)
-                    # reports whether she actually took it, for the ammo-spend check below.
+                    # Ren'Py resumes after the calling statement when the gate returns.
+                    # SafeDOCK's acceptance branch owns its inventory spend.
                     renpy.call("vt_dock_gift_gate", girl=girl, pill_id=self.id)
-
-                # Spend one unit of pill "ammo" now that the gift has been applied. A refused
-                # SafeDOCK/DryDOCK (blanket or persuaded-no) was never actually taken, so it isn't spent.
-                if self.id in ("planb_pill", "emergency_pill") and not vt_dock_gift_applied:
-                    pass
                 elif is_vt_pill:
                     vt_spend_pill_ammo(player, self.id)
 

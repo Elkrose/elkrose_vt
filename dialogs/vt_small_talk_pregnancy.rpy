@@ -9,8 +9,13 @@ default vt_baby_checkin_days = {}
 default vt_preg_menu_seen = set()
 # Reset on entry to the pregnancy menu. Contains literal captions hidden for that entry.
 default vt_preg_main_menu_hidden = set()
+# Scoped to a call made from an accepted invitation. Older saves default to Small Talk.
+default vt_bc_from_invite = False
 
 init python:
+    def vt_preg_sensitive_topics_available(girl, player):
+        return girl.pregnant or vt_topic_tier(girl, player) != "closed"
+
     def vt_family_pregnancy_reply(girl, role, both_pregnant, relative_by_player, both_by_player):
         if both_pregnant:
             situation = "both_by_player" if both_by_player else "both_expecting"
@@ -41,7 +46,19 @@ init python:
 label small_talk_pregnancy:
     jump vt_small_talk_pregnancy
 
-label vt_small_talk_pregnancy:
+label vt_small_talk_pregnancy(vt_bc_from_invite=False):
+    if vt_bc_from_invite:
+        # The invitation owns selected_girl and its location/return state. Restore
+        # this conversation's context when control goes back to the invitation.
+        $ renpy.dynamic("is_base_mother", "is_student", "is_other", "total_kids",
+            "kids_with_player", "kids_with_others", "is_currently_a_mother",
+            "pregnancy_phase", "player_knows", "she_knows", "girl_stats", "girl_approaches",
+            "sorted_girl_stats", "dominant_girl_stat1", "dominant_girl_value1",
+            "dominant_girl_stat2", "dominant_girl_value2", "dominant_girl_approach",
+            "girl_approach_value", "player_stats", "norm_compassion", "norm_control",
+            "norm_reputation", "norm_lust", "norm_arousal", "norm_greed",
+            "player_approaches", "dominant_approach", "approach_value", "is_natural_approach")
+
     # Clear identification of relationship types
     $ is_base_mother = False
     $ is_student = False
@@ -147,6 +164,9 @@ label vt_small_talk_pregnancy:
 
  
 
+    if vt_bc_from_invite:
+        jump vt_preg_personal_bc
+
     if not hasattr(selected_girl, "previous_pregnancy_reaction"):
         $ selected_girl.previous_pregnancy_reaction = "neutral"
     if not hasattr(selected_girl, "pregnancy_discussion_level"):
@@ -163,9 +183,13 @@ label vt_small_talk_pregnancy:
     # Skipped on the scheduled-follow-up path (it narrates its own approach) and when a
     # not-pregnant stranger is about to be refused at the CLOSED gate below.
     $ _preg_followup_pending = hasattr(selected_girl, "has_pregnancy_followup") and selected_girl.has_pregnancy_followup and has_discussed_pregnancy_before
-    $ _preg_topic_refused = (not selected_girl.pregnant) and vt_topic_tier(selected_girl, player) == "closed"
+    $ _preg_sensitive_topics = vt_preg_sensitive_topics_available(selected_girl, player)
+    $ _preg_topic_refused = not (_preg_sensitive_topics or vt_bc_general_available(selected_girl) or vt_bc_personal_available(selected_girl))
     if not _preg_followup_pending and not _preg_topic_refused:
-        "You approach [selected_girl] to discuss pregnancy and family matters."
+        if _preg_sensitive_topics:
+            "You approach [selected_girl] to discuss pregnancy and family matters."
+        else:
+            "You bring up the subject of protection with [selected_girl]."
 
     # # PREGNANCY DISCOVERY CHECK - JUMP TO SEPARATE LABEL IF PREGNANT AND DISCOVERY NEEDED
 
@@ -180,20 +204,17 @@ label vt_small_talk_pregnancy:
     else:
         $ renpy.log("No pregnancy discovery triggered - conditions not met")
 
-    # Layer 1 hard CLOSED gate (VT-Pregnancy-System.md section 7): a girl who is effectively a
-    # stranger -- low affection, low corruption and no sexual history, so her openness score
-    # sits below the CLOSED cut -- refuses the reproductive subject out of hand, however corrupt
-    # she is. The player has to build the relationship up first. Skipped while she is pregnant so
-    # a discovery / confession / follow-up is never blocked.
-    if not selected_girl.pregnant and vt_topic_tier(selected_girl, player) == "closed":
+    # Detailed pregnancy and protection topics retain the old openness check.
+    # General and personal BC have their own context gates.
+    if _preg_topic_refused:
         if is_base_mother:
-            selected_girl.character "That's a very personal subject, Professor, and I hardly know you. I'd rather not discuss my body or birth control with you."
+            selected_girl.character "I'd prefer to know you a little better before we get into anything personal, Professor."
         elif is_student:
-            selected_girl.character "Um... that's really personal, Professor. I-I don't know you well enough to talk about... pregnancy and things like that."
+            selected_girl.character "Could we talk about something else, Professor? We've barely had a chance to get to know each other."
         else:
-            selected_girl.character "That's an awfully personal thing to ask, Professor. I'm not comfortable discussing it with someone I barely know."
+            selected_girl.character "Let's get to know each other a little better first."
         return
-  
+
     # CHECK FOR ACTIVE FOLLOW-UP 
     # If we have a scheduled follow-up that's ready to happen
     if hasattr(selected_girl, "has_pregnancy_followup") and selected_girl.has_pregnancy_followup and has_discussed_pregnancy_before:
@@ -734,471 +755,28 @@ label vt_preg_main_menu:
     else:
         $ _fam_topic_caption = ""
     $ vt_preg_main_menu_hidden = set()
-    if not _fam_cross_aware or not _fam_topic_caption:
+    $ _preg_sensitive_topics = vt_preg_sensitive_topics_available(selected_girl, player)
+    if not vt_bc_general_available(selected_girl):
+        $ vt_preg_main_menu_hidden.add("What do you think about birth control in general?")
+    if not vt_bc_personal_available(selected_girl):
+        $ vt_preg_main_menu_hidden.add("Can we talk about your birth control?")
+    if not _preg_sensitive_topics:
+        $ vt_preg_main_menu_hidden.update(("About condoms...", "[_preg_topic_label]"))
+    if not _preg_sensitive_topics or not _fam_cross_aware or not _fam_topic_caption:
         # The menu set uses the literal caption, before substitution.
         $ vt_preg_main_menu_hidden.add("[_fam_topic_caption]")
 
     menu:
         set vt_preg_main_menu_hidden
         # BIRTH CONTROL OPTIONS
-        "What are your thoughts on birth control methods?":
-            player.character "What are your thoughts on birth control methods?"
-            # Reveal birth control status if player doesn't know yet
-            if not selected_girl.bc_status_known:
-                $ selected_girl.bc_status_known = True
-
-            # If she KNOWS she's pregnant, birth control is moot -- she says so, and the whole start/stop/
-            # breeding sub-menu is SKIPPED (no oblivious "let's prevent/risk pregnancy" questions). Pregnancy
-            # talk lives under "About your pregnancy...". A secret pregnancy (she doesn't know) frames it normally.
-            if selected_girl.pregnant and selected_girl.knows_pregnant:
-                $ _line = vt_say(selected_girl, "bc_already_pregnant", player)
-                selected_girl.character "[_line]"
-                jump vt_preg_wrapup
-            $ _line = vt_say(selected_girl, "bc_methods", player)
+        "What do you think about birth control in general?":
+            player.character "What do you think about birth control in general?"
+            $ _line = vt_bc_general_reply(selected_girl)
             selected_girl.character "[_line]"
+            return
 
-            # The salvaged family pitch (below) uses a caption aware of whether she's a mother and how many
-            # children she has -- a sibling vs another sibling -- so it reads right for base mothers and others.
-            # Also compute each pitch's "leaning" bool ONCE (reused by both the menu gate and its hint, so
-            # they can't drift) and the dynamic greyed-tooltip text that reports the actual blocking reason.
-            python:
-                if is_base_mother and total_kids == 1:
-                    _bc_family_pitch = "Do you think your daughter would like a sibling?"
-                elif total_kids >= 2:
-                    _bc_family_pitch = "Do you think your children would like another sibling?"
-                elif total_kids == 1:
-                    _bc_family_pitch = "Do you think your child would like a sibling?"
-                else:
-                    _bc_family_pitch = "Have you ever thought about starting a family together?"
-
-                _lean_natural = selected_girl.naturism > 50
-                _lean_family = (vt_baby_desire_band(selected_girl) in ("thinking", "obsessed", "fixation", "obsession")) or is_base_mother
-                _lean_thrill = vt_explicitness_register(selected_girl) in ("direct", "explicit", "crude")
-                _lean_health = selected_girl.discipline > 50
-                _bc_hint_natural = vt_bc_pitch_hint(selected_girl, _lean_natural, bc_need=True)
-                _bc_hint_family  = vt_bc_pitch_hint(selected_girl, _lean_family)
-                _bc_hint_thrill  = vt_bc_pitch_hint(selected_girl, _lean_thrill)
-                _bc_hint_health  = vt_bc_pitch_hint(selected_girl, _lean_health, bc_need=False)
-
-            menu:
-                "Have you considered starting birth control?|Only if she's not already on birth control" if not selected_girl.birth_control:
-                    if selected_girl.dominant_approach in ["compassionate", "dominate"]:
-                        $ selected_girl.birth_control = True
-                        $ selected_girl.apply_impacts({"discipline": (250, 750)})
-                        if selected_girl.dominant_approach == "compassionate":
-                            if is_base_mother:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You're right... as an experienced mother, I should be more responsible about family planning. I'll start birth control for our family's sake."
-                                else:
-                                    selected_girl.character "You're right... as an experienced mother, I should be more responsible about family planning. I'll start birth control."
-                            elif is_student:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You're right... I should be more responsible, especially since we already have a baby. My mom would be happy I'm being careful. I'll start birth control."
-                                else:
-                                    selected_girl.character "You're right... I should be more responsible. My mom would be happy I'm being careful. I'll start birth control."
-                            else:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You're right... I should be more responsible, especially since we already have a baby. I'll start birth control."
-                                else:
-                                    selected_girl.character "You're right... I should be more responsible. I'll start birth control."
-                        else:  # dominate approach
-                            if is_base_mother:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you think it's best, Professor. As an experienced mother, I will start birth control to better serve your wishes for our family."
-                                else:
-                                    selected_girl.character "If you think it's best, Professor. As an experienced mother, I will start birth control to better serve your wishes."
-                            elif is_student:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you think it's best, Professor. Since we already have a baby, I'll start birth control. Whatever you want."
-                                else:
-                                    selected_girl.character "If you think it's best, Professor. I'll start birth control. Whatever you want."
-                            else:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you think it's best, I'll start birth control for our family. Your will is my command."
-                                else:
-                                    selected_girl.character "If you think it's best, I'll start birth control. Your will is my command."
-                
-                    elif selected_girl.dominant_approach == "transactional":
-                        if is_base_mother:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Starting birth control? That costs money, Professor. As an experienced mother with our growing family, what are you offering to cover the expenses and compensate me for the inconvenience?"
-                            else:
-                                selected_girl.character "Starting birth control? That costs money, Professor. As an experienced mother, what are you offering to cover the expenses and compensate me for the inconvenience?"
-                        elif is_student:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Starting birth control? That costs money, Professor. Since we already have a baby, what are you offering to cover the expenses and compensate me?"
-                            else:
-                                selected_girl.character "Starting birth control? That costs money, Professor. What are you offering to cover the expenses and compensate me for the inconvenience?"
-                        else:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Starting birth control? That costs money, Professor. Since we already have a baby, what are you offering to cover the expenses and compensate me?"
-                            else:
-                                selected_girl.character "Starting birth control? That costs money, Professor. What are you offering to cover the expenses and compensate me for the inconvenience?"
-                        menu:
-                            "Offer 300 cash for birth control expenses?":
-                                if player.cash >= 300:
-                                    $ player.cash -= 300
-                                    $ selected_girl.cash += 300
-                                    $ selected_girl.birth_control = True
-                                    $ selected_girl.apply_impacts({"discipline": (250, 750), "corruption": (450, 750)})
-                                    if is_base_mother:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "300 covers the prescription and compensates me for being a responsible mother to our family. Fine, I'll start birth control."
-                                        else:
-                                            selected_girl.character "300 covers the prescription and compensates me for being a responsible mother. Fine, I'll start birth control."
-                                    elif is_student:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "300 for birth control? Oh my god, that's so much! Okay, yeah, I'll start taking them for our baby's sake. Thank you, Professor!"
-                                        else:
-                                            selected_girl.character "300 for birth control? Oh my god, that's so much! Okay, yeah, I'll start taking them. Thank you, Professor!"
-                                    else:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "300 covers the pills and my time. Fine, I'll start birth control for our family."
-                                        else:
-                                            selected_girl.character "300 covers the pills and my time. Fine, I'll start birth control."
-                                else:
-                                    $ selected_girl.birth_control = False
-                                    if is_base_mother:
-                                        selected_girl.character "Don't waste an experienced mother's time. Come back when you can afford my reproductive health."
-                                    elif is_student:
-                                        selected_girl.character "Oh... you don't have enough? That's okay... I'll figure something else out, I guess."
-                                    else:
-                                        selected_girl.character "Don't waste my time. Come back when you can afford my reproductive health."
-                                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                            
-                            # Only students get grade option
-                            "Grant her a grade bump of 15 percent?|Only available for students" if is_student:
-                                if selected_girl.grades >= 100:
-                                    selected_girl.character "But... my grades are already at maximum! A bump won't help much... can you offer something else?"
-                                    $ selected_girl.birth_control = False
-                                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                                else:
-                                    # Apply 15 point increase (not 15% of current grade)
-                                    $ new_grade = min(100, selected_girl.grades + 15)
-                                    $ selected_girl.grades = new_grade
-                                    $ selected_girl.birth_control = True
-                                    $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (750, 1500), "discipline": (-750, -250)})
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Fine. Guess you don't want to worry about having to support another child."
-                                    else:
-                                        selected_girl.character "A grade bump? Really? Oh my god, yes! My grades will be so easy! Deal! Start popping em now!"
-                            
-                            "Leave it be.":
-                                if is_base_mother:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to help support another child in our family."
-                                    else:
-                                        selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to help support another child."
-                                elif is_student:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Oh... okay. Well, if I get pregnant again, that's... your responsibility too, right? Just so we're clear?"
-                                    else:
-                                        selected_girl.character "Oh... okay. Well, if I get pregnant, that's... your responsibility too, right? Just so we're clear?"
-                                else:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to pay child support for our next baby."
-                                    else:
-                                        selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to pay child support."
-                                $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                    
-                    elif selected_girl.dominant_approach == "sexualized":
-                        if is_base_mother:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Birth control? But the risk of another baby with you is so exciting... though as an experienced mother, I guess I should be more careful. Maybe if you make it worth my while to stay on the pill?"
-                            else:
-                                selected_girl.character "Birth control? But the risk is so exciting... though as an experienced mother, I guess I should be more careful. Maybe if you make it worth my while to stay on the pill?"
-                        elif is_student:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Birth control? But the risk of another baby with you is so exciting! I don't know, Professor... you'd have to convince me it's worth giving up that thrill!"
-                            else:
-                                selected_girl.character "Birth control? But the risk is so exciting! I don't know, Professor... you'd have to convince me it's worth giving up that thrill!"
-                        else:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Birth control? But the risk of another baby with you is so exciting... I don't know, Professor. You'd have to convince me it's worth giving up that thrill!"
-                            else:
-                                selected_girl.character "Birth control? But the risk is so exciting... I don't know, Professor. You'd have to convince me it's worth giving up that thrill!"
-                    
-                    else:  # neutral or other approaches
-                        if is_base_mother:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "I'm not sure. As an experienced mother with our family, I should probably be more careful, but I don't like putting chemicals in my body."
-                            else:
-                                selected_girl.character "I'm not sure. As an experienced mother, I should probably be more careful, but I don't like putting chemicals in my body."
-                        elif is_student:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "I'm not sure... my mom said birth control is important, especially since we already have a baby, but I'm kind of scared of putting chemicals in my body."
-                            else:
-                                selected_girl.character "I'm not sure... my mom said birth control is important, but I'm kind of scared of putting chemicals in my body."
-                        else:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "I'm not sure. Since we already have a baby, maybe I should be more careful, but I prefer to let things happen naturally."
-                            else:
-                                selected_girl.character "I'm not sure. I prefer to let things happen naturally."
-                    
-                "Would you consider stopping birth control?|Only if she's on birth control" if selected_girl.birth_control:
-                    # Askable whenever she's on birth control and you're in this conversation -- no
-                    # relationship/history wall on the ASK, matching the persuasion pitches (the mod is
-                    # moving away from assuming these questions are player-directed; her corruption drives
-                    # it). Her WILLINGNESS band alone decides how readily; dominant_approach is VOICE/framing
-                    # only and no longer flips birth_control on its own (that no-floor flip was the old bug).
-                    $ _breed_band = vt_willingness_band(selected_girl, "stop_bc_breed")
-                    $ _breed_voice = selected_girl.dominant_approach
-                    if _breed_band == "eager" and _breed_voice != "transactional":
-                        $ selected_girl.birth_control = False
-                        $ selected_girl.apply_impacts({"baby_desire": (1000, 1500)})
-                        if selected_girl.dominant_approach == "compassionate":
-                            if is_base_mother:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You want me to stop birth control? To expand our family? As an experienced mother, I'd love that. I'll stop taking them right away for our growing family."
-                                else:
-                                    selected_girl.character "You want me to stop birth control... to start a family with you? As an experienced mother, I'd love that. I'll stop taking them right away."
-                            elif is_student:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You want me to stop birth control? So we could... have another baby? Wow! I'd love that! I'll stop taking them right away!"
-                                else:
-                                    selected_girl.character "You want me to stop birth control... so we could have a baby? Wow! I'd love that! I'll stop taking them right away!"
-                            else:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "You want me to stop birth control? I'd love that. I want to expand our family and experience everything with you naturally."
-                                else:
-                                    selected_girl.character "You want me to stop birth control? I'd love that. I want to start a family and experience everything with you naturally."
-                        elif selected_girl.dominant_approach == "sexualized":
-                            if is_base_mother:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "Stop birth control? So you can breed me again? Mmm... as an experienced woman, the thought of another baby with you is so hot. I'll stop taking them immediately."
-                                else:
-                                    selected_girl.character "You want me to stop birth control... so you can breed me? Mmm... as an experienced woman, the thought of your baby is so hot. I'll stop taking them immediately."
-                            elif is_student:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "Stop birth control? So you can get me pregnant again? Oh my god, that's so hot! Yes! I'll stop right now!"
-                                else:
-                                    selected_girl.character "You want me to stop birth control... so you can get me pregnant? Oh my god, that's so hot! Yes! I'll stop right now!"
-                            else:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "Stop birth control? So you can breed me again? Mmm... the thought of another baby with you is so hot. I'll stop taking them."
-                                else:
-                                    selected_girl.character "You want me to stop birth control... so you can breed me? Mmm... the thought of your baby is so hot. I'll stop taking them."
-                        elif selected_girl.dominant_approach == "dominate":
-                            if is_base_mother:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you wish me to stop birth control to expand our family, Professor. As an experienced mother, I will obey your command for our children."
-                                else:
-                                    selected_girl.character "If you wish me to stop birth control to start our family, Professor. As an experienced mother, I will obey your command."
-                            elif is_student:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you want me to stop birth control for our next baby, Professor. Okay, I'll stop taking them. Whatever you want."
-                                else:
-                                    selected_girl.character "If you want me to stop birth control for your first baby, Professor. Okay, I'll stop taking them. Whatever you want."
-                            else:
-                                if selected_girl.kids_with_player > 0:
-                                    selected_girl.character "If you wish me to stop birth control to expand our family, I will obey your command."
-                                else:
-                                    selected_girl.character "If you wish me to stop birth control to start our family, I will obey your command."
-                    elif _breed_voice == "transactional" and _breed_band in ("conditional", "eager"):
-                        # A transactional girl monetizes even a willing yes -- price beat (band-gated).
-                        if is_base_mother:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? So you can get me pregnant again? That's a significant financial commitment for our growing family, Professor. What are you offering for this... upgrade?"
-                            else:
-                                selected_girl.character "You want me to stop birth control... to get pregnant? That's a significant commitment, Professor. What's your offer for this?"
-                        elif is_student:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? So you can get me pregnant again? That's a huge commitment for our family, Professor. What are you offering for this... upgrade?"
-                            else:
-                                selected_girl.character "You want me to stop birth control... to get pregnant? That's a huge commitment, Professor. What are you offering for this?"
-                        else:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? So you can get me pregnant again? That's a significant financial commitment for our family, Professor. What are you offering for this... upgrade?"
-                            else:
-                                selected_girl.character "You want me to stop birth control... to get pregnant? That's a significant commitment, Professor. What's your offer for this?"
-                        menu:
-                            "Offer 5000 cash for stopping birth control?":
-                                if player.cash >= 5000:
-                                    $ player.cash -= 5000
-                                    $ selected_girl.cash += 5000
-                                    $ selected_girl.birth_control = False
-                                    $ selected_girl.apply_impacts({"baby_desire": (250, 750), "corruption": (500, 1500), "naturism":(250, 750)})
-                                    if is_base_mother:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "5000 to stop taking pills and risk another baby? As an experienced mother, that's reasonable for our growing family. Fine, I'll stop birth control."
-                                        else:
-                                            selected_girl.character "5000 to stop taking pills and risk pregnancy? As an experienced mother, that's reasonable. Fine, I'll stop birth control."
-                                    elif is_student:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "5000? Oh my god, that's so much money! Okay, yeah, I'll stop taking my pills! You can get me pregnant again for that!"
-                                        else:
-                                            selected_girl.character "5000? Oh my god, that's so much money! Okay, yeah, I'll stop taking my pills! You can get me pregnant for that!"
-                                    else:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "5000 to stop taking pills and risk another baby for our family? Deal. I'll stop birth control."
-                                        else:
-                                            selected_girl.character "5000 to stop taking pills and risk pregnancy? Deal. I'll stop birth control."
-                                else:
-                                    $ selected_girl.birth_control = True
-                                    if is_base_mother:
-                                        selected_girl.character "You think that's enough for an experienced woman to carry a child for you? Don't insult me. Come back when you're serious."
-                                    elif is_student:
-                                        selected_girl.character "That's not enough for a baby, is it? You need to be more serious than that."
-                                    else:
-                                        selected_girl.character "You think that's enough for potentially 18 years of commitment? Don't insult me. Come back when you're serious."
-                                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                            "Offer 10,000 to cover all medical expenses, as nature intended.":
-                                player.character "This includes vaginal condoms too."
-                                if player.cash >= 10000:
-                                    $ player.cash -= 10000
-                                    $ selected_girl.cash += 10000
-                                    $ selected_girl.birth_control = False
-                                    $ selected_girl.wants_vaginal_condom = False
-                                    $ selected_girl.player_knows_vaginal_condom = True
-                                    $ selected_girl.apply_impacts({"baby_desire": (500, 1000), "affection": (250, 750), "fear": (-750, -250), "corruption": (750, 1500), "naturism":(250, 750)})
-                                    if is_base_mother:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "Medical coverage for another child? As an experienced mother, I appreciate that security for our family. Fine, you can put another baby in me... but I want this wired to me now."
-                                        else:
-                                            selected_girl.character "Medical coverage for your child? As an experienced mother, I appreciate that security. Fine, you can put a baby in me... but I want this wired to me now."
-                                    elif is_student:
-                                        if selected_girl.kids_with_player > 0:
-                                            selected_girl.character "You'll cover all the doctor stuff for another baby? Really? Okay! That makes me feel so much better about expanding our family! Yeah, let's do it!"
-                                        else:
-                                            selected_girl.character "You'll cover all the doctor stuff for a baby? Really? Okay! That makes me feel so much better about this! Yeah, let's do it!"
-                                else:
-                                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Medical coverage for another child? You can't afford it, and can't count, so piss off."
-                                    else:
-                                        selected_girl.character "Medical coverage? That's security, but come back when you can actually afford it... PRO...FESS....OR..... dumbass."
-                            "Grant her a grade bump of 50 percent?|Only available for students" if is_student:
-                                if selected_girl.grades >= 100:
-                                    selected_girl.character "But... my grades are already perfect! A bump won't do anything... can you offer something else?"
-                                    $ selected_girl.birth_control = True
-                                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                                else:
-                                    # Apply 50 point increase
-                                    player.character "This also includes no vaginal condoms, remember that."
-                                    $ selected_girl.wants_vaginal_condom = False
-                                    $ selected_girl.player_knows_vaginal_condom = True
-                                    $ new_grade = min(100, selected_girl.grades + 50)
-                                    $ selected_girl.grades = new_grade
-                                    $ selected_girl.birth_control = False
-                                    $ selected_girl.apply_impacts({"baby_desire": (450, 750), "affection": (250, 750), "corruption": (250, 750), "discipline": (-750, -250), "naturism":(250, 750)})
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "A 50-point grade bump to have another baby? Fine. My grades will make things so much easier. Deal."
-                                    else:
-                                        selected_girl.character "A 50-point grade bump to have your baby? Oh my god, yes! My grades will be perfect! Deal! I'll stop taking my pills right now!"
-                        
-                            "Leave it be.":
-                                if is_base_mother:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Smart move. An experienced mother with our family isn't cheap, and I'm not getting pregnant again without proper compensation."
-                                    else:
-                                        selected_girl.character "Smart move. An experienced mother isn't cheap, and I'm not getting pregnant without proper compensation."
-                                elif is_student:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Oh... okay. Maybe having another baby right now is... a lot for our family. I understand."
-                                    else:
-                                        selected_girl.character "Oh... okay. Maybe having a baby right now is... a lot. I understand."
-                                else:
-                                    if selected_girl.kids_with_player > 0:
-                                        selected_girl.character "Smart move. I'm not getting pregnant again for our family without proper compensation."
-                                    else:
-                                        selected_girl.character "Smart move. I'm not getting pregnant without proper compensation."
-                                $ selected_girl.apply_impacts({"affection": (-750, -250)})
-                    elif _breed_band == "conditional":
-                        # Open to it, but wants reassurance/commitment first -- BC stays on for now.
-                        $ _breed_reg = vt_explicitness_register(selected_girl)
-                        if _breed_reg in ("crude", "explicit", "direct"):
-                            selected_girl.character "Mmm, maybe... but going bare to make a baby is a big step. Show me you really mean it, and I'm yours."
-                        else:
-                            selected_girl.character "I've thought about it... but I'd need to know we're truly committed before I'd ever stop. Can you give me that?"
-                    else:
-                        # Hesitant or refusing -- birth control stays on (was: low baby desire).
-                        if is_base_mother:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? As an experienced mother with our family to think about, I'm not sure that's wise right now. We need to be responsible."
-                            else:
-                                selected_girl.character "Stop birth control? As an experienced mother, I'm not sure that's wise right now. We need to be responsible."
-                        elif is_student:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? I'm not sure that's a good idea... I'm kind of scared of having another baby right now while I'm still in school."
-                            else:
-                                selected_girl.character "Stop birth control? I'm not sure that's a good idea... I'm kind of scared of getting pregnant right now."
-                        else:
-                            if selected_girl.kids_with_player > 0:
-                                selected_girl.character "Stop birth control? I'm not sure that's wise for our family right now. I need to think about our future."
-                            else:
-                                selected_girl.character "Stop birth control? I'm not sure that's wise. I need to think about my future."
-                        $ selected_girl.apply_impacts({"affection": (-750, -250)})
-
-                # ---- Salvaged persuasion pitches (vt_small_talk_birth_control.rpy retired). Each is a
-                #      themed entry point, askable once she's in this conversation (no relationship/history
-                #      wall); her vt_willingness_band alone decides, consistent with the generic stop/start-BC
-                #      options above. Transactional girls are excluded -- they use the cash beats above.
-                #      She changes BC only on an "eager" band. ----
-                "I think your body would feel better functioning naturally without artificial hormones.|[_bc_hint_natural]" if selected_girl.birth_control and _lean_natural and selected_girl.dominant_approach != "transactional":
-                    player.character "I think your body would feel better functioning naturally without artificial hormones."
-                    $ _bc_band = vt_willingness_band(selected_girl, "natural_cycle")
-                    if _bc_band == "eager":
-                        $ selected_girl.birth_control = False
-                        $ selected_girl.apply_impacts({"naturism": (250, 750), "affection": (250, 750)})
-                        $ _line = vt_say(selected_girl, "bc_pitch_natural_yes", player)
-                    else:
-                        $ _line = vt_say(selected_girl, "bc_pitch_natural_no", player)
-                    selected_girl.character "[_line]"
-
-                # Family pitch -- askable on OR off BC (on: pitch to stop; off: already off, pitch to try).
-                "[_bc_family_pitch]|[_bc_hint_family]" if _lean_family and selected_girl.dominant_approach != "transactional":
-                    player.character "[_bc_family_pitch]"
-                    $ _bc_band = vt_willingness_band(selected_girl, "stop_bc_breed")
-                    if selected_girl.birth_control:
-                        if _bc_band == "eager":
-                            $ selected_girl.birth_control = False
-                            $ selected_girl.apply_impacts({"baby_desire": (750, 1500), "affection": (250, 750)})
-                            $ _line = vt_say(selected_girl, "bc_pitch_family_yes", player)
-                        else:
-                            $ _line = vt_say(selected_girl, "bc_pitch_family_no", player)
-                    else:
-                        if _bc_band == "eager":
-                            $ selected_girl.apply_impacts({"baby_desire": (750, 1500), "affection": (250, 750)})
-                            $ _line = vt_say(selected_girl, "bc_pitch_family_yes_offbc", player)
-                        else:
-                            $ _line = vt_say(selected_girl, "bc_pitch_family_no_offbc", player)
-                    selected_girl.character "[_line]"
-
-                # Thrill pitch -- askable on OR off BC (on: pitch to stop; off: already off, savoring the risk).
-                "Isn't there something exciting about the possibility of pregnancy without birth control?|[_bc_hint_thrill]" if _lean_thrill and selected_girl.dominant_approach != "transactional":
-                    player.character "Isn't there something exciting about the possibility of pregnancy without birth control?"
-                    $ _bc_band = vt_willingness_band(selected_girl, "stop_bc_breed")
-                    if selected_girl.birth_control:
-                        if _bc_band == "eager":
-                            $ selected_girl.birth_control = False
-                            $ selected_girl.apply_impacts({"corruption": (750, 1500), "affection": (250, 750)})
-                            $ _line = vt_say(selected_girl, "bc_pitch_thrill_yes", player)
-                        else:
-                            $ _line = vt_say(selected_girl, "bc_pitch_thrill_no", player)
-                    else:
-                        if _bc_band == "eager":
-                            $ selected_girl.apply_impacts({"corruption": (750, 1500), "affection": (250, 750)})
-                            $ _line = vt_say(selected_girl, "bc_pitch_thrill_yes_offbc", player)
-                        else:
-                            $ _line = vt_say(selected_girl, "bc_pitch_thrill_no_offbc", player)
-                    selected_girl.character "[_line]"
-
-                "I'm concerned about your health and responsible reproductive choices.|[_bc_hint_health]" if not selected_girl.birth_control and _lean_health and selected_girl.dominant_approach != "transactional":
-                    player.character "I'm concerned about your health and responsible reproductive choices."
-                    $ _bc_band = vt_willingness_band(selected_girl, "start_bc")
-                    if _bc_band == "eager":
-                        $ selected_girl.birth_control = True
-                        $ selected_girl.apply_impacts({"discipline": (250, 750)})
-                        $ _line = vt_say(selected_girl, "bc_pitch_health_yes", player)
-                    else:
-                        $ _line = vt_say(selected_girl, "bc_pitch_health_no", player)
-                    selected_girl.character "[_line]"
-
-                "Never mind.":
-                    selected_girl.character "Oh... okay. Well, let me know if you want to talk about anything else."
-                    $ selected_girl.apply_impacts({"affection": (250, 750)})
-                    return
-                
+        "Can we talk about your birth control?":
+            jump vt_preg_personal_bc
 
         # Condoms and (when she's pregnant) pregnancy questions live behind sub-menus so the
         # top level stays short; each still asks one beat per visit.
@@ -1221,8 +799,402 @@ label vt_preg_main_menu:
         "Go back...":
             return "vt_preg_smalltalk_reenter"
 
-    # Reached by birth control (a protection topic) and the non-pregnant general beat; the reaction
-    # guards on pregnant+known so it only speaks after a pregnant girl's protection question.
+    call vt_preg_protection_reaction
+    jump vt_preg_wrapup
+
+label vt_bc_after_invite(vt_bc_partners):
+    # Called only after invitation acceptance. Only the chosen participant is
+    # discussed, and no invitation access survives this call.
+    $ renpy.dynamic("_vt_bc_partner")
+    $ _vt_bc_partner = renpy.display_menu([
+        (("Talk about birth control" if len(vt_bc_partners) == 1
+          else f"Talk to {partner.first_name} about birth control"), partner)
+        for partner in vt_bc_partners] + [("Continue", "continue")])
+    if _vt_bc_partner in vt_bc_partners:
+        $ renpy.dynamic(selected_girl=_vt_bc_partner)
+        call vt_small_talk_pregnancy(vt_bc_from_invite=True) from _call_vt_bc_invite_topics
+    return
+
+label vt_preg_personal_bc:
+    if not vt_bc_personal_available(selected_girl, vt_bc_from_invite):
+        return
+    player.character "Can we talk about your birth control?"
+    if selected_girl.pregnant and selected_girl.knows_pregnant:
+        if vt_bc_from_invite and not selected_girl.player_knows_pregnant:
+            selected_girl.character "I'd rather talk about that another time. Can we keep things simple for now?"
+        else:
+            $ _line = vt_say(selected_girl, "bc_already_pregnant", player)
+            selected_girl.character "[_line]"
+        if vt_bc_from_invite:
+            return
+        jump vt_preg_wrapup
+
+    python:
+        _bc_reveal_missing = (not selected_girl.bc_status_known and not selected_girl.birth_control
+                              and getattr(selected_girl, "vt_bc_missing_pending_reveal", False))
+        # Keep her believed status for the menu. The pregnancy check owns actual protection.
+        _bc_believed = selected_girl.birth_control or getattr(selected_girl, "vt_bc_placebo_active", False)
+
+    if _bc_reveal_missing:
+        # First ask after a successful confiscation -- she doesn't know it was taken, so her
+        # explanation is one of 3 stat-gated theories, not an assumed theft (see
+        # vt_bc_missing_theory, 07_vt_bc_sabotage.rpy), followed by a separate line on whether
+        # she's already decided to replace it.
+        $ _bc_theory_line = vt_voice(selected_girl, VT_BC_MISSING_THEORY_LINES[vt_bc_missing_theory(selected_girl)], "", player)
+        selected_girl.character "[_bc_theory_line]"
+        $ _bc_replacing = getattr(selected_girl, "vt_bc_replace_day", None) is not None
+        $ _bc_decision_line = vt_voice(selected_girl, VT_BC_MISSING_DECISION_LINES["replacing" if _bc_replacing else "undecided"], "", player)
+        selected_girl.character "[_bc_decision_line]"
+    else:
+        $ _line = vt_say(selected_girl, "bc_methods", player)
+        selected_girl.character "[_line]"
+
+    # Only the personal conversation discloses her status to the player.
+    $ selected_girl.bc_status_known = True
+    $ selected_girl.vt_bc_missing_pending_reveal = False
+
+    # The salvaged family pitch (below) uses a caption aware of whether she's a mother and how many
+    # children she has -- a sibling vs another sibling -- so it reads right for base mothers and others.
+    # Also compute each pitch's "leaning" bool ONCE (reused by both the menu gate and its hint, so
+    # they can't drift) and the dynamic greyed-tooltip text that reports the actual blocking reason.
+    python:
+        if is_base_mother and total_kids == 1:
+            _bc_family_pitch = "Do you think your daughter would like a sibling?"
+        elif total_kids >= 2:
+            _bc_family_pitch = "Do you think your children would like another sibling?"
+        elif total_kids == 1:
+            _bc_family_pitch = "Do you think your child would like a sibling?"
+        else:
+            _bc_family_pitch = "Have you ever thought about starting a family together?"
+
+        _lean_natural = selected_girl.naturism > 50
+        _lean_family = (vt_baby_desire_band(selected_girl) in ("thinking", "obsessed", "fixation", "obsession")) or is_base_mother
+        _lean_thrill = vt_explicitness_register(selected_girl) in ("direct", "explicit", "crude")
+        _lean_health = selected_girl.discipline > 50
+        _bc_hint_natural = vt_bc_pitch_hint(selected_girl, _lean_natural, bc_need=True)
+        _bc_hint_family  = vt_bc_pitch_hint(selected_girl, _lean_family)
+        _bc_hint_thrill  = vt_bc_pitch_hint(selected_girl, _lean_thrill)
+        _bc_hint_health  = vt_bc_pitch_hint(selected_girl, _lean_health, bc_need=False)
+
+    menu:
+        "Have you considered starting birth control?|Only if she's not already on birth control" if not _bc_believed:
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "start_bc", player)
+            $ _bc_band = vt_willingness_band(selected_girl, "start_bc", player)
+            if _bc_band not in ("conditional", "eager") or selected_girl.dominant_approach != "transactional":
+                $ _line = vt_bc_reply(selected_girl, "start_bc", _bc_band, player, details=_bc_decision)
+                if _bc_band == "eager":
+                    $ selected_girl.birth_control = True
+                    $ selected_girl.apply_impacts({"discipline": (250, 750)})
+                selected_girl.character "[_line]"
+            elif selected_girl.dominant_approach == "transactional":
+                if is_base_mother:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Starting birth control? That costs money, Professor. As an experienced mother with our growing family, what are you offering to cover the expenses and compensate me for the inconvenience?"
+                    else:
+                        selected_girl.character "Starting birth control? That costs money, Professor. As an experienced mother, what are you offering to cover the expenses and compensate me for the inconvenience?"
+                elif is_student:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Starting birth control? That costs money, Professor. Since we already have a baby, what are you offering to cover the expenses and compensate me?"
+                    else:
+                        selected_girl.character "Starting birth control? That costs money, Professor. What are you offering to cover the expenses and compensate me for the inconvenience?"
+                else:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Starting birth control? That costs money, Professor. Since we already have a baby, what are you offering to cover the expenses and compensate me?"
+                    else:
+                        selected_girl.character "Starting birth control? That costs money, Professor. What are you offering to cover the expenses and compensate me for the inconvenience?"
+                menu:
+                    "Offer 300 cash for birth control expenses?":
+                        if player.cash >= 300:
+                            $ player.cash -= 300
+                            $ selected_girl.cash += 300
+                            $ selected_girl.birth_control = True
+                            $ selected_girl.apply_impacts({"discipline": (250, 750), "corruption": (450, 750)})
+                            if is_base_mother:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "300 covers the prescription and compensates me for being a responsible mother to our family. Fine, I'll start birth control."
+                                else:
+                                    selected_girl.character "300 covers the prescription and compensates me for being a responsible mother. Fine, I'll start birth control."
+                            elif is_student:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "300 for birth control? Oh my god, that's so much! Okay, yeah, I'll start taking them for our baby's sake. Thank you, Professor!"
+                                else:
+                                    selected_girl.character "300 for birth control? Oh my god, that's so much! Okay, yeah, I'll start taking them. Thank you, Professor!"
+                            else:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "300 covers the pills and my time. Fine, I'll start birth control for our family."
+                                else:
+                                    selected_girl.character "300 covers the pills and my time. Fine, I'll start birth control."
+                        else:
+                            $ selected_girl.birth_control = False
+                            if is_base_mother:
+                                selected_girl.character "Don't waste an experienced mother's time. Come back when you can afford my reproductive health."
+                            elif is_student:
+                                selected_girl.character "Oh... you don't have enough? That's okay... I'll figure something else out, I guess."
+                            else:
+                                selected_girl.character "Don't waste my time. Come back when you can afford my reproductive health."
+                            $ selected_girl.apply_impacts({"affection": (-750, -250)})
+
+                    # Only students get grade option
+                    "Grant her a grade bump of up to 15 points?|Only available for currently enrolled students" if vt_grade_offer_target(selected_girl) is not None:
+                        if vt_grade_offer_target(selected_girl) is None:
+                            selected_girl.character "That grade offer does not apply to me. Can you offer something else?"
+                        elif selected_girl.grades >= 100:
+                            selected_girl.character "But... my grades are already at maximum! A bump won't help much... can you offer something else?"
+                            $ selected_girl.birth_control = False
+                            $ selected_girl.apply_impacts({"affection": (-750, -250)})
+                        else:
+                            # Apply 15 point increase (not 15% of current grade)
+                            $ new_grade = min(100, selected_girl.grades + 15)
+                            $ selected_girl.grades = new_grade
+                            $ selected_girl.birth_control = True
+                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "affection": (250, 750), "corruption": (750, 1500), "discipline": (-750, -250)})
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Fine. Guess you don't want to worry about having to support another child."
+                            else:
+                                selected_girl.character "A grade bump? Really? Oh my god, yes! My grades will be so easy! Deal! Start popping em now!"
+
+                    "Leave it be.":
+                        if is_base_mother:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to help support another child in our family."
+                            else:
+                                selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to help support another child."
+                        elif is_student:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Oh... okay. Well, if I get pregnant again, that's... your responsibility too, right? Just so we're clear?"
+                            else:
+                                selected_girl.character "Oh... okay. Well, if I get pregnant, that's... your responsibility too, right? Just so we're clear?"
+                        else:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to pay child support for our next baby."
+                            else:
+                                selected_girl.character "Fine. But don't come crying to me when I get pregnant and you have to pay child support."
+                        $ selected_girl.apply_impacts({"affection": (-750, -250)})
+
+        "Would you consider stopping birth control?|Only if she's on birth control" if _bc_believed:
+            # Askable whenever she's on birth control and you're in this conversation -- no
+            # relationship/history wall on the ASK, matching the persuasion pitches (the mod is
+            # moving away from assuming these questions are player-directed; her corruption drives
+            # it). Her WILLINGNESS band alone decides how readily; dominant_approach is VOICE/framing
+            # only and no longer flips birth_control on its own (that no-floor flip was the old bug).
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "stop_bc_breed", player)
+            $ _breed_band = vt_willingness_band(selected_girl, "stop_bc_breed")
+            $ _breed_voice = selected_girl.dominant_approach
+            if _breed_band == "eager" and _breed_voice != "transactional":
+                $ selected_girl.birth_control = False
+                $ selected_girl.vt_bc_placebo_active = False
+                $ selected_girl.apply_impacts({"baby_desire": (1000, 1500)})
+                $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _breed_band, player, details=_bc_decision)
+                selected_girl.character "[_line]"
+            elif _breed_voice == "transactional" and _breed_band in ("conditional", "eager"):
+                # A transactional girl monetizes even a willing yes -- price beat (band-gated).
+                if is_base_mother:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Stop birth control? So you can get me pregnant again? That's a significant financial commitment for our growing family, Professor. What are you offering for this... upgrade?"
+                    else:
+                        selected_girl.character "You want me to stop birth control... to get pregnant? That's a significant commitment, Professor. What's your offer for this?"
+                elif is_student:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Stop birth control? So you can get me pregnant again? That's a huge commitment for our family, Professor. What are you offering for this... upgrade?"
+                    else:
+                        selected_girl.character "You want me to stop birth control... to get pregnant? That's a huge commitment, Professor. What are you offering for this?"
+                else:
+                    if selected_girl.kids_with_player > 0:
+                        selected_girl.character "Stop birth control? So you can get me pregnant again? That's a significant financial commitment for our family, Professor. What are you offering for this... upgrade?"
+                    else:
+                        selected_girl.character "You want me to stop birth control... to get pregnant? That's a significant commitment, Professor. What's your offer for this?"
+                menu:
+                    "Offer 5000 cash for stopping birth control?":
+                        if player.cash >= 5000:
+                            $ player.cash -= 5000
+                            $ selected_girl.cash += 5000
+                            $ selected_girl.birth_control = False
+                            $ selected_girl.vt_bc_placebo_active = False
+                            $ selected_girl.apply_impacts({"baby_desire": (250, 750), "corruption": (500, 1500), "naturism":(250, 750)})
+                            if is_base_mother:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "5000 to stop taking pills and risk another baby? As an experienced mother, that's reasonable for our growing family. Fine, I'll stop birth control."
+                                else:
+                                    selected_girl.character "5000 to stop taking pills and risk pregnancy? As an experienced mother, that's reasonable. Fine, I'll stop birth control."
+                            elif is_student:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "5000? Oh my god, that's so much money! Okay, yeah, I'll stop taking my pills! You can get me pregnant again for that!"
+                                else:
+                                    selected_girl.character "5000? Oh my god, that's so much money! Okay, yeah, I'll stop taking my pills! You can get me pregnant for that!"
+                            else:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "5000 to stop taking pills and risk another baby for our family? Deal. I'll stop birth control."
+                                else:
+                                    selected_girl.character "5000 to stop taking pills and risk pregnancy? Deal. I'll stop birth control."
+                        else:
+                            # Deal fell through -- nothing actually changed, so don't force real
+                            # BC back on if she's under an active, undiscovered placebo swap
+                            # (this write predates that state existing and assumed ground truth
+                            # was already True, which is no longer guaranteed here).
+                            if not getattr(selected_girl, "vt_bc_placebo_active", False):
+                                $ selected_girl.birth_control = True
+                            if is_base_mother:
+                                selected_girl.character "You think that's enough for an experienced woman to carry a child for you? Don't insult me. Come back when you're serious."
+                            elif is_student:
+                                selected_girl.character "That's not enough for a baby, is it? You need to be more serious than that."
+                            else:
+                                selected_girl.character "You think that's enough for potentially 18 years of commitment? Don't insult me. Come back when you're serious."
+                            $ selected_girl.apply_impacts({"affection": (-750, -250)})
+                    "Offer 10,000 to cover all medical expenses, as nature intended.":
+                        player.character "This includes vaginal condoms too."
+                        if player.cash >= 10000:
+                            $ player.cash -= 10000
+                            $ selected_girl.cash += 10000
+                            $ selected_girl.birth_control = False
+                            $ selected_girl.vt_bc_placebo_active = False
+                            $ selected_girl.wants_vaginal_condom = False
+                            $ selected_girl.player_knows_vaginal_condom = True
+                            $ selected_girl.apply_impacts({"baby_desire": (500, 1000), "affection": (250, 750), "fear": (-750, -250), "corruption": (750, 1500), "naturism":(250, 750)})
+                            if is_base_mother:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "Medical coverage for another child? As an experienced mother, I appreciate that security for our family. Fine, you can put another baby in me... but I want this wired to me now."
+                                else:
+                                    selected_girl.character "Medical coverage for your child? As an experienced mother, I appreciate that security. Fine, you can put a baby in me... but I want this wired to me now."
+                            elif is_student:
+                                if selected_girl.kids_with_player > 0:
+                                    selected_girl.character "You'll cover all the doctor stuff for another baby? Really? Okay! That makes me feel so much better about expanding our family! Yeah, let's do it!"
+                                else:
+                                    selected_girl.character "You'll cover all the doctor stuff for a baby? Really? Okay! That makes me feel so much better about this! Yeah, let's do it!"
+                        else:
+                            $ selected_girl.apply_impacts({"affection": (-750, -250)})
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Medical coverage for another child? You can't afford it, and can't count, so piss off."
+                            else:
+                                selected_girl.character "Medical coverage? That's security, but come back when you can actually afford it... PRO...FESS....OR..... dumbass."
+                    "Grant her a grade bump of up to 50 points?|Only available for currently enrolled students" if vt_grade_offer_target(selected_girl) is not None:
+                        if vt_grade_offer_target(selected_girl) is None:
+                            selected_girl.character "That grade offer does not apply to me. Can you offer something else?"
+                        elif selected_girl.grades >= 100:
+                            selected_girl.character "But... my grades are already perfect! A bump won't do anything... can you offer something else?"
+                            # Deal fell through -- see the identical guard on the 5000-cash offer
+                            # above; don't force real BC back on over an active placebo swap.
+                            if not getattr(selected_girl, "vt_bc_placebo_active", False):
+                                $ selected_girl.birth_control = True
+                            $ selected_girl.apply_impacts({"affection": (-750, -250)})
+                        else:
+                            # Apply 50 point increase
+                            player.character "This also includes no vaginal condoms, remember that."
+                            $ selected_girl.wants_vaginal_condom = False
+                            $ selected_girl.player_knows_vaginal_condom = True
+                            $ new_grade = min(100, selected_girl.grades + 50)
+                            $ selected_girl.grades = new_grade
+                            $ selected_girl.birth_control = False
+                            $ selected_girl.vt_bc_placebo_active = False
+                            $ selected_girl.apply_impacts({"baby_desire": (450, 750), "affection": (250, 750), "corruption": (250, 750), "discipline": (-750, -250), "naturism":(250, 750)})
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "A 50-point grade bump to have another baby? Fine. My grades will make things so much easier. Deal."
+                            else:
+                                selected_girl.character "A 50-point grade bump to have your baby? Oh my god, yes! My grades will be perfect! Deal! I'll stop taking my pills right now!"
+
+                    "Leave it be.":
+                        if is_base_mother:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Smart move. An experienced mother with our family isn't cheap, and I'm not getting pregnant again without proper compensation."
+                            else:
+                                selected_girl.character "Smart move. An experienced mother isn't cheap, and I'm not getting pregnant without proper compensation."
+                        elif is_student:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Oh... okay. Maybe having another baby right now is... a lot for our family. I understand."
+                            else:
+                                selected_girl.character "Oh... okay. Maybe having a baby right now is... a lot. I understand."
+                        else:
+                            if selected_girl.kids_with_player > 0:
+                                selected_girl.character "Smart move. I'm not getting pregnant again for our family without proper compensation."
+                            else:
+                                selected_girl.character "Smart move. I'm not getting pregnant without proper compensation."
+                        $ selected_girl.apply_impacts({"affection": (-750, -250)})
+            else:
+                # A conditional answer asks for discussion; it does not promise a hidden task.
+                $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _breed_band, player, details=_bc_decision)
+                selected_girl.character "[_line]"
+                if _breed_band in ("refuse", "hesitant"):
+                    $ selected_girl.apply_impacts({"affection": (-750, -250)})
+
+        # ---- Salvaged persuasion pitches (vt_small_talk_birth_control.rpy retired). Each is a
+        #      themed entry point, askable once she's in this conversation (no relationship/history
+        #      wall); her vt_willingness_band alone decides, consistent with the generic stop/start-BC
+        #      options above. Transactional girls are excluded -- they use the cash beats above.
+        #      She changes BC only on an "eager" band. ----
+        "I think your body would feel better functioning naturally without artificial hormones.|[_bc_hint_natural]" if _bc_believed and _lean_natural and selected_girl.dominant_approach != "transactional":
+            player.character "I think your body would feel better functioning naturally without artificial hormones."
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "natural_cycle", player)
+            $ _bc_band = vt_willingness_band(selected_girl, "natural_cycle")
+            if _bc_band == "eager":
+                $ selected_girl.birth_control = False
+                $ selected_girl.vt_bc_placebo_active = False
+                $ selected_girl.apply_impacts({"naturism": (250, 750), "affection": (250, 750)})
+                $ _line = vt_bc_reply(selected_girl, "natural_cycle", _bc_band, player, pitch="natural", on_bc=_bc_believed, details=_bc_decision)
+            else:
+                $ _line = vt_bc_reply(selected_girl, "natural_cycle", _bc_band, player, pitch="natural", on_bc=_bc_believed, details=_bc_decision)
+            selected_girl.character "[_line]"
+
+        # Family pitch -- askable on OR off BC (on: pitch to stop; off: already off, pitch to try).
+        "[_bc_family_pitch]|[_bc_hint_family]" if _lean_family and selected_girl.dominant_approach != "transactional":
+            player.character "[_bc_family_pitch]"
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "stop_bc_breed", player)
+            $ _bc_band = vt_willingness_band(selected_girl, "stop_bc_breed")
+            if _bc_believed:
+                if _bc_band == "eager":
+                    $ selected_girl.birth_control = False
+                    $ selected_girl.vt_bc_placebo_active = False
+                    $ selected_girl.apply_impacts({"baby_desire": (750, 1500), "affection": (250, 750)})
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="family", on_bc=_bc_believed, details=_bc_decision)
+                else:
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="family", on_bc=_bc_believed, details=_bc_decision)
+            else:
+                if _bc_band == "eager":
+                    $ selected_girl.apply_impacts({"baby_desire": (750, 1500), "affection": (250, 750)})
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="family", on_bc=_bc_believed, details=_bc_decision)
+                else:
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="family", on_bc=_bc_believed, details=_bc_decision)
+            selected_girl.character "[_line]"
+
+        # Thrill pitch -- askable on OR off BC (on: pitch to stop; off: already off, savoring the risk).
+        "Isn't there something exciting about the possibility of pregnancy without birth control?|[_bc_hint_thrill]" if _lean_thrill and selected_girl.dominant_approach != "transactional":
+            player.character "Isn't there something exciting about the possibility of pregnancy without birth control?"
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "stop_bc_breed", player)
+            $ _bc_band = vt_willingness_band(selected_girl, "stop_bc_breed")
+            if _bc_believed:
+                if _bc_band == "eager":
+                    $ selected_girl.birth_control = False
+                    $ selected_girl.vt_bc_placebo_active = False
+                    $ selected_girl.apply_impacts({"corruption": (750, 1500), "affection": (250, 750)})
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="thrill", on_bc=_bc_believed, details=_bc_decision)
+                else:
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="thrill", on_bc=_bc_believed, details=_bc_decision)
+            else:
+                if _bc_band == "eager":
+                    $ selected_girl.apply_impacts({"corruption": (750, 1500), "affection": (250, 750)})
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="thrill", on_bc=_bc_believed, details=_bc_decision)
+                else:
+                    $ _line = vt_bc_reply(selected_girl, "stop_bc_breed", _bc_band, player, pitch="thrill", on_bc=_bc_believed, details=_bc_decision)
+            selected_girl.character "[_line]"
+
+        "I'm concerned about your health and responsible reproductive choices.|[_bc_hint_health]" if not _bc_believed and _lean_health and selected_girl.dominant_approach != "transactional":
+            player.character "I'm concerned about your health and responsible reproductive choices."
+            $ _bc_decision = vt_bc_decision_details(selected_girl, "start_bc", player)
+            $ _bc_band = vt_willingness_band(selected_girl, "start_bc")
+            if _bc_band == "eager":
+                $ selected_girl.birth_control = True
+                $ selected_girl.apply_impacts({"discipline": (250, 750)})
+                $ _line = vt_bc_reply(selected_girl, "start_bc", _bc_band, player, pitch="health", on_bc=_bc_believed, details=_bc_decision)
+            else:
+                $ _line = vt_bc_reply(selected_girl, "start_bc", _bc_band, player, pitch="health", on_bc=_bc_believed, details=_bc_decision)
+            selected_girl.character "[_line]"
+
+        "Never mind.":
+            selected_girl.character "Oh... okay. Well, let me know if you want to talk about anything else."
+            $ selected_girl.apply_impacts({"affection": (250, 750)})
+            return
+
+
+    if vt_bc_from_invite:
+        return
     call vt_preg_protection_reaction
     jump vt_preg_wrapup
 
@@ -1971,7 +1943,7 @@ label vt_preg_condom_submenu:
                         else:
                             # She already prefers bare -> the next escalation: finish inside instead
                             # of pulling out. Shares vt_accepts_vaginal_creampie with the in-sex coercion.
-                            $ _fi_band = vt_willingness_band(selected_girl, "stop_bc_breed", player)
+                            $ _fi_band = vt_willingness_band(selected_girl, "vaginal_finish", player)
                             if _fi_band == "eager":
                                 $ vt_set_accepts_creampie(selected_girl, True)
                                 $ selected_girl.apply_impacts({"corruption": (250, 750), "baby_desire": (250, 500)})
@@ -3742,7 +3714,7 @@ label vt_small_talk_pregnancy_followup:
                     if selected_girl.wants_vaginal_condom:
                         call vt_preg_fuvag_gobare_pitch
                     else:
-                        $ _fi_band = vt_willingness_band(selected_girl, "stop_bc_breed", player)
+                        $ _fi_band = vt_willingness_band(selected_girl, "vaginal_finish", player)
                         if _fi_band == "eager":
                             $ vt_set_accepts_creampie(selected_girl, True)
                             $ selected_girl.apply_impacts({"corruption": (250, 750), "baby_desire": (250, 500)})

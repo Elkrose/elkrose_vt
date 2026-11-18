@@ -185,13 +185,10 @@ init python:
         "demure":   ["Thank you. I am grateful for your understanding."],
     }
 
-# Set True by vt_dock_gift_gate whenever apply_planb_pill/apply_emergency_pill was actually
-# called, so vt_give_gift (01_vt_mod_items.rpy) knows whether to spend the pill "ammo" -- a
-# refused pill (blanket or persuaded-no) was never actually taken, so it isn't spent.
+# Records whether the gate applied a dose. Keep the flag for existing saves in this scene.
 default vt_dock_gift_applied = False
 
-# Called via renpy.call from vt_give_gift's is_vt_pill branch (a $-python statement running
-# inside the active `label give_girl_gift`, same technique 03_vt_pullout_coercion.rpy uses).
+# Gift.give_gift transfers control here from the medicine menu.
 label vt_dock_gift_gate(girl, pill_id):
     $ vt_dock_gift_applied = False
 
@@ -207,7 +204,7 @@ label vt_dock_gift_gate(girl, pill_id):
         return
 
     python:
-        _dg_ask = "start_bc" if pill_id == "planb_pill" else "keep_pregnancy"
+        _dg_ask = "take_safedock" if pill_id == "planb_pill" else "keep_pregnancy"
         _dg_reachable = vt_ask_reachable(girl, _dg_ask, player)
 
     if not _dg_reachable:
@@ -239,11 +236,14 @@ label vt_dock_gift_gate(girl, pill_id):
     $ _dg_band = vt_willingness_band(girl, _dg_ask, player)
 
     if _dg_band in ("eager", "conditional"):
-        # She's willing -- straightforward accept, no menu (mirrors start_bc's small-talk pitch:
-        # no push/respect friction when she already wants this).
+        # Conditional and eager answers both accept the medicine without a follow-up menu.
         if pill_id == "planb_pill":
-            $ girl.apply_planb_pill()
-            $ vt_dock_gift_applied = True
+            if player.get_item_quantity(pill_id) <= 0:
+                return
+            python:
+                girl.apply_planb_pill()
+                vt_spend_pill_ammo(player, pill_id)
+                vt_dock_gift_applied = True
             $ _dg_line = vt_voice(girl, VT_SAFEDOCK_ACCEPT, "...")
         else:
             $ girl.apply_emergency_pill()

@@ -252,6 +252,7 @@ label vt_coffee_booth_invite_bathroom:
     if girl_acceptance >= 40:
         $ _vt_coffee_line = vt_booth_voice(selected_girl, VT_COFFEE_BOOTH_BATHROOM_YES)
         selected_girl.character "[_vt_coffee_line]"
+        call vt_bc_after_invite([selected_girl]) from _call_vt_coffee_bc_invite
         $ remove_girl_id_from_location(selected_girl.id, "girls_in_coffee_shop")
         $ se_forced_sex = False
         $ se_participants = [selected_girl]

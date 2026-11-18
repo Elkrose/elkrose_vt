@@ -141,7 +141,7 @@ init -1 python:
             "wants_vaginal_condom": bool(getattr(girl, "wants_vaginal_condom", False)),
             "wants_anal_condom":    bool(getattr(girl, "wants_anal_condom", False)),
             "wants_oral_condom":    bool(getattr(girl, "wants_oral_condom", False)),
-            "birth_control":        bool(getattr(girl, "birth_control", False)),
+            "birth_control":        bool(getattr(girl, "birth_control", False) or getattr(girl, "vt_bc_placebo_active", False)),
             "virgin":               (getattr(girl, "vaginal_sex_count", 0) or 0) <= 0,
             # Anal virginity, tracked separately: first anal is its own trepidation/reluctance beat
             # ("gross and weird at first"). Composed from the patcher's anal_sex_count, parallel to virgin.
