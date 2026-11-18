@@ -250,6 +250,7 @@ label vt_bar_booth_invite_venue(destination, closing=False):
         else:
             $ _vt_venue_reply = vt_booth_voice(selected_girl, VT_BAR_BOOTH_VENUE_YES[destination])
         selected_girl.character "[_vt_venue_reply]"
+        call vt_bc_after_invite([selected_girl]) from _call_vt_bar_bc_invite
         $ remove_girl_id_from_location(selected_girl.id, "girls_at_bar")
         $ se_forced_sex = selected_girl.has_trait("drunk") or selected_girl.has_trait("tipsy")
         $ se_participants = [selected_girl]

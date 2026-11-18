@@ -133,7 +133,7 @@ label vt_academy_bathroom_sex:
         approach_match_bonus = 0
         if chosen_approach == selected_girl.dominant_approach:
             # The stronger her personality, the bigger the bonus for matching it
-            approach_match_bonus = int(selected_girl.approach_strength * 5) # e.g., 8.0 -> 40 point bonus
+            approach_match_bonus = int(selected_girl.approach_strength / 10 * 5) # e.g., strength 80 -> 40 point bonus
 
         # Penalty if the chosen approach clashes with the girl's dominant approach
         # This is a simple map of direct opposites
@@ -146,7 +146,7 @@ label vt_academy_bathroom_sex:
         approach_clash_penalty = 0
         if approach_clash_map.get(chosen_approach) == selected_girl.dominant_approach:
             # The stronger her clashing personality, the bigger the penalty
-            approach_clash_penalty = -int(selected_girl.approach_strength * 3) # e.g., 8.0 -> -24 point penalty
+            approach_clash_penalty = -int(selected_girl.approach_strength / 10 * 3) # e.g., strength 80 -> -24 point penalty
 
         # Final calculated acceptance
         final_acceptance = base_acceptance + approach_match_bonus + approach_clash_penalty
@@ -294,9 +294,9 @@ label vt_academy_bathroom_sex:
                 # Calculate the final acceptance score for the second girl
                 python:
                     base_acceptance_2 = girl.get_acceptance_by_name("sex_interaction")
-                    approach_match_bonus_2 = int(girl.approach_strength * 5) if chosen_approach_2 == girl.dominant_approach else 0
+                    approach_match_bonus_2 = int(girl.approach_strength / 10 * 5) if chosen_approach_2 == girl.dominant_approach else 0
                     approach_clash_map_2 = {"dominate": "compassionate", "compassionate": "dominate", "sexualized": "transactional", "transactional": "sexualized"}
-                    approach_clash_penalty_2 = -int(girl.approach_strength * 3) if approach_clash_map_2.get(chosen_approach_2) == girl.dominant_approach else 0
+                    approach_clash_penalty_2 = -int(girl.approach_strength / 10 * 3) if approach_clash_map_2.get(chosen_approach_2) == girl.dominant_approach else 0
                     final_acceptance_2 = base_acceptance_2 + approach_match_bonus_2 + approach_clash_penalty_2
 
                 # *** DIALOGUE REACTIONS FOR SECOND GIRL BASED ON FINAL_ACCEPTANCE ***
@@ -595,17 +595,9 @@ label vt_academy_bathroom_sex:
                                 girl.character "That's what I thought. Pathetic."
                                 $ girl.apply_impacts({"affection": (-750, -250)})
 
-            # If we got here, we proceed to the sex scene
-            $ time_manager.skip_time(minutes=20)
-            scene black with dissolve
-            scene bg_stall_bathroom with dissolve
-            return "start_sex_interaction"
+            jump vt_academy_bathroom_depart
         else:
-            # If we got here, we proceed to the sex scene
-            $ time_manager.skip_time(minutes=20)
-            scene black with dissolve
-            scene bg_stall_bathroom with dissolve
-            return "start_sex_interaction"
+            jump vt_academy_bathroom_depart
     elif final_acceptance >= 20:
         # --- SOFT REJECT FOR FIRST GIRL ---
         $ actions_already_done[selected_girl.id].append("block_talking_bathroom")
@@ -689,10 +681,7 @@ label vt_academy_bathroom_sex:
                         $ se_use_generic_ending = True
                         $ se_remove_girls_from_location = True
                         $ se_additional_webm_sub_tags = ["bathroom"]
-                        $ time_manager.skip_time(minutes=20)
-                        scene black with dissolve
-                        scene bg_stall_bathroom with dissolve
-                        return "start_sex_interaction"
+                        jump vt_academy_bathroom_depart
                     else:
                         selected_girl.character "You don't have it on you? Don't waste my time then."
                         $ selected_girl.apply_impacts({"affection": (-750, -250)})
@@ -723,10 +712,7 @@ label vt_academy_bathroom_sex:
                             $ se_use_generic_ending = True
                             $ se_remove_girls_from_location = True
                             $ se_additional_webm_sub_tags = ["bathroom"]
-                            $ time_manager.skip_time(minutes=20)
-                            scene black with dissolve
-                            scene bg_stall_bathroom with dissolve
-                            return "start_sex_interaction"
+                            jump vt_academy_bathroom_depart
                     else:
                         selected_girl.character "You can't alter my grades. Don't lie to me. Cash or get lost."
                         $ selected_girl.apply_impacts({"affection": (-750, -250)})
@@ -821,3 +807,10 @@ label vt_academy_bathroom_sex:
         return "show_academy_bathroom"
 
     return
+
+label vt_academy_bathroom_depart:
+    call vt_bc_after_invite(se_participants) from _call_vt_academy_bathroom_bc
+    $ time_manager.skip_time(minutes=20)
+    scene black with dissolve
+    scene bg_stall_bathroom with dissolve
+    return "start_sex_interaction"

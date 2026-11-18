@@ -1,5 +1,22 @@
 Virginal Tracker Mod
 
+1.1.9
+
+- Restored SafeDOCK's original acceptance scoring, separate from requests to
+  start ongoing birth control.
+- Fixed SafeDOCK inventory. An accepted dose uses one pill. Refusing it leaves
+  the pill count unchanged.
+- Corrected the approach bonus and penalty for both academy bathroom invitations.
+- Baby Desire growth after vaginal finishes now uses different chances for agreed
+  unprotected finishes, unnoticed condom breaks and intact protection. Forced
+  finishes and failed withdrawal do not grant Baby Desire XP. Removed the shared
+  awareness bonus that could apply even when protection held.
+- General birth-control talk opens at 25 Affection and keeps her status private.
+  Personal discussion opens after shared intimate history or an accepted
+  intimate invitation in the academy bathroom, bar booth or coffee-shop booth.
+- Requests to start or stop birth control now weigh Baby Desire and Affection
+  most heavily, with Fear, Discipline and player stats shaping the response.
+
 1.1.8
 
 - Added mother/daughter pregnancy small talk under Pregnancy & Protection (#22).
